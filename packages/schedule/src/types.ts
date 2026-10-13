@@ -21,3 +21,27 @@ export interface Channel {
   breaks?: boolean;
   items: ChannelItem[];
 }
+
+/** Where a channel's content comes from. A channel plays its sources' items in order (or shuffled). */
+export type SourceRef =
+  | { kind: 'plex-show'; ratingKey: string; title: string }
+  | { kind: 'plex-collection'; ratingKey: string; title: string }
+  | { kind: 'plex-library'; sectionKey: string; type: 'movie' | 'show'; title: string }
+  | { kind: 'plex-item'; ratingKey: string; title: string }
+  | { kind: 'plex-sample'; count: number; title: string }
+  | { kind: 'ia-search'; query: string; items: number; filesPerItem: number; title: string }
+  | { kind: 'ia-item'; identifier: string; title: string };
+
+/** A channel as the user defines it; the server resolves its sources into items. */
+export interface ChannelConfig {
+  id: string;
+  number: number;
+  name: string;
+  /** loop = in order. */
+  mode: ChannelMode;
+  breaks: boolean;
+  anchorMs: number;
+  sources: SourceRef[];
+  /** Item ids the user removed from what the sources produced. */
+  excluded: string[];
+}

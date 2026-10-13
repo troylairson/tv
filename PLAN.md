@@ -402,6 +402,21 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   now line; breaks fold into the preceding show's block; Settings lives in
   the guide header (`GET /api/guide`).*
 
+**Channel management** — ✅ *done (pulled forward, Plex first)*
+- Channels are user-owned config (`channels-config.json`) with ordered content
+  sources: Plex show / collection / library / item, IA search (refreshed
+  nightly) / IA item. The server resolves sources to items in the background
+  (cached in `channels.json`); renames/renumbers are instant; content changes
+  apply after the current airing. Episodes removed by hand are excluded.
+- `/manage` page for phone/laptop: channel list, editor, Plex browser (library,
+  title search, collections, whole library), Internet Archive search, resolved
+  item list, 24-hour preview. TV Settings → *Manage channels* shows URL + QR code.
+- New channels start at their first item when created (anchor = creation time).
+- Upgrading kept the existing five IA channels (and the Plex sampler) as
+  ordinary editable channels without re-resolving.
+- Still to do from Phase 2 below: the bench/screening workflow, in/out points,
+  health checks and understudies.
+
 **Phase 2 — Discover (IA channel building)**
 - Search/filter UI, expand items into episodes, preview, bench, screening,
   "make channel from bench", filler pools.

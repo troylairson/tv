@@ -16,8 +16,8 @@ function plexHeaders(): Record<string, string> {
   };
 }
 
-async function plexJson<T>(pathAndQuery: string): Promise<T> {
-  const res = await fetch(`${config.plexUrl}${pathAndQuery}`, { headers: plexHeaders(), signal: AbortSignal.timeout(15_000) });
+async function plexJson<T>(pathAndQuery: string, timeoutMs = 15_000): Promise<T> {
+  const res = await fetch(`${config.plexUrl}${pathAndQuery}`, { headers: plexHeaders(), signal: AbortSignal.timeout(timeoutMs) });
   if (!res.ok) throw new Error(`Plex ${pathAndQuery} → HTTP ${res.status}`);
   return (await res.json()) as T;
 }
@@ -28,6 +28,10 @@ interface PlexMetadata {
   ratingKey: string;
   type: string;
   title: string;
+  titleSort?: string;
+  summary?: string;
+  leafCount?: number;
+  childCount?: number;
   grandparentTitle?: string;
   parentIndex?: number;
   index?: number;
@@ -60,6 +64,110 @@ function displayTitle(m: PlexMetadata): string {
   return m.year && !title.includes(String(m.year)) ? `${title} (${m.year})` : title;
 }
 
+function toItem(m: PlexMetadata): ChannelItem {
+  return {
+    id: `plex:${m.ratingKey}`,
+    source: 'plex',
+    ref: m.ratingKey,
+    title: displayTitle(m),
+    durationSec: (m.duration ?? 0) / 1000,
+    thumb: m.thumb ? `/plex${m.thumb}` : undefined,
+  };
+}
+
+const playable = (m: PlexMetadata) => (m.type === 'movie' || m.type === 'episode') && (m.duration ?? 0) > 0;
+
+/** Episodes in broadcast order: show, then season, then episode. */
+function byEpisodeOrder(a: PlexMetadata, b: PlexMetadata): number {
+  return (
+    (a.grandparentTitle ?? '').localeCompare(b.grandparentTitle ?? '') ||
+    (a.parentIndex ?? 0) - (b.parentIndex ?? 0) ||
+    (a.index ?? 0) - (b.index ?? 0)
+  );
+}
+
+async function metadataList(pathAndQuery: string): Promise<PlexMetadata[]> {
+  // Whole libraries can be thousands of entries on a slow server.
+  const data = await plexJson<PlexContainer<{ Metadata?: PlexMetadata[] }>>(pathAndQuery, 120_000);
+  return data.MediaContainer.Metadata ?? [];
+}
+
+/** All of a show's episodes, in order. */
+async function showEpisodes(ratingKey: string): Promise<PlexMetadata[]> {
+  return (await metadataList(`/library/metadata/${encodeURIComponent(ratingKey)}/allLeaves`)).sort(byEpisodeOrder);
+}
+
+/** Expand shows (and seasons) to their episodes; keep movies and episodes as they are. */
+async function expand(list: PlexMetadata[]): Promise<PlexMetadata[]> {
+  const out: PlexMetadata[] = [];
+  for (const m of list) {
+    if (m.type === 'show' || m.type === 'season') out.push(...(await showEpisodes(m.ratingKey)));
+    else out.push(m);
+  }
+  return out.filter(playable);
+}
+
+// ── Browsing (for the channel manager) ───────────────────────────────────────
+
+export interface PlexBrowseItem {
+  ratingKey: string;
+  type: string;
+  title: string;
+  year?: number;
+  /** Episodes in a show, items in a collection. */
+  count?: number;
+  durationMin?: number;
+  thumb?: string;
+}
+
+function browseItem(m: PlexMetadata): PlexBrowseItem {
+  return {
+    ratingKey: m.ratingKey,
+    type: m.type,
+    title: m.title,
+    year: m.year,
+    count: m.leafCount ?? m.childCount,
+    durationMin: m.duration ? Math.round(m.duration / 60_000) : undefined,
+    thumb: m.thumb ? `/plex/photo/:/transcode?width=240&height=360&minSize=1&upscale=1&url=${encodeURIComponent(m.thumb)}` : undefined,
+  };
+}
+
+/** Shows (show libraries) or movies (movie libraries), optionally filtered by title. */
+export async function browseSection(sectionKey: string, query = ''): Promise<PlexBrowseItem[]> {
+  const q = query.trim() ? `&title=${encodeURIComponent(query.trim())}` : '';
+  const list = await metadataList(`/library/sections/${encodeURIComponent(sectionKey)}/all?sort=titleSort${q}`);
+  return list.map(browseItem);
+}
+
+export async function browseCollections(sectionKey: string): Promise<PlexBrowseItem[]> {
+  const list = await metadataList(`/library/sections/${encodeURIComponent(sectionKey)}/collections`);
+  return list.map((m) => ({ ...browseItem(m), type: 'collection' }));
+}
+
+// ── Resolving channel sources to playable items ──────────────────────────────
+
+/** A show: every episode in order. */
+export async function resolveShow(ratingKey: string): Promise<ChannelItem[]> {
+  return (await showEpisodes(ratingKey)).filter(playable).map(toItem);
+}
+
+/** A collection: its movies, and every episode of any shows in it. */
+export async function resolveCollection(ratingKey: string): Promise<ChannelItem[]> {
+  return (await expand(await metadataList(`/library/collections/${encodeURIComponent(ratingKey)}/children`))).map(toItem);
+}
+
+/** A whole library: all movies (by title) or all episodes (by show, season, episode). */
+export async function resolveLibrary(sectionKey: string, type: 'movie' | 'show'): Promise<ChannelItem[]> {
+  const list = await metadataList(`/library/sections/${encodeURIComponent(sectionKey)}/all?type=${type === 'movie' ? 1 : 4}&sort=titleSort`);
+  if (type === 'show') list.sort(byEpisodeOrder);
+  return list.filter(playable).map(toItem);
+}
+
+/** One movie or episode; a show or season expands to its episodes. */
+export async function resolveItem(ratingKey: string): Promise<ChannelItem[]> {
+  return (await expand(await metadataList(`/library/metadata/${encodeURIComponent(ratingKey)}`))).map(toItem);
+}
+
 /** A stable random sample of movies and episodes across video libraries, for the Phase 0 test channel. */
 export async function sampleItems(count = 40): Promise<ChannelItem[]> {
   const all: PlexMetadata[] = [];
@@ -72,16 +180,7 @@ export async function sampleItems(count = 40): Promise<ChannelItem[]> {
     );
     all.push(...(data.MediaContainer.Metadata ?? []));
   }
-  return seededShuffle(all.filter((m) => (m.duration ?? 0) > 0), 1)
-    .slice(0, count)
-    .map((m) => ({
-      id: `plex:${m.ratingKey}`,
-      source: 'plex' as const,
-      ref: m.ratingKey,
-      title: displayTitle(m),
-      durationSec: (m.duration ?? 0) / 1000,
-      thumb: m.thumb ? `/plex${m.thumb}` : undefined,
-    }));
+  return seededShuffle(all.filter(playable), 1).slice(0, count).map(toItem);
 }
 
 export interface PlexPlayback {

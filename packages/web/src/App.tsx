@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { clockStats, now, syncClock } from './clock';
+import qrcode from 'qrcode-generator';
 import { capabilities, report } from './diag';
 import { Guide } from './Guide';
 import { lastKeyInfo, toAction, type Action, type KeyInfo } from './keys';
@@ -49,6 +50,9 @@ export function App() {
   const [showDiag, setShowDiag] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
+  const [showManage, setShowManage] = useState(false);
+  /** The channel being watched, by id, so it survives the list changing under us. */
+  const currentId = useRef<string | null>(null);
   const guideAction = useRef<((action: Action) => boolean) | null>(null);
   const [settingsFocus, setSettingsFocus] = useState(0);
   const [house, setHouse] = useState<HouseSettings | null>(null);
@@ -83,8 +87,20 @@ export function App() {
     setBuilding(body.building);
     const list = body.channels.slice().sort((a, b) => a.number - b.number);
     setChannels(list);
+    // Channels can be added, renumbered or deleted from the manager while we watch.
+    if (currentId.current) {
+      const i = list.findIndex((c) => c.id === currentId.current);
+      if (i >= 0) setIndex(i);
+      else if (list.length) tuneTo(list, 0);
+    }
     return list;
   }
+
+  useEffect(() => {
+    if (!poweredOn) return;
+    const t = setInterval(() => void loadChannels().catch(() => undefined), 60_000);
+    return () => clearInterval(t);
+  }, [poweredOn]);
 
   async function loadHouseSettings() {
     try {
@@ -118,6 +134,7 @@ export function App() {
     const channel = list[i];
     if (!channel || !tuner.current) return;
     setIndex(i);
+    currentId.current = channel.id;
     store(LAST_CHANNEL_KEY, String(channel.number));
     const t = Date.now();
     setOsdUntil(t + 3000);
@@ -129,6 +146,7 @@ export function App() {
     setInfoUntil(0);
     setShowDiag(false);
     setShowGuide(true);
+    void loadChannels().catch(() => undefined);
   }
 
   function tuneToNumber(number: number) {
@@ -192,6 +210,12 @@ export function App() {
       },
     },
     {
+      label: 'Manage channels',
+      value: 'Open on phone',
+      note: 'Add, edit and delete channels from a phone or laptop on your home network',
+      activate: () => setShowManage(true),
+    },
+    {
       label: 'Diagnostics',
       value: showDiag ? 'Shown' : 'Hidden',
       note: 'Playback details for troubleshooting (also: ▶ while watching)',
@@ -212,6 +236,10 @@ export function App() {
     }
     if (tunerState.status === 'blocked' && action.type === 'ok') {
       tuner.current?.retune();
+      return true;
+    }
+    if (showManage) {
+      if (action.type === 'back' || action.type === 'ok') setShowManage(false);
       return true;
     }
     if (showSettings) {
@@ -374,7 +402,9 @@ export function App() {
         />
       )}
 
-      {showSettings && <Settings rows={settingsRows} focus={settingsFocus} />}
+      {showSettings && !showManage && <Settings rows={settingsRows} focus={settingsFocus} />}
+
+      {showManage && <ManageQr />}
 
       {showDiag && !showSettings && (
         <Diagnostics state={tunerState} caps={caps} lastKey={lastKey} plexMode={plexMode} video={video.current} />
@@ -383,6 +413,26 @@ export function App() {
       {poweredOn && !showDiag && !showSettings && infoUntil > t && (
         <div class="hint">▲▼ channel · OK guide</div>
       )}
+    </div>
+  );
+}
+
+/** The manager's address as a QR code, for opening it on a phone. */
+function ManageQr() {
+  const url = `${location.origin}/manage`;
+  const svg = useMemo(() => {
+    const qr = qrcode(0, 'M');
+    qr.addData(url);
+    qr.make();
+    return qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true });
+  }, [url]);
+  return (
+    <div class="manage-qr">
+      <h2>Manage channels</h2>
+      <div class="manage-qr-code" dangerouslySetInnerHTML={{ __html: svg }} />
+      <p>Scan with your phone, or open</p>
+      <p class="manage-qr-url">{url}</p>
+      <p class="dim">on any device on your home network. Back to close.</p>
     </div>
   );
 }

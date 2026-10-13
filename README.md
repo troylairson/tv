@@ -4,8 +4,8 @@ Always-on, cable-TV-style channels built from the Internet Archive and your Plex
 server. Every screen in the house shows the same thing at the same moment: tune in
 at 3:17 am and you land mid-episode, like real TV.
 
-See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0 done; Phase 1 (stored schedule, commercial breaks, TV guide)
-is in.** Plex plays. (spikes on
+See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0 and Phase 1 done; channel management (Plex and Internet
+Archive sources) is in.** (spikes on
 the real hardware). See [docs/phase0.md](docs/phase0.md) for what to test.
 
 ## What's here
@@ -62,6 +62,29 @@ grid pages through time), OK watches the highlighted channel, Back closes. The
 live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
 commercial breaks on/off (applies to every TV in the house), CRT effect and Plex
 playback mode (this TV only), diagnostics.
+
+## Managing channels
+
+Open **`http://<laptop-ip>:8420/manage`** on a phone or laptop (on the TV:
+guide → Settings → *Manage channels* shows the address and a QR code).
+
+- **Channels:** add, rename, renumber, delete; play in order or shuffled;
+  commercial breaks on/off per channel.
+- **Content** (mix as many sources as you like, played top to bottom when
+  in order):
+  - **Plex:** a show (every episode, in season/episode order), a collection, a
+    whole library, or single movies. Browse by library, search by title.
+  - **Internet Archive:** search a collection (Classic TV, cartoons, feature
+    films, Prelinger, film noir…) and add single items, or add the search
+    itself, which picks up new results nightly.
+- **What plays:** the resolved episode list; ✕ removes an episode without
+  removing its show.
+- **Next 24 hours:** the schedule as the guide will show it.
+
+Changes take effect after whatever is on now. A new channel starts at its first
+episode the moment it's created. Sources are refreshed nightly (new Plex
+episodes, new Internet Archive search results). Settings live in
+`/DATA/AppData/retro-tv/channels-config.json`.
 
 ## Commercial breaks
 

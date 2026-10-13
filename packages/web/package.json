@@ -10,7 +10,8 @@
   },
   "dependencies": {
     "hls.js": "^1.6.0",
-    "preact": "^10.26.0"
+    "preact": "^10.26.0",
+    "qrcode-generator": "^1.5.2"
   },
   "devDependencies": {
     "@preact/preset-vite": "^2.10.0",

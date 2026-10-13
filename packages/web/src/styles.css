@@ -214,5 +214,15 @@ html, body, #app {
 
 .guide-hint { margin-top: auto; font-size: 1.9vh; color: var(--dim); text-align: center; }
 
-/* Settings opened from the guide sits on top of it. */
-.settings { z-index: 4; }
+/* Settings (and the QR code) sit on top of the guide; keep them opaque so the grid doesn't show through. */
+.settings, .manage-qr { z-index: 4; background: #0c123c; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45); }
+
+.manage-qr {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5;
+  padding: 3vh 3vw; text-align: center; background: var(--panel); border: 0.4vh solid var(--edge);
+}
+.manage-qr h2 { margin: 0 0 2vh; font-size: 4vh; color: var(--accent); letter-spacing: 0.2em; }
+.manage-qr-code { width: 34vh; height: 34vh; margin: 0 auto 2vh; padding: 1vh; background: #fff; }
+.manage-qr-code svg { width: 100%; height: 100%; display: block; }
+.manage-qr p { margin: 0.6vh 0; font-size: 2.4vh; }
+.manage-qr-url { font-size: 3.4vh !important; font-weight: bold; color: var(--accent); }

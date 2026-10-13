@@ -40,7 +40,8 @@ export interface BreakOptions<T extends ScheduleItem = ScheduleItem> {
 }
 
 export function itemsKey(channel: ScheduleChannel): string {
-  return hashString(channel.items.map((i) => `${i.id}:${i.durationSec}`).join('|')).toString(36);
+  // Mode is part of it: switching between in-order and shuffle changes what plays next.
+  return hashString(channel.mode + '|' + channel.items.map((i) => `${i.id}:${i.durationSec}`).join('|')).toString(36);
 }
 
 function successor(channel: ScheduleChannel, { cycle, index }: Cursor): Cursor {

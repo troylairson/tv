@@ -139,5 +139,5 @@ export function seededShuffle<T>(items: readonly T[], seed: number): T[] {
   }
   return out;
 }
-export type { Channel, ChannelItem } from './types';
+export type { Channel, ChannelConfig, ChannelItem, SourceRef } from './types';
 export * from './lineup';

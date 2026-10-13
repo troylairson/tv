@@ -47,6 +47,9 @@ importers:
       preact:
         specifier: ^10.26.0
         version: 10.29.8
+      qrcode-generator:
+        specifier: ^1.5.2
+        version: 1.5.2
     devDependencies:
       '@preact/preset-vite':
         specifier: ^2.10.0
@@ -908,6 +911,9 @@ packages:
     peerDependenciesMeta:
       preact-render-to-string:
         optional: true
+
+  qrcode-generator@1.5.2:
+    resolution: {integrity: sha512-pItrW0Z9HnDBnFmgiNrY1uxRdri32Uh9EjNYLPVC2zZ3ZRIIEqBoDgm4DkvDwNNDHTK7FNkmr8zAa77BYc9xNw==}
 
   rollup@4.64.6:
     resolution: {integrity: sha512-fX1Vy+UNKdXn+xKDnu/HBXbHVr1AY8cSdQj9BU4kLv5aFCMqGpvrVbyUMmjN3DdzWhSAuTbcX8PCNEVaumthYA==}
@@ -1821,6 +1827,8 @@ snapshots:
       source-map-js: 1.2.2
 
   preact@10.29.8: {}
+
+  qrcode-generator@1.5.2: {}
 
   rollup@4.64.6:
     dependencies:

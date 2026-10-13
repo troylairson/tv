@@ -1,1 +1,1 @@
-export type { Channel, ChannelItem } from '@retro-tv/schedule';
+export type { Channel, ChannelConfig, ChannelItem, SourceRef } from '@retro-tv/schedule';

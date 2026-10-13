@@ -3,10 +3,23 @@ import path from 'node:path';
 import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
-import { getChannels, initChannels, rebuild } from './channels';
+import {
+  channelStatuses,
+  createChannel,
+  deleteChannel,
+  getChannels,
+  getConfig,
+  initChannels,
+  refreshAll,
+  resolveChannel,
+  resolvedItems,
+  updateChannel,
+  ValidationError,
+} from './channels';
 import { mediaPath, poolStatus, readyCommercials, startCommercialPool } from './commercials';
 import { config, plexConfigured } from './config';
 import { serveFile } from './media';
+import * as ia from './ia';
 import * as plex from './plex';
 import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
 import { getSettings, loadSettings, updateSettings } from './settings';
@@ -21,6 +34,7 @@ app.use('/api/*', async (c, next) => {
 });
 
 app.onError((err, c) => {
+  if (err instanceof ValidationError) return c.json({ error: err.message }, 400);
   console.error(`${c.req.method} ${c.req.path}:`, err.message);
   return c.json({ error: err.message }, 500);
 });
@@ -101,8 +115,69 @@ app.get('/media/commercials/:file', (c) => {
 });
 
 app.post('/api/channels/rebuild', (c) => {
-  void rebuild().catch((err) => console.error('channel build failed', err));
+  void refreshAll().catch((err) => console.error('channel refresh failed', err));
   return c.json({ ok: true, building: true }, 202);
+});
+
+// ── Channel manager (the /manage page) ──────────────────────────────────────
+
+app.get('/api/manage/channels', (c) => c.json({ channels: channelStatuses(), plexConfigured: plexConfigured() }));
+
+app.post('/api/manage/channels', async (c) => {
+  const created = await createChannel(await c.req.json());
+  return c.json(created, 201);
+});
+
+app.put('/api/manage/channels/:id', async (c) => {
+  const result = await updateChannel(c.req.param('id'), await c.req.json());
+  if (!result) return c.json({ error: 'No such channel' }, 404);
+  // Commercials on/off changes the future schedule; regenerate it (the current airing finishes).
+  if (result.breaksChanged) {
+    const channel = getChannels().channels.find((ch) => ch.id === result.config.id);
+    if (channel) regenerate([channel]);
+  }
+  return c.json(result.config);
+});
+
+app.delete('/api/manage/channels/:id', async (c) => {
+  return (await deleteChannel(c.req.param('id'))) ? c.json({ ok: true }) : c.json({ error: 'No such channel' }, 404);
+});
+
+app.post('/api/manage/channels/:id/refresh', (c) => {
+  if (!getConfig(c.req.param('id'))) return c.json({ error: 'No such channel' }, 404);
+  void resolveChannel(c.req.param('id'));
+  return c.json({ ok: true }, 202);
+});
+
+/** What the channel's sources produced (for listing and removing items). */
+app.get('/api/manage/channels/:id/items', (c) => {
+  if (!getConfig(c.req.param('id'))) return c.json({ error: 'No such channel' }, 404);
+  return c.json({ items: resolvedItems(c.req.param('id')) });
+});
+
+/** The next N hours as the guide will show them. */
+app.get('/api/manage/channels/:id/preview', (c) => {
+  const channel = getChannels().channels.find((ch) => ch.id === c.req.param('id'));
+  if (!channel) return c.json({ blocks: [] });
+  const now = Date.now();
+  const hours = Math.min(48, Number(c.req.query('hours')) || 24);
+  return c.json({ blocks: guideBlocks(channel, now, now + hours * 3600_000) });
+});
+
+// ── Internet Archive search (for the channel manager) ───────────────────────
+
+app.get('/api/ia/search', async (c) => {
+  const q = (c.req.query('q') ?? '').trim();
+  const collection = (c.req.query('collection') ?? '').trim();
+  const parts = [q, collection && `collection:${collection}`].filter(Boolean);
+  if (!parts.length) return c.json({ error: 'Enter a search or pick a collection' }, 400);
+  const query = parts.map((p) => `(${p})`).join(' AND ');
+  const { numFound, docs } = await ia.search(query, { rows: 40, page: Number(c.req.query('page')) || 1 });
+  return c.json({
+    query,
+    total: numFound,
+    results: docs.map((d) => ({ ...d, thumb: ia.thumbUrl(d.identifier) })),
+  });
 });
 
 // ── Plex ─────────────────────────────────────────────────────────────────────
@@ -114,6 +189,8 @@ app.use('/api/plex/*', async (c, next) => {
 
 app.get('/api/plex/status', async (c) => c.json(await plex.identity()));
 app.get('/api/plex/sections', async (c) => c.json(await plex.sections()));
+app.get('/api/plex/sections/:key/items', async (c) => c.json(await plex.browseSection(c.req.param('key'), c.req.query('q') ?? '')));
+app.get('/api/plex/sections/:key/collections', async (c) => c.json(await plex.browseCollections(c.req.param('key'))));
 
 /** Self-test of the whole Plex playback chain. Without an id, uses the first item on a Plex channel. */
 app.get('/api/plex/test/:ratingKey?', async (c) => {
