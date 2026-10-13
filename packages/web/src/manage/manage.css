@@ -145,3 +145,7 @@ body.manage #app { height: auto; overflow: visible; }
 .mg-week-block.c3 { background: #ff9fd0; }
 .mg-week-block.c4 { background: #ffb36b; }
 .mg-week-block.c5 { background: #c9a6ff; }
+
+.mg-ideas { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.mg-idea p { margin: 6px 0; line-height: 1.45; }
+.mg-idea .mg-row { margin-top: 8px; }

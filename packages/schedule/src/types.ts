@@ -33,8 +33,20 @@ export type SourceRef =
   | { kind: 'plex-library'; sectionKey: string; type: 'movie' | 'show'; title: string }
   | { kind: 'plex-item'; ratingKey: string; title: string }
   | { kind: 'plex-sample'; count: number; title: string }
-  | { kind: 'ia-search'; query: string; items: number; filesPerItem: number; title: string }
-  | { kind: 'ia-item'; identifier: string; title: string };
+  | {
+      kind: 'ia-search';
+      query: string;
+      items: number;
+      filesPerItem: number;
+      title: string;
+      /** Skip videos shorter than this (clips, promos). */
+      minMinutes?: number;
+      /** Which results to take, and their order: popular first (default), or archive order (oldest first). */
+      sort?: IaSort;
+    }
+  | { kind: 'ia-item'; identifier: string; title: string; minMinutes?: number };
+
+export type IaSort = 'popular' | 'identifier' | 'date' | 'title';
 
 /** "These days, at this time, for this long, play this." Times are in the house time zone. */
 export interface SlotConfig {
@@ -62,4 +74,6 @@ export interface ChannelConfig {
   excluded: string[];
   /** Time slots on top of the regular programming. */
   slots?: SlotConfig[];
+  /** Set when the channel was added from a channel pack. */
+  packId?: string;
 }

@@ -2,6 +2,7 @@
 import { plexConfigured } from './config';
 import * as ia from './ia';
 import * as plex from './plex';
+import type { IaSort } from '@retro-tv/schedule';
 import type { ChannelItem, SourceRef } from './types';
 
 async function mapLimit<T, R>(inputs: T[], limit: number, fn: (input: T) => Promise<R>): Promise<R[]> {
@@ -17,8 +18,15 @@ async function mapLimit<T, R>(inputs: T[], limit: number, fn: (input: T) => Prom
   return results;
 }
 
-async function iaSearchItems(query: string, items: number, filesPerItem: number): Promise<ChannelItem[]> {
-  const { docs } = await ia.search(query, { rows: items });
+const IA_SORTS: Record<IaSort, string> = {
+  popular: 'downloads desc',
+  identifier: 'identifier asc',
+  date: 'date asc',
+  title: 'titleSorter asc',
+};
+
+async function iaSearchItems(query: string, items: number, filesPerItem: number, sort: IaSort = 'popular'): Promise<ChannelItem[]> {
+  const { docs } = await ia.search(query, { rows: items, sort: IA_SORTS[sort] ?? IA_SORTS.popular });
   const perItem = await mapLimit(docs, 6, async (doc) => {
     try {
       return ia.itemsFromMetadata(doc.identifier, await ia.metadata(doc.identifier), filesPerItem);
@@ -31,6 +39,12 @@ async function iaSearchItems(query: string, items: number, filesPerItem: number)
 }
 
 export async function resolveSource(source: SourceRef): Promise<ChannelItem[]> {
+  const items = await resolveSourceItems(source);
+  const min = 'minMinutes' in source && source.minMinutes ? source.minMinutes * 60 : 0;
+  return min ? items.filter((i) => i.durationSec >= min) : items;
+}
+
+async function resolveSourceItems(source: SourceRef): Promise<ChannelItem[]> {
   if (source.kind.startsWith('plex-') && !plexConfigured()) throw new Error('Plex is not configured');
   switch (source.kind) {
     case 'plex-show':
@@ -44,7 +58,7 @@ export async function resolveSource(source: SourceRef): Promise<ChannelItem[]> {
     case 'plex-sample':
       return plex.sampleItems(source.count);
     case 'ia-search':
-      return iaSearchItems(source.query, source.items, source.filesPerItem);
+      return iaSearchItems(source.query, source.items, source.filesPerItem, source.sort);
     case 'ia-item':
       return ia.itemsFromMetadata(source.identifier, await ia.metadata(source.identifier));
   }

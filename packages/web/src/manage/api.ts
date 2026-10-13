@@ -34,6 +34,16 @@ export interface IaResult {
   thumb: string;
 }
 
+export interface PackInfo {
+  id: string;
+  name: string;
+  description: string;
+  curated: string;
+  sourceCount: number;
+  slotCount: number;
+  installed: { id: string; number: number; name: string }[];
+}
+
 export interface PreviewBlock {
   title: string;
   startMs: number;
@@ -65,6 +75,8 @@ export const api = {
   refresh: (id: string) => call<{ ok: true }>(`/api/manage/channels/${id}/refresh`, { method: 'POST' }),
   items: (id: string) => call<{ items: ChannelItem[] }>(`/api/manage/channels/${id}/items`),
   preview: (id: string) => call<{ blocks: PreviewBlock[] }>(`/api/manage/channels/${id}/preview?hours=24`),
+  packs: () => call<{ packs: PackInfo[] }>('/api/manage/packs'),
+  installPack: (id: string) => call<ChannelConfig>(`/api/manage/packs/${id}/install`, { method: 'POST' }),
   plexSections: () => call<PlexSection[]>('/api/plex/sections'),
   plexBrowse: (key: string, q: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/items?q=${encodeURIComponent(q)}`),
   plexCollections: (key: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/collections`),

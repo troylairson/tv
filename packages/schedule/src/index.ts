@@ -139,7 +139,7 @@ export function seededShuffle<T>(items: readonly T[], seed: number): T[] {
   }
   return out;
 }
-export type { Channel, ChannelConfig, ChannelItem, SlotConfig, SourceRef } from './types';
+export type { Channel, ChannelConfig, ChannelItem, IaSort, SlotConfig, SourceRef } from './types';
 export * from './lineup';
 export * from './slots';
 export * from './timezone';

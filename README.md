@@ -91,6 +91,16 @@ guide → Settings → *Manage channels* shows the address and a QR code).
   in the house time zone (shown in the manager, with a button to use your
   device's).
 
+- **Channel ideas:** ready-made, hand-curated channels you add with one tap
+  (content, order and time slots included), then tweak like any other channel.
+  First up: **Retro Pro Wrestling**: about 690 hours of 1979–1999 wrestling TV
+  (WWF Prime Time / Challenge / Superstars, WCW Saturday Night, Memphis, Mid-South,
+  Georgia, Florida, Portland, World Class), *Saturday Night's Main Event* on
+  Saturdays at 11:30 pm, NWA supercards on Sunday nights and the *Rock 'n'
+  Wrestling* cartoon on Saturday mornings. Packs live in
+  `packages/server/src/packs/`; new ones are curated by researching the Internet
+  Archive (ask Claude for a theme).
+
 Changes take effect after whatever is on now. A new channel starts at its first
 episode the moment it's created. Sources are refreshed nightly (new Plex
 episodes, new Internet Archive search results). Settings live in

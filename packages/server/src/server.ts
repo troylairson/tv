@@ -20,6 +20,7 @@ import { mediaPath, poolStatus, readyCommercials, startCommercialPool } from './
 import { config, plexConfigured } from './config';
 import { serveFile } from './media';
 import * as ia from './ia';
+import { getPack, PACKS } from './packs';
 import * as plex from './plex';
 import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
 import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
@@ -125,6 +126,32 @@ app.get('/api/manage/channels', (c) => c.json({ channels: channelStatuses(), ple
 
 app.post('/api/manage/channels', async (c) => {
   const created = await createChannel(await c.req.json());
+  return c.json(created, 201);
+});
+
+/** Ready-made channels (see src/packs). */
+app.get('/api/manage/packs', (c) => {
+  const statuses = channelStatuses();
+  return c.json({
+    packs: PACKS.map((p) => ({
+      id: p.id,
+      name: p.name,
+      description: p.description,
+      curated: p.curated,
+      sourceCount: p.sources.length,
+      slotCount: p.slots.length,
+      installed: statuses.filter((s) => s.packId === p.id).map((s) => ({ id: s.id, number: s.number, name: s.name })),
+    })),
+  });
+});
+
+app.post('/api/manage/packs/:id/install', async (c) => {
+  const pack = getPack(c.req.param('id'));
+  if (!pack) return c.json({ error: 'No such pack' }, 404);
+  const created = await createChannel(
+    { name: pack.name, mode: pack.mode, breaks: pack.breaks, sources: pack.sources, slots: pack.slots },
+    { packId: pack.id },
+  );
   return c.json(created, 201);
 });
 

@@ -1,7 +1,7 @@
 import type { ChannelItem, SourceRef } from '@retro-tv/schedule';
 import { useEffect, useState } from 'preact/hooks';
 import { AddContent } from './AddContent';
-import { api, fmtDuration, sourceLabel, type ChannelFields, type ChannelStatus, type PreviewBlock } from './api';
+import { api, fmtDuration, sourceLabel, type ChannelFields, type ChannelStatus, type PackInfo, type PreviewBlock } from './api';
 import { Schedule, type DraftSlot } from './Schedule';
 
 type Route = { page: 'list' } | { page: 'new' } | { page: 'edit'; id: string };

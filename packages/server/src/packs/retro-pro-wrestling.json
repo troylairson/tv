@@ -1,0 +1,43 @@
+{
+  "id": "retro-pro-wrestling",
+  "name": "Retro Pro Wrestling",
+  "description": "Wrestling TV from 1979 to 1999: WWF Prime Time Wrestling, Wrestling Challenge and Superstars, WCW Saturday Night, and the territories (Memphis, Mid-South, Georgia, Florida, Portland, World Class). Saturday Night's Main Event airs Saturdays at 11:30 pm, NWA supercards (Starrcade, Clash of the Champions) on Sunday nights, and the Hulk Hogan's Rock 'n' Wrestling cartoon on Saturday mornings.",
+  "curated": "2026-10-13: about 670 hours across 14 Internet Archive searches; clips under 10 minutes and IWA Mid-South (2000s indie) excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    { "kind": "ia-search", "title": "WWF Prime Time Wrestling", "query": "title:(\"Prime Time Wrestling\") AND title:(WWF)", "items": 80, "filesPerItem": 1, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "WWF Wrestling Challenge", "query": "title:(\"WWF Wrestling Challenge\")", "items": 80, "filesPerItem": 1, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "WWF Superstars of Wrestling", "query": "title:(\"WWF Superstars of Wrestling\")", "items": 80, "filesPerItem": 1, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "WCW Saturday Night (1990–1999)", "query": "title:(\"WCW Saturday Night\") AND title:(Complete)", "items": 10, "filesPerItem": 25, "minMinutes": 20 },
+    { "kind": "ia-search", "title": "CWA/USWA Memphis Wrestling", "query": "title:(\"Memphis Wrestling Archive\")", "items": 30, "filesPerItem": 12, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "Mid-South Wrestling", "query": "title:(\"Mid South Wrestling\") AND NOT title:(IWA)", "items": 30, "filesPerItem": 5, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "Georgia Championship Wrestling", "query": "title:(\"Georgia Championship Wrestling\")", "items": 10, "filesPerItem": 3, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "Championship Wrestling from Florida", "query": "title:(\"Championship Wrestling From Florida\") OR title:(\"Classic Wrestling From Florida\")", "items": 15, "filesPerItem": 3, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "Portland Wrestling", "query": "title:(\"Portland Wrestling\")", "items": 10, "filesPerItem": 10, "minMinutes": 10 },
+    { "kind": "ia-search", "title": "World Class Championship Wrestling", "query": "title:(\"World Class Championship Wrestling\") OR title:(WCCW)", "items": 15, "filesPerItem": 3, "minMinutes": 10 }
+  ],
+  "slots": [
+    {
+      "days": [6],
+      "start": "23:30",
+      "durationMin": 90,
+      "order": "next",
+      "source": { "kind": "ia-search", "title": "Saturday Night's Main Event", "query": "title:(\"Saturday Night's Main Event\")", "items": 40, "filesPerItem": 1, "minMinutes": 20, "sort": "identifier" }
+    },
+    {
+      "days": [0],
+      "start": "20:00",
+      "durationMin": 180,
+      "order": "next",
+      "source": { "kind": "ia-search", "title": "NWA Supercards: Starrcade & Clash of the Champions", "query": "(title:(Starrcade) AND (title:(NWA) OR title:(JCP))) OR (title:(\"Clash of the Champions\") AND title:(NWA))", "items": 40, "filesPerItem": 1, "minMinutes": 60, "sort": "identifier" }
+    },
+    {
+      "days": [6],
+      "start": "09:00",
+      "durationMin": 60,
+      "order": "next",
+      "source": { "kind": "ia-search", "title": "Hulk Hogan's Rock 'n' Wrestling (cartoon)", "query": "title:(\"Rock N Wrestling\") AND title:(Hulk) AND NOT title:(abridged)", "items": 6, "filesPerItem": 30, "minMinutes": 15, "sort": "identifier" }
+    }
+  ]
+}

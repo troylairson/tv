@@ -270,7 +270,7 @@ function applyInput(base: ChannelConfig, input: ChannelInput, selfId?: string): 
   return next;
 }
 
-export async function createChannel(input: ChannelInput): Promise<ChannelConfig> {
+export async function createChannel(input: ChannelInput, extra: { packId?: string } = {}): Promise<ChannelConfig> {
   const used = new Set(configs.map((c) => c.number));
   let number = 2;
   while (used.has(number)) number++;
@@ -285,7 +285,7 @@ export async function createChannel(input: ChannelInput): Promise<ChannelConfig>
     sources: [],
     excluded: [],
   };
-  const created = applyInput(base, input);
+  const created = { ...applyInput(base, input), ...(extra.packId ? { packId: extra.packId } : {}) };
   configs.push(created);
   await saveConfigs();
   void resolveChannel(created.id);

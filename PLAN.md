@@ -442,6 +442,17 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 - Not yet: drag-to-reschedule on the grid, programming blocks (pools of shows in a
   time range), era-matched commercials.
 
+**Channel packs (curated "Channel ideas")** — ✅ *first one done*
+- No AI API at runtime: themes are researched and curated in a Claude Code session
+  and committed as JSON packs (`packages/server/src/packs/`), installable in one tap
+  from the manager. IA sources gained `minMinutes` (drop clips) and `sort`
+  (archive order for "next episode" slots).
+- First pack: Retro Pro Wrestling (~690 h). Ideas for more: 70s/80s Saturday
+  morning cartoons, 50s sci-fi B-movies, classic sitcoms, game shows, old-time
+  news & PSAs, holiday specials.
+- Later, if an API key is ever available: an AI channel builder that screens
+  search results the same way.
+
 **Phase 4 — Real scheduling + editor**
 - Time-slot and block modes with filler padding.
 - Channel editor: weekly slot grid, drag to reschedule, 24h preview.
