@@ -356,8 +356,14 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   and every Internet Archive channel plays. The TV-side failure handling
   (decision check, fallback to the other Plex mode, commercials or colour bars
   instead of endless retries) and title cleanup came out of this round.
-- **Known issue, deferred to Phase 3: the Plex channel doesn't play.** First
-  seen as an HLS "manifest load error". Things to check when we come back to it:
+- **Plex channel didn't play: root cause found and fixed (awaiting a check on
+  the real setup).** `/api/plex/test` showed every step working server→Plex
+  directly but failing through our `/plex` proxy. Plex gzips its playlists;
+  `fetch()` decompresses them, but the proxy forwarded Plex's original
+  (compressed) `content-length`, so the TV received a truncated playlist,
+  which hls.js reports as "manifestLoadError". The proxy now asks Plex for
+  uncompressed bytes and never forwards a stale length (regression test in
+  `plex.test.ts`). If it still fails, the checklist below applies:
   0. `http://<laptop-ip>:8420/api/plex/test`: runs metadata → direct read →
      decision → start.m3u8 → media playlist, plus the same through our proxy,
      and shows each step's status and body. First diag (Safari on a Mac, old

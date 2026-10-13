@@ -237,6 +237,11 @@ export async function proxy(req: Request): Promise<Response> {
   const upstream = `${config.plexUrl}${incoming.pathname.replace(/^\/plex/, '')}${incoming.search}`;
   const headers: Record<string, string> = { ...plexHeaders() };
   delete headers.Accept;
+  // Ask for the bytes as stored. fetch() transparently decompresses gzip, so a
+  // compressed reply's content-length would no longer match the body we pass on
+  // and Node cuts the response short: that truncated Plex playlists (hls.js
+  // "manifestLoadError") and would break byte ranges for direct play.
+  headers['Accept-Encoding'] = 'identity';
   const range = req.headers.get('range');
   if (range) headers.Range = range;
 
@@ -247,7 +252,10 @@ export async function proxy(req: Request): Promise<Response> {
     return new Response(body, { status: res.status, headers: { 'content-type': 'text/plain' } });
   }
   const out = new Headers();
+  const encoded = Boolean(res.headers.get('content-encoding'));
   for (const name of PASS_RESPONSE_HEADERS) {
+    // If Plex compressed anyway, the body is already decoded: its length is unknown, so let Node chunk it.
+    if (encoded && name === 'content-length') continue;
     const value = res.headers.get(name);
     if (value) out.set(name, value);
   }
