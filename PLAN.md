@@ -6,6 +6,40 @@ stations, and user tools to create and reschedule channels. Sources: the Interne
 Archive (and other public archives) plus a personal Plex server. Target screens:
 any browser, and a Google TV.
 
+## 0. Decisions so far
+
+| Question | Answer | Consequence |
+|---|---|---|
+| Where does the backend run? | On the old laptop running **ZimaOS**, next to Plex | Ship as a Docker image + compose file installable as a ZimaOS custom app; SQLite on a mounted volume; talks to Plex over `localhost`/LAN |
+| Home-only or remote too? | **Home only** for now | No auth beyond a simple admin PIN, no remote-Plex relay, plain HTTP on the LAN is fine (no mixed-content problem if the app itself is served over HTTP) |
+| Device | **Chromecast with Google TV** | Weak CPU/GPU, ~2 GB RAM: keep the UI light (Preact), CRT effects in CSS only by default, prefer H.264 MP4/HLS; verify HEVC/AC3 behaviour in Phase 0 |
+| Distribution | **Sideloaded APK** is fine | Option B (WebView wrapper) confirmed |
+| Internet Archive | Must be able to **discover IA content in-app and build channels from it**, like spelunkr | First-class "Discover" feature (section 2b) |
+
+## 0b. What spelunkr.tv does (from its public front-end)
+
+Worth copying:
+- **Synchronized "live" channels:** like the plan below, clients compute position
+  from wall-clock time. To make sure clients agree, it **corrects for clock skew**:
+  it fetches its own origin a few times, reads the HTTP `Date` header, takes the
+  lowest-RTT sample and applies the offset if it's > 2 s. We should do the same
+  against our server (cheap and it matters on TVs with drifting clocks).
+- **Items are files, not identifiers.** It resolves an IA identifier through
+  `https://archive.org/metadata/{id}`, picks the best playable file (prefers MP4/
+  h.264), and plays `https://archive.org/download/{id}/{file}`. Thumbnails come from
+  `https://archive.org/services/img/{id}`. Many IA items are *whole series in one
+  item* ("Green Acres Complete Series"), so one identifier → many episodes.
+- **In/out points per program** (`out_s`), so a reel can be trimmed of dead air or
+  a 2-hour compilation can be cut into slots.
+- **A curation pipeline:** found items go onto a **"bench"** as *candidates*, get
+  screened (playable? actually video? taken down / "dark"? has a title &
+  description?), then *approved* onto a channel. Dead items are replaced by an
+  **"understudy"** from the bench with a similar duration so the schedule doesn't
+  break.
+- **Channel character:** themed channels with their own intro/bumper "scenes",
+  "UP NEXT ON {channel}" cards, period fonts/skins. Social extras (comments,
+  reactions, clips) live in Supabase — not needed for us.
+
 ---
 
 ## 1. The core trick: schedules are math, not streams
@@ -55,13 +89,49 @@ Editing a channel invalidates from "now" forward — the past stays as it aired.
 ## 2. Sources
 
 ### Internet Archive (and similar)
-- Discovery: `advancedsearch.php` (collections like `classic_tv`, `prelinger`,
-  `classic_tv_commercials`, `tvnews`), metadata via `/metadata/{identifier}`.
-- Metadata includes per-file `length` (duration) and format; most items have an
-  **h.264 MP4 derivative** that plays everywhere.
+- Search: `advancedsearch.php` (sortable, paged; e.g.
+  `collection:classic_tv AND mediatype:movies` sorted by `downloads desc` →
+  11k+ results) and `services/search/v1/scrape` (cursor paging for pulling a whole
+  collection). Search-level fields (`runtime`, `year`) are often missing — real
+  durations come from metadata.
+- Metadata: `/metadata/{identifier}` lists every file with `format` and `length`;
+  most items have an **h.264 MP4 derivative** that plays on the Chromecast.
+  Check `is_dark` (taken down) and `mediatype === "movies"`.
+- Playback: `https://archive.org/download/{id}/{file}` (redirects to a storage
+  node, supports range requests, so seeking to an offset works).
 - Great filler source: vintage commercials, PSAs, station IDs, test patterns.
 - Caveats: durations are occasionally missing/wrong (probe with `ffprobe` once and
   cache), archive.org can be slow to start — mask with static/transition.
+
+### 2b. Discover: building channels from the Internet Archive
+
+The in-app equivalent of spelunkr's curation, usable from a phone/laptop browser
+(and in a simpler form from the TV remote):
+
+1. **Browse & search** — free text plus filters: collection (with a curated
+   shortlist: `classic_tv`, `prelinger`, `classic_cartoons`, `feature_films`,
+   `classic_tv_commercials`, `tvnews`, `ephemera`…), decade/year, subject,
+   sort (most downloaded, newest, random). Results show the IA thumbnail, title,
+   year, download count.
+2. **Expand an item** — fetch its metadata and list playable *files* with
+   durations, so "Get Smart (complete)" becomes 138 episodes you can pick from.
+   Inline preview player.
+3. **Bench** — add files or whole items to a bench (a shopping cart of
+   candidates). Each gets an automatic **screening**: playable MP4 exists, not
+   dark, duration known (ffprobe on the server if not), not a duplicate.
+   Optional manual trim (in/out points).
+4. **Make a channel** from the bench — choose a mode (loop / shuffle / time slots),
+   number, name, era skin; or **add to an existing channel** or its **filler pool**.
+5. **Smart channels (query-backed)** — save a search as a channel source
+   ("collection:prelinger AND subject:automobiles, 1950–1965"). The server
+   re-runs it nightly, screens new results, and adds them, so the channel grows
+   on its own.
+6. **Health checks & understudies** — a nightly job re-checks items. If one goes
+   dark or unplayable, swap in an approved bench item of similar duration
+   (spelunkr's "understudy"), so already-published guide slots still play.
+
+All IA calls go through our server, which caches metadata in SQLite. That keeps
+the TV fast and keeps us polite to archive.org.
 
 ### Plex
 - Auth with an `X-Plex-Token` (store **server-side only**, never ship to the client).
@@ -128,7 +198,7 @@ engine already produces exactly what XMLTV needs.
 ## 4. Architecture
 
 ```
-┌────────────────────────── Home server / NAS (Docker) ─────────────────────────┐
+┌───────────── ZimaOS laptop (Docker, same box as Plex) ────────────────────────┐
 │  API server (TypeScript, Fastify or Hono)                                      │
 │   ├─ Source adapters: Archive.org, Plex, Local                                 │
 │   ├─ Schedule engine (pure, shared package) + materialised airings cache       │
@@ -145,9 +215,20 @@ engine already produces exactly what XMLTV needs.
    └───────────────────────┘                       └───────────────────────┘
 ```
 
-Why a backend at all (vs. pure client)? Plex token safety, mixed-content/CORS
-proxying, caching archive.org metadata and probed durations, and one shared
-channel lineup for every screen in the house. It runs naturally next to Plex.
+Why a backend at all (vs. pure client)? Plex token safety, CORS proxying,
+caching archive.org metadata and probed durations, the nightly IA jobs (smart
+channels, health checks), and one shared channel lineup for every screen in the
+house. It runs next to Plex on the ZimaOS laptop.
+
+**Deployment on ZimaOS:** one Docker image (server + built web app served
+statically), a `docker-compose.yml` that can be imported as a ZimaOS custom app,
+a volume for SQLite + cache under `/DATA/AppData/retro-tv`, port e.g. `8420`.
+The app gets the Plex URL (`http://<laptop-ip>:32400`) and token via the settings
+UI (Plex PIN sign-in) or env vars. The TV loads `http://<laptop-ip>:8420`; give
+the laptop a DHCP reservation so the address doesn't change.
+
+**Clock sync:** the server exposes `/api/time`. Clients sample it 3× on startup
+and adjust their offset (the spelunkr technique), so every TV agrees on "now".
 
 ### Repo layout (monorepo, pnpm workspaces)
 ```
@@ -162,8 +243,11 @@ android-tv/   # Kotlin WebView wrapper
 ### Data model (first cut)
 ```
 Source       { id, kind, config (plex url/token, archive collections…) }
-MediaItem    { id, sourceId, externalId, title, series?, season?, episode?,
-               year?, durationSec, thumb?, tags[] }
+MediaItem    { id, sourceId, externalId (IA: identifier/filename; Plex: ratingKey),
+               title, series?, season?, episode?, year?, durationSec,
+               inSec?, outSec?, thumb?, tags[], status: 'candidate'|'approved'|'rejected'|'dead',
+               lastCheckedAt }
+SavedQuery   { id, sourceId, query, filters, targetChannelId?, targetFillerPoolId?, lastRunAt }
 Channel      { id, number, name, logo?, mode, anchorTime, rules[], fillerPoolIds[],
                style? (era, CRT preset) }
 Rule         { kind: 'slot'|'block'|'loop'|'shuffle', days?, start?, end?,
@@ -182,9 +266,11 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   current time line, live preview in the corner. Optional "Prevue Channel" mode: a
   channel whose content *is* the auto-scrolling guide.
 - **Info banner:** what's on now/next with progress bar.
+- **Discover** (section 2b): search the Internet Archive, expand items into
+  episodes, bench, screen, make channels or smart channels.
 - **Channel editor** (best on phone/laptop, also usable with D-pad):
   - New channel: name, number, logo, mode.
-  - Add content: search Plex/Archive, pick shows/movies/collections.
+  - Add content: from the bench, Plex libraries/collections, or a saved IA query.
   - Slot editor: a weekly grid; drag shows into slots ("reschedule").
   - Filler settings: commercial breaks on/off, era-appropriate pools.
   - Preview: the materialised next 24h before saving.
@@ -195,31 +281,42 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 
 ## 6. Phased roadmap
 
-**Phase 0 — Spikes (de-risk first)**
-- Schedule engine: loop mode + offset calculation with tests.
-- Play an archive.org MP4 at a computed offset in the browser.
-- Play a Plex item via the transcoder HLS at an offset.
-- Load a test page on the actual Google TV (sideloaded browser *and* a minimal
-  WebView APK) — confirm autoplay, hls.js, key events, performance.
+**Phase 0 — Spikes (de-risk on the real hardware)**
+- Schedule engine: loop mode + offset calculation, with unit tests.
+- A minimal server in Docker on the ZimaOS laptop serving a test page + `/api/time`.
+- On the Chromecast with Google TV, via a minimal WebView APK: play an archive.org
+  MP4 at a computed offset; play a Plex item through the transcoder HLS at an
+  offset; check autoplay, remote key events (CH+/CH−, numbers, Back), channel-change
+  latency and CPU headroom for CSS CRT effects.
+- Measure how many simultaneous Plex transcodes the old laptop can handle (it
+  decides whether we prefer direct play).
 
-**Phase 1 — MVP: "it's a TV"**
-- Channels defined in a JSON file; Archive.org source only.
-- Full-screen player, channel up/down, number entry, static transition, OSD.
-- Guide grid with D-pad navigation.
+**Phase 1 — MVP: "it's a TV" (Internet Archive only)**
+- Server: SQLite, IA adapter with metadata cache, channels + airings API, clock sync.
+- A few hand-seeded channels (e.g. classic TV, Prelinger, cartoons) in loop/shuffle.
+- TV UI: full-screen player, channel up/down, number entry, static transition, OSD,
+  guide grid with D-pad navigation.
 
-**Phase 2 — Server + Plex**
-- Backend with SQLite, Plex adapter + proxy, materialised airings API.
-- Time-slot mode + filler padding.
+**Phase 2 — Discover (IA channel building)**
+- Search/filter UI, expand items into episodes, preview, bench, screening,
+  "make channel from bench", filler pools.
+- Smart (query-backed) channels + nightly refresh and health checks / understudies.
 
-**Phase 3 — Customisation**
-- Channel editor (create, edit, reschedule slots, filler pools), preview.
+**Phase 3 — Plex**
+- Plex PIN sign-in, library browser, Plex adapter + proxy, transcode vs direct play.
+- Plex shows/collections as channel content (e.g. "next episode" series slots).
 
-**Phase 4 — Google TV**
-- Android TV WebView wrapper: launcher banner, key bridge, autoplay, keep-screen-on.
-- Docs for sideloading (Developer Options → `adb connect` → `adb install`).
+**Phase 4 — Real scheduling + editor**
+- Time-slot and block modes with filler padding.
+- Channel editor: weekly slot grid, drag to reschedule, 24h preview.
 
-**Phase 5 — Polish & stretch**
-- CRT presets (CSS + optional WebGL), era bumpers, Prevue-style guide channel.
+**Phase 5 — Google TV polish**
+- WebView wrapper: launcher banner, key bridge, autoplay, keep-screen-on, launch
+  straight to the last channel.
+- Sideloading doc (Developer Options → Network debugging → `adb connect` → `adb install`).
+
+**Phase 6 — Polish & stretch**
+- Era skins, bumpers / "UP NEXT" cards, Prevue-style guide channel.
 - M3U/XMLTV export so channels also appear in Plex Live TV / TiviMate.
 - Native ExoPlayer playback in the wrapper for direct-play codecs.
 
@@ -233,10 +330,9 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   close in spirit).
 
 ## 8. Open questions
-1. Where will the backend run — the same box as Plex (Docker on a NAS/PC)? Is it OK
-   for the TV experience to require that box to be on?
-2. Is this single-household, or should it also work away from home (remote Plex)?
-3. Which device exactly — Chromecast with Google TV, Google TV Streamer, or a TV
-   with Google TV built in? (Affects performance budget.)
-4. Comfortable sideloading an APK, or do you want a Play Store path eventually?
-5. Frontend preference: React vs. Preact/Solid (Preact is lighter for weak TV CPUs).
+1. What CPU is in the ZimaOS laptop, and is the Plex library mostly H.264? An old
+   CPU without Quick Sync may manage only 1–2 transcodes, which pushes us toward
+   direct play wherever possible.
+2. Frontend: proposing **Preact + Vite + TypeScript** (light enough for the
+   Chromecast). Server: **Node + Hono + SQLite**. Speak up if you prefer otherwise.
+3. Any must-have IA collections or channel ideas for the first seeded lineup?
