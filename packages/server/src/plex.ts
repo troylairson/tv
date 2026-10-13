@@ -93,19 +93,8 @@ export interface PlexPlayback {
   media?: { container?: string; videoCodec?: string; audioCodec?: string };
 }
 
-export async function playback(ratingKey: string, offsetSec: number, mode: 'transcode' | 'direct'): Promise<PlexPlayback> {
-  const data = await plexJson<PlexContainer<{ Metadata?: PlexMetadata[] }>>(`/library/metadata/${encodeURIComponent(ratingKey)}`);
-  const media = data.MediaContainer.Metadata?.[0]?.Media?.[0];
-  const mediaInfo = { container: media?.container, videoCodec: media?.videoCodec, audioCodec: media?.audioCodec };
-
-  if (mode === 'direct') {
-    const part = media?.Part?.[0];
-    if (!part) throw new Error(`Plex item ${ratingKey} has no media part`);
-    return { url: `/plex${part.key}`, type: 'file', startAt: offsetSec, media: mediaInfo };
-  }
-
-  const session = randomUUID();
-  const params = new URLSearchParams({
+function transcodeParams(ratingKey: string, offsetSec: number, session: string): URLSearchParams {
+  return new URLSearchParams({
     path: `/library/metadata/${ratingKey}`,
     mediaIndex: '0',
     partIndex: '0',
@@ -128,8 +117,68 @@ export async function playback(ratingKey: string, offsetSec: number, mode: 'tran
     'X-Plex-Client-Profile-Extra':
       'add-transcode-target(type=videoProfile&context=streaming&protocol=hls&container=mpegts&videoCodec=h264&audioCodec=aac)',
   });
+}
+
+export async function playback(ratingKey: string, offsetSec: number, mode: 'transcode' | 'direct'): Promise<PlexPlayback> {
+  const data = await plexJson<PlexContainer<{ Metadata?: PlexMetadata[] }>>(`/library/metadata/${encodeURIComponent(ratingKey)}`);
+  const media = data.MediaContainer.Metadata?.[0]?.Media?.[0];
+  const mediaInfo = { container: media?.container, videoCodec: media?.videoCodec, audioCodec: media?.audioCodec };
+
+  if (mode === 'direct') {
+    const part = media?.Part?.[0];
+    if (!part) throw new Error(`Plex item ${ratingKey} has no media part`);
+    return { url: `/plex${part.key}`, type: 'file', startAt: offsetSec, media: mediaInfo };
+  }
+
+  const session = randomUUID();
+  const params = transcodeParams(ratingKey, offsetSec, session);
   await checkDecision(params);
   return { url: `/plex/video/:/transcode/universal/start.m3u8?${params}`, type: 'hls', startAt: 0, session, media: mediaInfo };
+}
+
+async function probeStep(url: string, init: RequestInit = {}) {
+  const started = Date.now();
+  try {
+    const res = await fetch(url, { ...init, headers: { ...plexHeaders(), ...(init.headers as Record<string, string>) }, signal: AbortSignal.timeout(30_000) });
+    const body = await res.text();
+    return { status: res.status, contentType: res.headers.get('content-type'), ms: Date.now() - started, body: body.slice(0, 600) };
+  } catch (err) {
+    return { error: (err as Error).message, ms: Date.now() - started };
+  }
+}
+
+/**
+ * Run the whole playback chain from the server and report every step's response,
+ * so a "manifest load error" on the TV can be traced to the step that fails.
+ */
+export async function selfTest(ratingKey: string, offsetSec = 60) {
+  const result: Record<string, unknown> = { plexUrl: config.plexUrl, ratingKey, offsetSec };
+  try {
+    const data = await plexJson<PlexContainer<{ Metadata?: PlexMetadata[] }>>(`/library/metadata/${encodeURIComponent(ratingKey)}`);
+    const item = data.MediaContainer.Metadata?.[0];
+    const media = item?.Media?.[0];
+    result.item = { title: item?.title, duration: item?.duration, container: media?.container, videoCodec: media?.videoCodec, audioCodec: media?.audioCodec, part: media?.Part?.[0]?.key };
+    const part = media?.Part?.[0]?.key;
+    if (part) result.direct = await probeStep(`${config.plexUrl}${part}`, { headers: { Range: 'bytes=0-1023' } });
+  } catch (err) {
+    result.metadataError = (err as Error).message;
+    return result;
+  }
+
+  const session = randomUUID();
+  const params = transcodeParams(ratingKey, offsetSec, session);
+  const base = `${config.plexUrl}/video/:/transcode/universal`;
+  result.decision = await probeStep(`${base}/decision?${params}`);
+  const start = await probeStep(`${base}/start.m3u8?${params}`);
+  result.start = start;
+  // Follow the master playlist to the media playlist, the step hls.js takes next.
+  const variant = 'body' in start && start.status === 200 ? start.body?.split('\n').find((l) => l && !l.startsWith('#')) : undefined;
+  if (variant) result.variant = await probeStep(new URL(variant.trim(), `${base}/start.m3u8`).toString());
+  // And the same through our own proxy, the path the TV actually uses.
+  result.viaProxy = await probeStep(`http://127.0.0.1:${config.port}/plex/video/:/transcode/universal/start.m3u8?${transcodeParams(ratingKey, offsetSec, `${session}-proxy`)}`);
+  await stopTranscode(session);
+  await stopTranscode(`${session}-proxy`);
+  return result;
 }
 
 interface Decision {

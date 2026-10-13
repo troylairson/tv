@@ -13,6 +13,13 @@ import { getSettings, loadSettings, updateSettings } from './settings';
 
 const app = new Hono();
 
+// Say UTF-8 explicitly: without it Safari shows raw JSON as Latin-1 ("â€“" for "–").
+app.use('/api/*', async (c, next) => {
+  await next();
+  const type = c.res.headers.get('content-type');
+  if (type?.startsWith('application/json') && !type.includes('charset')) c.res.headers.set('content-type', 'application/json; charset=utf-8');
+});
+
 app.onError((err, c) => {
   console.error(`${c.req.method} ${c.req.path}:`, err.message);
   return c.json({ error: err.message }, 500);
@@ -94,6 +101,17 @@ app.use('/api/plex/*', async (c, next) => {
 
 app.get('/api/plex/status', async (c) => c.json(await plex.identity()));
 app.get('/api/plex/sections', async (c) => c.json(await plex.sections()));
+
+/** Self-test of the whole Plex playback chain. Without an id, uses the first item on a Plex channel. */
+app.get('/api/plex/test/:ratingKey?', async (c) => {
+  let key = c.req.param('ratingKey');
+  if (!key) {
+    const item = getChannels().channels.flatMap((ch) => ch.items).find((i) => i.source === 'plex');
+    if (!item) return c.json({ error: 'No Plex items on any channel yet' }, 404);
+    key = item.ref;
+  }
+  return c.json(await plex.selfTest(key, Number(c.req.query('offset')) || 60));
+});
 
 app.get('/api/plex/play/:ratingKey', async (c) => {
   const offset = Number(c.req.query('offset') ?? 0) || 0;

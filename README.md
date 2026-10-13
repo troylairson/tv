@@ -120,5 +120,6 @@ image includes them).
 Useful endpoints: `/api/channels`, `/api/channels/<id>/airings` (the stored
 schedule, commercials included), `/api/settings`, `/api/commercials` (pool status),
 `/api/time`, `/api/info`, `/api/diag` (reports from every screen, newest first),
-`/api/plex/status`. Plex problems are also logged by the server (`docker logs
-retro-tv`).
+`/api/plex/status`, `/api/plex/test` (runs the whole Plex playback chain from the
+server and shows each step's response). Plex problems are also logged by the
+server (`docker logs retro-tv`).

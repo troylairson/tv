@@ -358,6 +358,10 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   instead of endless retries) and title cleanup came out of this round.
 - **Known issue, deferred to Phase 3: the Plex channel doesn't play.** First
   seen as an HLS "manifest load error". Things to check when we come back to it:
+  0. `http://<laptop-ip>:8420/api/plex/test`: runs metadata → direct read →
+     decision → start.m3u8 → media playlist, plus the same through our proxy,
+     and shows each step's status and body. First diag (Safari on a Mac, old
+     build) showed the very first request (start.m3u8) failing, before any video.
   1. `docker logs retro-tv`: the server now logs Plex's refusal reason and the
      proxy's upstream HTTP status/body.
   2. `/api/diag`: each failed tune records both attempts (convert and direct)
