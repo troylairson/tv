@@ -1,3 +1,4 @@
+import { prettifyTitle } from './titles';
 import type { ChannelItem } from './types';
 
 const IA = 'https://archive.org';
@@ -102,7 +103,7 @@ export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles
     id: `ia:${identifier}/${f.name}`,
     source: 'ia' as const,
     ref: `${identifier}/${f.name}`,
-    title: files.length > 1 ? f.stem.replace(/[_]+/g, ' ') : title,
+    title: files.length > 1 ? prettifyTitle(f.stem, { filename: true }) : prettifyTitle(title),
     durationSec: Math.round(f.durationSec * 100) / 100,
     url: downloadUrl(identifier, f.name),
     thumb: thumbUrl(identifier),

@@ -97,3 +97,33 @@ html, body, #app {
 .diag .ok { color: #7f7; }
 .diag .no { color: #f77; }
 .diag .small { font-size: 1.4vh; }
+
+/* SMPTE-style colour bars for "technical difficulties". */
+.bars {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right,
+    #c0c0c0 0 14.28%, #c0c000 14.28% 28.57%, #00c0c0 28.57% 42.85%, #00c000 42.85% 57.14%,
+    #c000c0 57.14% 71.42%, #c00000 71.42% 85.71%, #0000c0 85.71% 100%);
+}
+
+.bug {
+  position: absolute; left: var(--safe-x); top: var(--safe-y); padding: 0.8vh 1.2vw;
+  font-size: 2.2vh; font-weight: bold; color: var(--accent);
+  background: rgba(0, 0, 0, 0.6); border: 0.3vh solid var(--accent);
+}
+
+.banner-hint { margin-top: 1vh; font-size: 1.8vh; color: var(--dim); text-align: right; }
+
+.settings {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(70vw, 1100px); padding: 3vh 3vw;
+  background: var(--panel); border: 0.4vh solid var(--edge);
+}
+.settings h2 { margin: 0 0 2vh; font-size: 4vh; color: var(--accent); letter-spacing: 0.2em; }
+.settings ul { list-style: none; margin: 0; padding: 0; }
+.settings li { padding: 1.4vh 1.2vw; border: 0.3vh solid transparent; margin-bottom: 0.8vh; }
+.settings li.focused { border-color: var(--accent); background: rgba(255, 210, 63, 0.12); }
+.settings-row { display: flex; justify-content: space-between; font-size: 3vh; font-weight: bold; }
+.settings-value { color: var(--accent); }
+.settings-note { margin-top: 0.5vh; font-size: 1.9vh; color: var(--dim); }
+.settings-hint { margin-top: 2vh; font-size: 1.9vh; color: var(--dim); text-align: center; }

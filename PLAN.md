@@ -194,10 +194,9 @@ breaks: { poolId, min: 1, max: 3, after: 'every-item' | 'every-n-items' | 'none'
   :00/:30, filling the exact gap with as many commercials as fit, then a station
   ID or test card for any leftover seconds.
 
-Unknowns until the ZIP is read on the real network: how many commercials, which
-formats (the "no ._files" description suggests a Mac-made archive, so maybe
-`.mov`), and whether members are stored or deflated. Phase 1's first task
-measures this.
+Measured: 2,032 entries in a ZIP64 archive (277 KB index), almost all deflated
+MP4s with a median size of 3.7 MB. Anything over 3 minutes (infomercials) is
+skipped.
 
 ### Plex
 - Auth with an `X-Plex-Token` (store **server-side only**, never ship to the client).
@@ -353,6 +352,11 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 ## 6. Phased roadmap
 
 **Phase 0 — Spikes (de-risk on the real hardware)** — *code done, awaiting on-device results; see `docs/phase0.md`*
+- Reported so far: some channels hit an HLS "manifest load error" (Plex
+  transcodes). Now Plex's playback decision is checked server-side so the real
+  reason is shown, timeouts are longer for a slow laptop, the TV falls back to
+  the other Plex mode, and failures fill the slot with commercials instead of
+  retrying forever. Filename-style titles are cleaned up.
 - Schedule engine: loop mode + offset calculation, with unit tests.
 - A minimal server in Docker on the ZimaOS laptop serving a test page + `/api/time`.
 - On the Chromecast with Google TV, via a minimal WebView APK: play an archive.org
@@ -368,6 +372,10 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   clients look up "now" from airings instead of computing it.
 - **Commercial breaks:** read the `commercials-clean` ZIP index remotely, cache and
   normalise a rolling pool of commercials, and insert 1–3 between shows (section 2c).
+  *Done early (with the stored schedule and a Settings panel to turn breaks on/off).*
+  The archive turned out to hold 2,032 entries (1,858 MP4, 108 MKV, 31 WebM; most
+  H.264/AAC, so a remux is enough), in year folders 2000–2015 plus "Holiday
+  Commercials". Year folders allow era-matched breaks later.
 - A few hand-seeded channels (e.g. classic TV, Prelinger, cartoons) in loop/shuffle.
 - TV UI: full-screen player, channel up/down, number entry, static transition, OSD,
   guide grid with D-pad navigation.
@@ -411,6 +419,5 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 2. Frontend: proposing **Preact + Vite + TypeScript** (light enough for the
    Chromecast). Server: **Node + Hono + SQLite**. Speak up if you prefer otherwise.
 3. Any must-have IA collections or channel ideas for the first seeded lineup?
-4. Commercial breaks: after **every** show on **every** channel, or should some
-   channels (e.g. Feature Films, or the Commercials channel itself) skip them? And
-   how much laptop disk can the commercial cache use?
+4. ~~Commercial breaks~~: after every show for now (not on the Commercials channel),
+   with an on/off setting. Disk budget defaults to 3 GB (`COMMERCIAL_CACHE_MB`).

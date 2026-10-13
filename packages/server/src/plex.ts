@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { seededShuffle } from '@retro-tv/schedule';
 import { config } from './config';
+import { prettifyTitle } from './titles';
 import type { ChannelItem } from './types';
 
 function plexHeaders(): Record<string, string> {
@@ -49,12 +50,14 @@ export async function sections() {
 }
 
 function displayTitle(m: PlexMetadata): string {
+  const title = prettifyTitle(m.title);
   if (m.type === 'episode' && m.grandparentTitle) {
     const s = String(m.parentIndex ?? 0).padStart(2, '0');
     const e = String(m.index ?? 0).padStart(2, '0');
-    return `${m.grandparentTitle} S${s}E${e} – ${m.title}`;
+    return `${prettifyTitle(m.grandparentTitle)} S${s}E${e} – ${title}`;
   }
-  return m.year ? `${m.title} (${m.year})` : m.title;
+  // Unmatched files often carry the year in the name already: "Movie (1999)".
+  return m.year && !title.includes(String(m.year)) ? `${title} (${m.year})` : title;
 }
 
 /** A stable random sample of movies and episodes across video libraries, for the Phase 0 test channel. */
@@ -125,12 +128,45 @@ export async function playback(ratingKey: string, offsetSec: number, mode: 'tran
     'X-Plex-Client-Profile-Extra':
       'add-transcode-target(type=videoProfile&context=streaming&protocol=hls&container=mpegts&videoCodec=h264&audioCodec=aac)',
   });
-  // Newer Plex servers want a decision before start; older ones don't care. Failure here is not fatal.
-  await fetch(`${config.plexUrl}/video/:/transcode/universal/decision?${params}`, {
-    headers: plexHeaders(),
-    signal: AbortSignal.timeout(15_000),
-  }).catch(() => undefined);
+  await checkDecision(params);
   return { url: `/plex/video/:/transcode/universal/start.m3u8?${params}`, type: 'hls', startAt: 0, session, media: mediaInfo };
+}
+
+interface Decision {
+  generalDecisionCode?: number;
+  generalDecisionText?: string;
+  transcodeDecisionCode?: number;
+  transcodeDecisionText?: string;
+}
+
+/**
+ * Ask Plex whether it can stream this item before handing the URL to the TV.
+ * Without this, a refusal only shows up as an opaque HLS "manifest load error".
+ */
+async function checkDecision(params: URLSearchParams): Promise<void> {
+  let res: Response;
+  try {
+    res = await fetch(`${config.plexUrl}/video/:/transcode/universal/decision?${params}`, {
+      headers: plexHeaders(),
+      signal: AbortSignal.timeout(20_000),
+    });
+  } catch (err) {
+    throw new Error(`Plex didn't answer the playback decision: ${(err as Error).message}`);
+  }
+  // Old servers don't have the endpoint; let them try.
+  if (res.status === 404) return;
+  const body = await res.text();
+  if (!res.ok) throw new Error(`Plex refused to stream (HTTP ${res.status}) ${body.slice(0, 200)}`.trim());
+  let decision: Decision = {};
+  try {
+    decision = (JSON.parse(body) as { MediaContainer?: Decision }).MediaContainer ?? {};
+  } catch {
+    return; // XML or empty: nothing to check
+  }
+  // Codes 1xxx are OK; 2xxx+ mean Plex can neither direct play nor transcode it.
+  if ((decision.generalDecisionCode ?? 1000) >= 2000) {
+    throw new Error(`Plex can't play this: ${decision.generalDecisionText ?? ''} ${decision.transcodeDecisionText ?? ''}`.trim());
+  }
 }
 
 export async function stopTranscode(session: string): Promise<void> {
@@ -156,6 +192,11 @@ export async function proxy(req: Request): Promise<Response> {
   if (range) headers.Range = range;
 
   const res = await fetch(upstream, { method: req.method, headers, signal: req.signal });
+  if (!res.ok && res.status !== 206) {
+    const body = (await res.text()).slice(0, 300);
+    console.warn(`plex proxy: ${req.method} ${incoming.pathname} → HTTP ${res.status} ${body}`);
+    return new Response(body, { status: res.status, headers: { 'content-type': 'text/plain' } });
+  }
   const out = new Headers();
   for (const name of PASS_RESPONSE_HEADERS) {
     const value = res.headers.get(name);

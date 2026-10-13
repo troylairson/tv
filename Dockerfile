@@ -14,6 +14,8 @@ RUN pnpm -r test && pnpm -r build
 FROM node:22-alpine
 WORKDIR /app
 ENV NODE_ENV=production PORT=8420 DATA_DIR=/data WEB_DIR=/app/web
+# ffmpeg/ffprobe check and remux the commercials pulled from the Internet Archive.
+RUN apk add --no-cache ffmpeg
 # server.js is a single bundle (esbuild), so the runtime image needs no node_modules.
 COPY --from=build /src/packages/server/dist/server.js ./server.js
 COPY --from=build /src/packages/web/dist ./web

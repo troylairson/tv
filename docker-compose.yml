@@ -16,6 +16,9 @@ services:
       PLEX_URL: ${PLEX_URL:-http://host.docker.internal:32400}
       PLEX_TOKEN: ${PLEX_TOKEN:-}
       TZ: ${TZ:-America/New_York}
+      # Commercial breaks: how many commercials to keep ready, and the disk budget.
+      COMMERCIAL_POOL_SIZE: ${COMMERCIAL_POOL_SIZE:-200}
+      COMMERCIAL_CACHE_MB: ${COMMERCIAL_CACHE_MB:-3000}
     extra_hosts:
       - "host.docker.internal:host-gateway"
 x-casaos:

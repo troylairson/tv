@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
-import { airingsBetween, type Channel } from '@retro-tv/schedule';
 import { clockStats, now, syncClock } from './clock';
 import { capabilities, report } from './diag';
 import { lastKeyInfo, toAction, type Action, type KeyInfo } from './keys';
+import { Settings, type SettingRow } from './Settings';
 import { initStaticAudio, Static } from './Static';
-import { Tuner, type TunerState } from './tuner';
+import { Tuner, type ChannelInfo, type PlexMode, type TunerState } from './tuner';
 
 const params = new URLSearchParams(location.search);
 /** Set by the Android TV wrapper, which allows autoplay without a gesture. */
 const IN_TV_APP = params.get('tv') === '1';
 const LAST_CHANNEL_KEY = 'retro-tv:last-channel';
 const CRT_KEY = 'retro-tv:crt';
+const PLEX_MODE_KEY = 'retro-tv:plex-mode';
 
 function store(key: string, value?: string): string | null {
   try {
@@ -24,18 +25,33 @@ function store(key: string, value?: string): string | null {
 
 const fmtTime = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
+interface HouseSettings {
+  commercialBreaks: boolean;
+}
+interface PoolStatus {
+  ready: number;
+  target: number;
+  state: string;
+  message?: string;
+}
+
 export function App() {
   const video = useRef<HTMLVideoElement>(null);
   const tuner = useRef<Tuner | null>(null);
   const [poweredOn, setPoweredOn] = useState(false);
-  const [channels, setChannels] = useState<Channel[]>([]);
+  const [channels, setChannels] = useState<ChannelInfo[]>([]);
   const [building, setBuilding] = useState(false);
   const [index, setIndex] = useState(0);
-  const [tunerState, setTunerState] = useState<TunerState>({ status: 'idle', latencies: [], stalls: 0 });
+  const [tunerState, setTunerState] = useState<TunerState>({ status: 'idle', upcoming: [], latencies: [], stalls: 0 });
   const [osdUntil, setOsdUntil] = useState(0);
   const [infoUntil, setInfoUntil] = useState(0);
   const [showDiag, setShowDiag] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [settingsFocus, setSettingsFocus] = useState(0);
+  const [house, setHouse] = useState<HouseSettings | null>(null);
+  const [pool, setPool] = useState<PoolStatus | null>(null);
   const [crt, setCrt] = useState(store(CRT_KEY) !== 'off');
+  const [plexMode, setPlexMode] = useState<PlexMode>(store(PLEX_MODE_KEY) === 'direct' ? 'direct' : 'transcode');
   const [digits, setDigits] = useState('');
   const [lastKey, setLastKey] = useState<KeyInfo | null>(null);
   const [, setTick] = useState(0);
@@ -50,38 +66,52 @@ export function App() {
   useEffect(() => {
     if (!video.current) return;
     tuner.current = new Tuner(video.current, setTunerState);
+    tuner.current.plexMode = plexMode;
     report('caps', { ...caps });
   }, []);
 
   useEffect(() => {
-    if (IN_TV_APP) powerOn();
+    if (IN_TV_APP) void powerOn();
   }, []);
 
   async function loadChannels() {
     const res = await fetch('/api/channels');
-    const body = (await res.json()) as { channels: Channel[]; building: boolean };
+    const body = (await res.json()) as { channels: ChannelInfo[]; building: boolean };
     setBuilding(body.building);
     const list = body.channels.slice().sort((a, b) => a.number - b.number);
     setChannels(list);
     return list;
   }
 
+  async function loadHouseSettings() {
+    try {
+      const [s, p] = await Promise.all([fetch('/api/settings').then((r) => r.json()), fetch('/api/commercials').then((r) => r.json())]);
+      setHouse(s as HouseSettings);
+      setPool(p as PoolStatus);
+    } catch {
+      // Shown as "unavailable" in the panel.
+    }
+  }
+
+  // Enter on the focused power button fires both its click and our key handler; only power on once.
+  const powering = useRef(false);
   async function powerOn() {
-    if (poweredOn) return;
+    if (powering.current) return;
+    powering.current = true;
     initStaticAudio();
     setPoweredOn(true);
     await syncClock();
-    let list = await loadChannels().catch(() => [] as Channel[]);
+    let list = await loadChannels().catch(() => [] as ChannelInfo[]);
     while (!list.length) {
       await new Promise((r) => setTimeout(r, 5000));
-      list = await loadChannels().catch(() => [] as Channel[]);
+      list = await loadChannels().catch(() => [] as ChannelInfo[]);
     }
     const last = Number(store(LAST_CHANNEL_KEY));
     const start = Math.max(0, list.findIndex((c) => c.number === last));
     tuneTo(list, start);
   }
 
-  function tuneTo(list: Channel[], i: number) {
+  function tuneTo(list: ChannelInfo[], i: number) {
     const channel = list[i];
     if (!channel || !tuner.current) return;
     setIndex(i);
@@ -91,6 +121,67 @@ export function App() {
     setInfoUntil(t + 5000);
     void tuner.current.tune(channel);
   }
+
+  function openSettings() {
+    setInfoUntil(0);
+    setSettingsFocus(0);
+    setShowSettings(true);
+    void loadHouseSettings();
+  }
+
+  const poolNote = !pool
+    ? ''
+    : pool.state === 'disabled' || pool.state === 'error'
+      ? ` · ${pool.message ?? pool.state}`
+      : pool.ready < pool.target
+        ? ` · ${pool.ready} of ${pool.target} commercials downloaded`
+        : ` · ${pool.ready} commercials ready`;
+
+  const settingsRows: SettingRow[] = [
+    {
+      label: 'Commercial breaks',
+      value: house ? (house.commercialBreaks ? 'On' : 'Off') : '…',
+      note: `1–3 vintage commercials between shows. Applies to every TV${poolNote}`,
+      activate: async () => {
+        if (!house) return;
+        const res = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ commercialBreaks: !house.commercialBreaks }),
+        });
+        setHouse((await res.json()) as HouseSettings);
+      },
+    },
+    {
+      label: 'CRT effect',
+      value: crt ? 'On' : 'Off',
+      note: 'Scanlines and vignette. This TV only',
+      activate: () => {
+        store(CRT_KEY, crt ? 'off' : 'on');
+        setCrt(!crt);
+      },
+    },
+    {
+      label: 'Plex playback',
+      value: plexMode === 'transcode' ? 'Convert' : 'Direct',
+      note: 'Convert: Plex converts video for this TV. Direct: play files as-is. Falls back to the other if one fails',
+      activate: () => {
+        const next: PlexMode = plexMode === 'transcode' ? 'direct' : 'transcode';
+        store(PLEX_MODE_KEY, next);
+        setPlexMode(next);
+        if (tuner.current) {
+          tuner.current.plexMode = next;
+          if (tunerState.airing?.item.source === 'plex') tuner.current.retune();
+        }
+      },
+    },
+    {
+      label: 'Diagnostics',
+      value: showDiag ? 'Shown' : 'Hidden',
+      note: 'Playback details for troubleshooting (also: ▶ while watching)',
+      activate: () => setShowDiag(!showDiag),
+    },
+  ];
 
   // Key handling reads the latest state through a ref so the listener is attached once.
   const handlerRef = useRef<(action: Action) => boolean>(() => false);
@@ -103,6 +194,25 @@ export function App() {
       tuner.current?.retune();
       return true;
     }
+    if (showSettings) {
+      switch (action.type) {
+        case 'channelUp':
+          setSettingsFocus((settingsFocus - 1 + settingsRows.length) % settingsRows.length);
+          return true;
+        case 'channelDown':
+          setSettingsFocus((settingsFocus + 1) % settingsRows.length);
+          return true;
+        case 'ok':
+          void settingsRows[settingsFocus]?.activate();
+          return true;
+        case 'back':
+        case 'left':
+          setShowSettings(false);
+          return true;
+        default:
+          return true;
+      }
+    }
     switch (action.type) {
       case 'channelUp':
         tuneTo(channels, (index + 1) % channels.length);
@@ -111,13 +221,9 @@ export function App() {
         tuneTo(channels, (index - 1 + channels.length) % channels.length);
         return true;
       case 'ok':
-        if (showDiag && tuner.current) {
-          tuner.current.plexMode = tuner.current.plexMode === 'transcode' ? 'direct' : 'transcode';
-          if (tunerState.airing?.item.source === 'plex') tuner.current.retune();
-          setTick((n) => n + 1);
-        } else {
-          setInfoUntil(infoUntil > Date.now() ? 0 : Date.now() + 8000);
-        }
+        // First OK shows the info banner; OK again (while it's up) opens Settings.
+        if (infoUntil > Date.now()) openSettings();
+        else setInfoUntil(Date.now() + 8000);
         return true;
       case 'right':
         setShowDiag(!showDiag);
@@ -164,16 +270,17 @@ export function App() {
   }, [digits]);
 
   const channel = channels[index];
-  const airing = tunerState.airing;
+  const { airing, status, filler } = tunerState;
   const t = Date.now();
-  const upNext = channel && airing ? airingsBetween(channel, airing.endMs, airing.endMs + 1)[0] : undefined;
+  const nextShow = tunerState.upcoming.find((a) => a.kind === 'show');
   const progress = airing ? Math.min(1, Math.max(0, (now() - airing.startMs) / (airing.endMs - airing.startMs))) : 0;
-  const showStatic = poweredOn && (tunerState.status === 'tuning' || tunerState.status === 'error' || tunerState.status === 'idle');
+  const isBreak = airing?.kind === 'commercial';
 
   return (
     <div class={`tv ${crt ? 'crt' : ''}`}>
       <video ref={video} class="screen" playsInline />
-      <Static visible={showStatic} />
+      {poweredOn && status === 'standby' && !filler && <div class="bars" />}
+      <Static visible={poweredOn && (status === 'tuning' || status === 'idle')} />
 
       {!poweredOn && (
         <button class="power" onClick={() => void powerOn()} autoFocus>
@@ -189,15 +296,17 @@ export function App() {
         </div>
       )}
 
-      {tunerState.status === 'error' && (
+      {status === 'standby' && !filler && (
         <div class="card">
-          <h1>TECHNICAL DIFFICULTIES</h1>
-          <p>{tunerState.error}</p>
-          <p class="dim">Retrying shortly…</p>
+          <h1>PLEASE STAND BY</h1>
+          <p>We're experiencing technical difficulties.</p>
+          {nextShow && <p class="dim">Back at {fmtTime(airing?.endMs ?? nextShow.startMs)} with {nextShow.item.title}</p>}
         </div>
       )}
 
-      {tunerState.status === 'blocked' && (
+      {status === 'standby' && filler && <div class="bug">We'll be right back</div>}
+
+      {status === 'blocked' && (
         <div class="card">
           <h1>PRESS OK</h1>
           <p>The browser needs a button press before it will play sound.</p>
@@ -219,25 +328,32 @@ export function App() {
             </span>
             <span class="banner-clock">{fmtTime(now())}</span>
           </div>
-          <div class="banner-title">{airing.item.title}</div>
+          <div class="banner-title">{isBreak ? 'Commercial Break' : airing.item.title}</div>
           <div class="banner-row dim">
             <span>
-              {fmtTime(airing.startMs)} – {fmtTime(airing.endMs)}
+              {isBreak ? airing.item.title : `${fmtTime(airing.startMs)} – ${fmtTime(airing.endMs)}`}
             </span>
-            {upNext && <span>Next: {upNext.item.title}</span>}
+            {nextShow && (
+              <span>
+                {isBreak ? 'Up next' : 'Next'}: {nextShow.item.title}
+              </span>
+            )}
           </div>
           <div class="progress">
             <div class="progress-fill" style={{ width: `${progress * 100}%` }} />
           </div>
+          <div class="banner-hint">OK again for Settings</div>
         </div>
       )}
 
-      {showDiag && (
-        <Diagnostics state={tunerState} caps={caps} lastKey={lastKey} plexMode={tuner.current?.plexMode ?? 'transcode'} video={video.current} />
+      {showSettings && <Settings rows={settingsRows} focus={settingsFocus} />}
+
+      {showDiag && !showSettings && (
+        <Diagnostics state={tunerState} caps={caps} lastKey={lastKey} plexMode={plexMode} video={video.current} />
       )}
 
-      {poweredOn && !showDiag && infoUntil > t && (
-        <div class="hint">▲▼ channel · OK info · ◀ CRT effect · ▶ diagnostics</div>
+      {poweredOn && !showDiag && !showSettings && infoUntil > t && (
+        <div class="hint">▲▼ channel · OK info · OK OK settings</div>
       )}
     </div>
   );
@@ -304,7 +420,7 @@ function Diagnostics({
           offset {offsetMs} ms, rtt {rttMs ?? '–'} ms
         </dd>
         <dt>Plex mode</dt>
-        <dd>{plexMode} (OK to switch)</dd>
+        <dd>{plexMode} (change in Settings)</dd>
         <dt>Last key</dt>
         <dd>{lastKey ? `key="${lastKey.key}" code="${lastKey.code}" keyCode=${lastKey.keyCode}` : '–'}</dd>
         <dt>Screen</dt>

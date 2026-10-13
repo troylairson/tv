@@ -4,7 +4,7 @@ Always-on, cable-TV-style channels built from the Internet Archive and your Plex
 server. Every screen in the house shows the same thing at the same moment: tune in
 at 3:17 am and you land mid-episode, like real TV.
 
-See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0** (spikes on
+See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0, plus commercial breaks from Phase 1** (spikes on
 the real hardware). See [docs/phase0.md](docs/phase0.md) for what to test.
 
 ## What's here
@@ -51,10 +51,31 @@ to turn the TV on.
 |---|---|
 | ↑ / ↓ (also PgUp/PgDn, CH+/CH−) | Channel up / down |
 | 0–9 | Type a channel number |
-| Enter / OK | Show/hide the info banner |
-| → | Diagnostics panel (with it open, OK switches Plex transcode/direct) |
+| Enter / OK | Info banner; **OK again** opens **Settings** |
+| → | Diagnostics panel |
 | ← | CRT effect on/off |
 | Esc / Back | Close panels |
+
+**Settings** (OK, OK): commercial breaks on/off (applies to every TV in the
+house), CRT effect and Plex playback mode (this TV only), diagnostics.
+
+## Commercial breaks
+
+Between shows, every channel (except the Commercials channel) plays 1–3 vintage
+commercials from the Internet Archive's
+[`commercials-clean`](https://archive.org/download/commercials-clean) archive
+(about 2,000 commercials from 2000–2015). The archive is one 21 GB ZIP, so the
+server never downloads all of it: it reads the ZIP's index, then pulls
+commercials one at a time, checks them with ffprobe, remuxes them for streaming
+and keeps a rolling pool on disk (`/DATA/AppData/retro-tv/commercials`). Breaks
+start once 5 commercials are ready, usually within a minute of first start.
+
+Tune with environment variables: `COMMERCIAL_POOL_SIZE` (default 200) and
+`COMMERCIAL_CACHE_MB` (default 3000).
+
+If a show won't play (a dead link, or Plex refuses), the TV first tries the other
+Plex mode, then fills the slot with commercials under a "We'll be right back"
+bug (or colour bars) and returns for the next show on schedule.
 
 ## Install on the Chromecast with Google TV
 
@@ -91,7 +112,12 @@ pnpm build        # packages/server/dist/server.js (single bundle) + packages/we
 ```
 
 Server environment: `PORT` (8420), `DATA_DIR` (`./data`), `WEB_DIR`
-(`../web/dist`), `PLEX_URL`, `PLEX_TOKEN`.
+(`../web/dist`), `PLEX_URL`, `PLEX_TOKEN`, `COMMERCIAL_POOL_SIZE`,
+`COMMERCIAL_CACHE_MB`. Commercials need `ffmpeg`/`ffprobe` on the PATH (the Docker
+image includes them).
 
-Useful endpoints: `/api/channels`, `/api/time`, `/api/info`, `/api/diag`
-(reports from every screen, newest first), `/api/plex/status`.
+Useful endpoints: `/api/channels`, `/api/channels/<id>/airings` (the stored
+schedule, commercials included), `/api/settings`, `/api/commercials` (pool status),
+`/api/time`, `/api/info`, `/api/diag` (reports from every screen, newest first),
+`/api/plex/status`. Plex problems are also logged by the server (`docker logs
+retro-tv`).

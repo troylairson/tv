@@ -4,8 +4,12 @@ import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import { getChannels, initChannels, rebuild } from './channels';
+import { mediaPath, poolStatus, readyCommercials, startCommercialPool } from './commercials';
 import { config, plexConfigured } from './config';
+import { serveFile } from './media';
 import * as plex from './plex';
+import { airingsFor, ensureLineup, loadLineups, referencedCommercials, regenerate } from './scheduler';
+import { getSettings, loadSettings, updateSettings } from './settings';
 
 const app = new Hono();
 
@@ -22,10 +26,59 @@ app.get('/api/time', (c) => {
 
 app.get('/api/info', (c) => {
   const { channels, builtAt, building } = getChannels();
-  return c.json({ plexConfigured: plexConfigured(), channels: channels.length, builtAt, building });
+  return c.json({ plexConfigured: plexConfigured(), channels: channels.length, builtAt, building, commercials: poolStatus() });
 });
 
-app.get('/api/channels', (c) => c.json(getChannels()));
+/** Channel list without the (large) item lists; what's on comes from /airings. */
+app.get('/api/channels', (c) => {
+  const { channels, builtAt, building } = getChannels();
+  return c.json({
+    builtAt,
+    building,
+    channels: channels.map(({ items, ...channel }) => ({ ...channel, itemCount: items.length })),
+  });
+});
+
+/** The stored schedule for one channel: shows and commercial breaks. */
+app.get('/api/channels/:id/airings', (c) => {
+  const channel = getChannels().channels.find((ch) => ch.id === c.req.param('id'));
+  if (!channel) return c.json({ error: 'No such channel' }, 404);
+  const now = Date.now();
+  const from = Number(c.req.query('from')) || now - 10 * 60_000;
+  const to = Math.min(Number(c.req.query('to')) || now + 3 * 3600_000, now + 48 * 3600_000);
+  c.header('cache-control', 'no-store');
+  return c.json({ airings: airingsFor(channel, from, to) });
+});
+
+// ── Settings (house-wide: they change the shared schedule) ──────────────────
+
+app.get('/api/settings', (c) => c.json(getSettings()));
+
+app.put('/api/settings', async (c) => {
+  const before = getSettings();
+  const after = await updateSettings((await c.req.json().catch(() => ({}))) as Record<string, unknown>);
+  if (before.commercialBreaks !== after.commercialBreaks) regenerate(getChannels().channels);
+  return c.json(after);
+});
+
+// ── Commercials ──────────────────────────────────────────────────────────────
+
+app.get('/api/commercials', (c) => c.json(poolStatus()));
+
+/** A few random commercials, used by a TV to fill time when a show won't play. */
+app.get('/api/commercials/random', (c) => {
+  const count = Math.min(20, Number(c.req.query('count')) || 6);
+  const pool = readyCommercials();
+  const picks = [];
+  for (let i = 0; i < count && pool.length; i++) picks.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]!);
+  return c.json({ commercials: picks });
+});
+
+app.get('/media/commercials/:file', (c) => {
+  const file = mediaPath(c.req.param('file'));
+  if (!file) return c.text('Not found', 404);
+  return serveFile(file, c.req.header('range'));
+});
 
 app.post('/api/channels/rebuild', (c) => {
   void rebuild().catch((err) => console.error('channel build failed', err));
@@ -81,7 +134,17 @@ const webRoot = path.relative(process.cwd(), config.webDir) || '.';
 app.use('/*', serveStatic({ root: webRoot }));
 app.get('*', serveStatic({ root: webRoot, path: 'index.html' }));
 
+await loadSettings();
+await loadLineups();
 await initChannels();
+await startCommercialPool({
+  onChange: () => regenerate(getChannels().channels),
+  referenced: referencedCommercials,
+});
+// Keep every channel's lineup topped up (and pruned) even when nobody is watching it.
+setInterval(() => {
+  for (const channel of getChannels().channels) ensureLineup(channel);
+}, 10 * 60_000);
 serve({ fetch: app.fetch, port: config.port, hostname: '0.0.0.0' }, ({ port }) => {
   console.log(`retro-tv listening on http://0.0.0.0:${port} (web: ${config.webDir}, data: ${config.dataDir}, plex: ${plexConfigured() ? config.plexUrl : 'off'})`);
 });
