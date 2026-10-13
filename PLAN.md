@@ -84,6 +84,16 @@ the schedule into a concrete list of `Airing { channelId, start, end, mediaId,
 offsetIntoMedia }` for a rolling window (e.g. now-2h → now+48h) and caches it.
 Editing a channel invalidates from "now" forward — the past stays as it aired.
 
+**Decision (from commercial breaks, section 2c): materialise from Phase 1.**
+Random 1–3 commercial breaks make every pass through a channel a different
+length, so "position = elapsed mod total" stops working. Instead the server
+*generates* airings forward and **persists them** (SQLite): it keeps each channel
+≥ 48 h ahead, appending show → break → show… with the seeded PRNG making the
+choices. Clients fetch `/api/channels/:id/airings?from&to` and binary-search for
+"now". The schedule stays deterministic and shared by every screen, and the same
+machinery later handles time slots and blocks. The pure engine stays as the
+generator and for tests.
+
 ---
 
 ## 2. Sources
@@ -132,6 +142,62 @@ The in-app equivalent of spelunkr's curation, usable from a phone/laptop browser
 
 All IA calls go through our server, which caches metadata in SQLite. That keeps
 the TV fast and keeps us polite to archive.org.
+
+### 2c. Commercial breaks between shows
+
+Goal: when a show ends, play **1–3 vintage commercials**, then the next show, like
+real broadcast TV. The first pool is the Internet Archive item
+[`commercials-clean`](https://archive.org/download/commercials-clean)
+("Commercials (Clean)").
+
+**The source is one 20.9 GB ZIP** (`Commercials (Clean).zip`), not individual
+videos. So archive.org hasn't made MP4 copies or recorded durations, and it can't
+be used like the other IA items. Plan:
+
+1. **Read the ZIP remotely, never download all of it.** A ZIP's table of contents
+   (central directory) sits at the end of the file. The server fetches it with
+   HTTP `Range` requests (a few MB at most), giving every member's name, size,
+   offset and compression method. That's the commercial catalogue.
+2. **Fetch commercials on demand.** For each commercial picked, range-request just
+   its bytes (inflate it if the member is deflated, usually it's stored) and save
+   it to `/DATA/AppData/retro-tv/cache/commercials/`.
+3. **Probe and normalise.** `ffprobe` for duration and codecs. If it isn't
+   H.264/AAC in MP4, transcode once with `ffmpeg` (commercials are short, so it's
+   cheap even on the old laptop). Record each one as a `MediaItem` in a
+   `FillerPool` of kind `commercial`.
+4. **Keep a rolling pool.** A background job keeps N ready-to-air commercials
+   cached (e.g. 300, or a disk budget like 3 GB) and slowly rotates new ones in,
+   so breaks stay varied without storing all 21 GB. Members that fail to probe or
+   play are marked dead and skipped.
+5. **Serve from the laptop.** Cached commercials are served by our server
+   (`/media/commercials/…`) with `Range` support, so they start instantly and can
+   be joined mid-commercial when someone tunes in.
+
+Fallback if range reads ever fail: archive.org can extract single members on the
+fly (`/download/commercials-clean/Commercials%20(Clean).zip/<member>`). Use that
+URL for fetching instead; caching and probing stay the same.
+
+**Scheduling a break** (per channel, configurable):
+
+```
+breaks: { poolId, min: 1, max: 3, after: 'every-item' | 'every-n-items' | 'none',
+          avoidRepeatWithin: '2h' }
+```
+
+- After each show, the generator picks k ∈ [min, max] commercials with the
+  channel's seeded PRNG, never repeating one aired on that channel in the last
+  `avoidRepeatWithin`.
+- Breaks are real airings (`isFiller: true`): the guide shows only the shows
+  (start times include the break), and the info banner says "Commercial break".
+- Changing channels into a break joins it mid-commercial, like real TV.
+- Later, **time-slot mode** uses the same pool to *pad* a show out to the next
+  :00/:30, filling the exact gap with as many commercials as fit, then a station
+  ID or test card for any leftover seconds.
+
+Unknowns until the ZIP is read on the real network: how many commercials, which
+formats (the "no ._files" description suggests a Mac-made archive, so maybe
+`.mov`), and whether members are stored or deflated. Phase 1's first task
+measures this.
 
 ### Plex
 - Auth with an `X-Plex-Token` (store **server-side only**, never ship to the client).
@@ -252,10 +318,12 @@ MediaItem    { id, sourceId, externalId (IA: identifier/filename; Plex: ratingKe
                lastCheckedAt }
 SavedQuery   { id, sourceId, query, filters, targetChannelId?, targetFillerPoolId?, lastRunAt }
 Channel      { id, number, name, logo?, mode, anchorTime, rules[], fillerPoolIds[],
+               breaks?: { poolId, min, max, after, avoidRepeatWithin },
                style? (era, CRT preset) }
 Rule         { kind: 'slot'|'block'|'loop'|'shuffle', days?, start?, end?,
                contentRef: {mediaIds | seriesId | collection | query}, order: 'next'|'random' }
-FillerPool   { id, mediaIds[], kind: 'commercial'|'bumper'|'station_id'|'test_card' }
+FillerPool   { id, mediaIds[], kind: 'commercial'|'bumper'|'station_id'|'test_card',
+               source?: { kind: 'ia-zip', identifier, file, cacheBudgetMb } }
 Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materialised
 ```
 
@@ -295,7 +363,11 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   decides whether we prefer direct play).
 
 **Phase 1 — MVP: "it's a TV" (Internet Archive only)**
-- Server: SQLite, IA adapter with metadata cache, channels + airings API, clock sync.
+- Server: SQLite, IA adapter with metadata cache, clock sync.
+- **Materialised schedule:** generator writes airings ≥ 48 h ahead; airings API;
+  clients look up "now" from airings instead of computing it.
+- **Commercial breaks:** read the `commercials-clean` ZIP index remotely, cache and
+  normalise a rolling pool of commercials, and insert 1–3 between shows (section 2c).
 - A few hand-seeded channels (e.g. classic TV, Prelinger, cartoons) in loop/shuffle.
 - TV UI: full-screen player, channel up/down, number entry, static transition, OSD,
   guide grid with D-pad navigation.
@@ -339,3 +411,6 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 2. Frontend: proposing **Preact + Vite + TypeScript** (light enough for the
    Chromecast). Server: **Node + Hono + SQLite**. Speak up if you prefer otherwise.
 3. Any must-have IA collections or channel ideas for the first seeded lineup?
+4. Commercial breaks: after **every** show on **every** channel, or should some
+   channels (e.g. Feature Films, or the Commercials channel itself) skip them? And
+   how much laptop disk can the commercial cache use?
