@@ -351,12 +351,22 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 
 ## 6. Phased roadmap
 
-**Phase 0 — Spikes (de-risk on the real hardware)** — *code done, awaiting on-device results; see `docs/phase0.md`*
-- Reported so far: some channels hit an HLS "manifest load error" (Plex
-  transcodes). Now Plex's playback decision is checked server-side so the real
-  reason is shown, timeouts are longer for a slow laptop, the TV falls back to
-  the other Plex mode, and failures fill the slot with commercials instead of
-  retrying forever. Filename-style titles are cleaned up.
+**Phase 0 — Spikes (de-risk on the real hardware)** — ✅ *done*
+- Result: the server runs on ZimaOS, the app runs on the Chromecast with Google TV,
+  and every Internet Archive channel plays. The TV-side failure handling
+  (decision check, fallback to the other Plex mode, commercials or colour bars
+  instead of endless retries) and title cleanup came out of this round.
+- **Known issue, deferred to Phase 3: the Plex channel doesn't play.** First
+  seen as an HLS "manifest load error". Things to check when we come back to it:
+  1. `docker logs retro-tv`: the server now logs Plex's refusal reason and the
+     proxy's upstream HTTP status/body.
+  2. `/api/diag`: each failed tune records both attempts (convert and direct)
+     with their errors.
+  3. `/api/plex/status`: confirms URL and token from inside the container
+     (`host.docker.internal` vs the laptop's LAN IP).
+  4. Whether Plex rejects the transcode parameters (try without
+     `X-Plex-Client-Profile-Extra`, or with the decision's session reused) and
+     whether direct play fails on codecs (MKV/HEVC/AC-3) vs the network.
 - Schedule engine: loop mode + offset calculation, with unit tests.
 - A minimal server in Docker on the ZimaOS laptop serving a test page + `/api/time`.
 - On the Chromecast with Google TV, via a minimal WebView APK: play an archive.org
@@ -386,6 +396,7 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 - Smart (query-backed) channels + nightly refresh and health checks / understudies.
 
 **Phase 3 — Plex**
+- First: fix the Plex channel not playing (see the known issue under Phase 0).
 - Plex PIN sign-in, library browser, Plex adapter + proxy, transcode vs direct play.
 - Plex shows/collections as channel content (e.g. "next episode" series slots).
 

@@ -4,7 +4,8 @@ Always-on, cable-TV-style channels built from the Internet Archive and your Plex
 server. Every screen in the house shows the same thing at the same moment: tune in
 at 3:17 am and you land mid-episode, like real TV.
 
-See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0, plus commercial breaks from Phase 1** (spikes on
+See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0 done; commercial breaks from Phase 1 are in.** Known issue:
+the Plex channel doesn't play yet (tracked in the plan, Phase 3) (spikes on
 the real hardware). See [docs/phase0.md](docs/phase0.md) for what to test.
 
 ## What's here
