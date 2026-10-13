@@ -2,6 +2,7 @@ import type { ChannelConfig, ChannelItem, SourceRef } from '@retro-tv/schedule';
 
 export interface ChannelStatus extends ChannelConfig {
   itemCount: number;
+  slotItemCounts: Record<string, number>;
   totalSec: number;
   resolving: boolean;
   resolvedAt: string | null;
@@ -37,7 +38,8 @@ export interface PreviewBlock {
   title: string;
   startMs: number;
   endMs: number;
-  kind: 'show' | 'break';
+  kind: 'show' | 'break' | 'offair';
+  slot?: boolean;
 }
 
 async function call<T>(url: string, init?: RequestInit): Promise<T> {
@@ -53,7 +55,7 @@ const json = (method: string, data: unknown): RequestInit => ({
   body: JSON.stringify(data),
 });
 
-export type ChannelFields = Pick<ChannelConfig, 'number' | 'name' | 'mode' | 'breaks' | 'sources' | 'excluded'>;
+export type ChannelFields = Pick<ChannelConfig, 'number' | 'name' | 'mode' | 'breaks' | 'sources' | 'excluded' | 'slots'>;
 
 export const api = {
   channels: () => call<{ channels: ChannelStatus[]; plexConfigured: boolean }>('/api/manage/channels'),

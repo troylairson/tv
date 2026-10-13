@@ -7,14 +7,18 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import {
   extendLineup,
+  extendScheduledLineup,
   itemsKey,
   pruneLineup,
   rebaseLineup,
+  slotsKey,
   startLineup,
+  startScheduledLineup,
   truncateLineup,
   type BreakOptions,
   type Lineup,
   type LineupAiring,
+  type SlotSchedule,
 } from '@retro-tv/schedule';
 import { MIN_READY_FOR_BREAKS, readyCommercials } from './commercials';
 import { config } from './config';
@@ -57,21 +61,36 @@ function breaksFor(channel: Channel): BreakOptions<ChannelItem> | null {
   return { pool, min: 1, max: 3, avoidRepeat: Math.min(30, Math.floor(pool.length / 2)) };
 }
 
+function scheduleFor(channel: Channel): SlotSchedule<ChannelItem> | null {
+  return channel.slots?.length ? { timeZone: getSettings().timeZone, slots: channel.slots } : null;
+}
+
 /** Make sure the channel's lineup covers [now, untilMs] and return it. */
 export function ensureLineup(channel: Channel, untilMs = Date.now() + HORIZON_MS): Lineup<ChannelItem> | null {
   const now = Date.now();
+  const schedule = scheduleFor(channel);
+  const start = () => (schedule ? startScheduledLineup(channel, schedule, now) : startLineup(channel, now));
   let lineup: Lineup<ChannelItem> | null = lineups.get(channel.id) ?? null;
   const last = lineup?.airings[lineup.airings.length - 1];
 
   if (!lineup || !last || last.endMs < now) {
-    // New channel, or the server was off past the end of the stored lineup: join the plain schedule.
-    lineup = startLineup(channel, now);
+    // New channel, or the server was off past the end of the stored lineup: start afresh.
+    lineup = start();
   } else if (lineup.itemsKey !== itemsKey(channel)) {
-    lineup = rebaseLineup(lineup, channel, now);
+    // Regular programming changed: finish what's on, then join the new list.
+    lineup = rebaseLineup(lineup, channel, now) ?? start();
+  } else if ((lineup.slotsKey ?? '') !== slotsKey(schedule)) {
+    // Time slots (or the house time zone) changed: keep what's on, regenerate after it.
+    lineup = truncateLineup(lineup, now);
   }
   if (!lineup) return null;
 
-  if (lineup.cursorMs < untilMs) lineup = extendLineup(lineup, channel, Math.max(untilMs, now + HORIZON_MS) + EXTEND_SLACK_MS, breaksFor(channel));
+  if (lineup.cursorMs < untilMs || (lineup.slotsKey ?? '') !== slotsKey(schedule)) {
+    const until = Math.max(untilMs, now + HORIZON_MS) + EXTEND_SLACK_MS;
+    lineup = schedule
+      ? extendScheduledLineup(lineup, channel, schedule, until, breaksFor(channel))
+      : { ...extendLineup(lineup, channel, until, breaksFor(channel)), slotsKey: '' };
+  }
   lineup = pruneLineup(lineup, now - KEEP_PAST_MS);
   if (lineup !== lineups.get(channel.id)) {
     lineups.set(channel.id, lineup);
@@ -111,7 +130,9 @@ export interface GuideBlock {
   startMs: number;
   /** Includes the commercial break that follows, like a printed TV listing. */
   endMs: number;
-  kind: 'show' | 'break';
+  kind: 'show' | 'break' | 'offair';
+  /** Part of a time slot. */
+  slot?: boolean;
 }
 
 /** The channel's programmes for a guide row: shows only, each spanning up to the next show. */
@@ -121,9 +142,17 @@ export function guideBlocks(channel: Channel, fromMs: number, toMs: number): Gui
   const blocks: GuideBlock[] = [];
   for (const a of airings) {
     const last = blocks[blocks.length - 1];
-    if (a.kind === 'show') blocks.push({ title: a.item.title, startMs: a.startMs, endMs: a.endMs, kind: 'show' });
-    else if (last && last.endMs === a.startMs) last.endMs = a.endMs;
-    else blocks.push({ title: 'Commercial Break', startMs: a.startMs, endMs: a.endMs, kind: 'break' });
+    if (a.kind === 'show') {
+      blocks.push({ title: a.item.title, startMs: a.startMs, endMs: a.endMs, kind: 'show', slot: Boolean(a.slotId) || undefined });
+    } else if (a.kind === 'offair') {
+      if (last?.kind === 'offair' && last.endMs === a.startMs) last.endMs = a.endMs;
+      else blocks.push({ title: 'Off the Air', startMs: a.startMs, endMs: a.endMs, kind: 'offair' });
+    } else if (last && last.kind !== 'offair' && last.endMs === a.startMs) {
+      // Commercials and "coming up" cards belong to the show before them.
+      last.endMs = a.endMs;
+    } else {
+      blocks.push({ title: 'Commercial Break', startMs: a.startMs, endMs: a.endMs, kind: 'break' });
+    }
   }
   return blocks.filter((b) => b.endMs > fromMs && b.startMs < toMs);
 }

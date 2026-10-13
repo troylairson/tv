@@ -1,4 +1,5 @@
 import type { ChannelMode, ScheduleItem } from './index';
+import type { TimeSlot } from './slots';
 
 /** Shared between server and web: what /api/channels returns. */
 export interface ChannelItem extends ScheduleItem {
@@ -19,7 +20,10 @@ export interface Channel {
   anchorMs: number;
   /** false: never insert commercial breaks (e.g. the Commercials channel itself). */
   breaks?: boolean;
+  /** Regular programming (plays outside time slots). */
   items: ChannelItem[];
+  /** Time slots with their resolved items. */
+  slots?: TimeSlot<ChannelItem>[];
 }
 
 /** Where a channel's content comes from. A channel plays its sources' items in order (or shuffled). */
@@ -31,6 +35,18 @@ export type SourceRef =
   | { kind: 'plex-sample'; count: number; title: string }
   | { kind: 'ia-search'; query: string; items: number; filesPerItem: number; title: string }
   | { kind: 'ia-item'; identifier: string; title: string };
+
+/** "These days, at this time, for this long, play this." Times are in the house time zone. */
+export interface SlotConfig {
+  id: string;
+  /** 0 = Sunday … 6 = Saturday. */
+  days: number[];
+  /** "HH:MM", 24-hour. */
+  start: string;
+  durationMin: number;
+  order: 'next' | 'random';
+  source: SourceRef;
+}
 
 /** A channel as the user defines it; the server resolves its sources into items. */
 export interface ChannelConfig {
@@ -44,4 +60,6 @@ export interface ChannelConfig {
   sources: SourceRef[];
   /** Item ids the user removed from what the sources produced. */
   excluded: string[];
+  /** Time slots on top of the regular programming. */
+  slots?: SlotConfig[];
 }

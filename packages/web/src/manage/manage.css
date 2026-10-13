@@ -112,3 +112,36 @@ body.manage #app { height: auto; overflow: visible; }
   .mg-channel .mg-actions { width: 100%; justify-content: flex-end; }
   .mg-grid { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); }
 }
+
+.mg button.mg-link-button { background: none; border: 0; padding: 0; color: var(--mg-accent); text-decoration: underline; }
+.mg-slots { list-style: none; margin: 12px 0; padding: 0; display: grid; gap: 10px; }
+.mg-slot { border: 1px solid var(--mg-line); border-radius: 8px; padding: 10px 12px; background: #140f3e; }
+.mg-slot-head { display: flex; flex-wrap: wrap; gap: 4px 12px; align-items: baseline; margin-bottom: 8px; }
+.mg-slot-fields { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: flex-end; }
+.mg-days { display: flex; gap: 3px; }
+.mg .mg-days button { width: 34px; padding: 6px 0; text-align: center; }
+.mg .mg-days button.active { background: var(--mg-accent); color: #160d45; border-color: var(--mg-accent); font-weight: 700; }
+.mg-slot-picker { margin-top: 10px; }
+.mg-slot-picker .mg-card { background: #0f0b33; }
+.mg-preview li.slot { color: var(--mg-fg); }
+.mg-preview .mg-badge { margin: 0 0 0 8px; vertical-align: 1px; background: #6b4b10; }
+
+.mg-week { display: flex; gap: 2px; margin: 12px 0; overflow-x: auto; font-size: 11px; }
+.mg-week-hours { position: relative; width: 38px; flex: none; margin-top: 18px; color: var(--mg-dim); }
+.mg-week-hours div { position: absolute; right: 4px; transform: translateY(-50%); }
+.mg-week-day { flex: 1; min-width: 56px; }
+.mg-week-dayname { text-align: center; color: var(--mg-dim); height: 18px; }
+.mg-week-col {
+  position: relative; border-radius: 4px;
+  background: repeating-linear-gradient(to bottom, #1d1756 0 1px, #120d3a 1px 66px);
+}
+.mg-week-block {
+  position: absolute; left: 2px; right: 2px; overflow: hidden; padding: 1px 3px; border-radius: 3px;
+  color: #160d45; font-weight: 600; line-height: 1.2; white-space: nowrap; text-overflow: ellipsis;
+}
+.mg-week-block.c0 { background: #ffd23f; }
+.mg-week-block.c1 { background: #7fe08a; }
+.mg-week-block.c2 { background: #7fc8ff; }
+.mg-week-block.c3 { background: #ff9fd0; }
+.mg-week-block.c4 { background: #ffb36b; }
+.mg-week-block.c5 { background: #c9a6ff; }

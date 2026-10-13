@@ -2,6 +2,7 @@ import type { ChannelItem, SourceRef } from '@retro-tv/schedule';
 import { useEffect, useState } from 'preact/hooks';
 import { AddContent } from './AddContent';
 import { api, fmtDuration, sourceLabel, type ChannelFields, type ChannelStatus, type PreviewBlock } from './api';
+import { Schedule, type DraftSlot } from './Schedule';
 
 type Route = { page: 'list' } | { page: 'new' } | { page: 'edit'; id: string };
 
@@ -112,11 +113,13 @@ function ChannelList() {
   );
 }
 
-const EMPTY: ChannelFields = { number: 0, name: '', mode: 'loop', breaks: true, sources: [], excluded: [] };
+type Form = Omit<ChannelFields, 'slots'> & { slots: DraftSlot[] };
+
+const EMPTY: Form = { number: 0, name: '', mode: 'loop', breaks: true, sources: [], excluded: [], slots: [] };
 
 function Editor({ id }: { id: string | null }) {
   const [saved, setSaved] = useState<ChannelStatus | null>(null);
-  const [form, setForm] = useState<ChannelFields>(EMPTY);
+  const [form, setForm] = useState<Form>(EMPTY);
   const [plexConfigured, setPlexConfigured] = useState(false);
   const [dirty, setDirty] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -137,7 +140,7 @@ function Editor({ id }: { id: string | null }) {
     }
     const c = r.channels.find((ch) => ch.id === id) ?? null;
     setSaved(c);
-    if (c && !dirty) setForm({ number: c.number, name: c.name, mode: c.mode, breaks: c.breaks, sources: c.sources, excluded: c.excluded });
+    if (c && !dirty) setForm({ number: c.number, name: c.name, mode: c.mode, breaks: c.breaks, sources: c.sources, excluded: c.excluded, slots: c.slots ?? [] });
   };
 
   useEffect(() => {
@@ -151,7 +154,7 @@ function Editor({ id }: { id: string | null }) {
     return () => clearInterval(t);
   }, [saved?.resolving, saved?.upToDate, dirty]);
 
-  const set = (patch: Partial<ChannelFields>) => {
+  const set = (patch: Partial<Form>) => {
     setForm((f) => ({ ...f, ...patch }));
     setDirty(true);
     setNotice(null);
@@ -171,16 +174,22 @@ function Editor({ id }: { id: string | null }) {
   };
 
   async function save() {
+    const unpicked = form.slots.findIndex((s) => !s.source);
+    if (unpicked >= 0) {
+      setError(`Time slot ${unpicked + 1}: pick a show first`);
+      return;
+    }
+    const fields: ChannelFields = { ...form, slots: form.slots.map((s) => ({ ...s, source: s.source! })) };
     setSaving(true);
     setError(null);
     try {
       if (id) {
-        await api.update(id, form);
+        await api.update(id, fields);
         setDirty(false);
         setNotice('Saved. Changes start after what’s on now.');
         await load();
       } else {
-        const created = await api.create({ ...form, name: form.name || 'New Channel' });
+        const created = await api.create({ ...fields, name: fields.name || 'New Channel' });
         go(`/manage/${encodeURIComponent(created.id)}`);
       }
     } catch (e) {
@@ -224,8 +233,9 @@ function Editor({ id }: { id: string | null }) {
         </label>
       </div>
 
-      <h2>Content</h2>
+      <h2>Regular programming</h2>
       <div class="mg-card">
+        <p class="mg-dim small">Plays whenever no time slot is on. Leave it empty for a channel that's only on during its time slots.</p>
         {form.sources.length === 0 && <p class="mg-dim">Nothing yet. Add shows, movies or collections below.</p>}
         <ol class="mg-sources">
           {form.sources.map((s, i) => (
@@ -253,6 +263,14 @@ function Editor({ id }: { id: string | null }) {
         )}
       </div>
 
+      <h2>Time slots</h2>
+      <Schedule
+        slots={form.slots}
+        onChange={(slots) => set({ slots })}
+        episodeCounts={saved?.slotItemCounts ?? {}}
+        plexConfigured={plexConfigured}
+      />
+
       <div class="mg-savebar">
         {error && <span class="mg-error">{error}</span>}
         {notice && !error && <span class="mg-notice">{notice}</span>}
@@ -261,7 +279,7 @@ function Editor({ id }: { id: string | null }) {
         </button>
       </div>
 
-      <h2>Add content</h2>
+      <h2>Add to regular programming</h2>
       <AddContent plexConfigured={plexConfigured} onAdd={addSource} added={form.sources} />
 
       {id && saved && (
@@ -328,7 +346,7 @@ function Preview({ channel }: { channel: ChannelStatus }) {
   const [blocks, setBlocks] = useState<PreviewBlock[] | null>(null);
   useEffect(() => {
     void api.preview(channel.id).then((r) => setBlocks(r.blocks));
-  }, [channel.resolvedAt, channel.mode, channel.breaks]);
+  }, [channel.resolvedAt, channel.mode, channel.breaks, JSON.stringify(channel.slots ?? [])]);
   const fmt = (ms: number) => new Date(ms).toLocaleTimeString([], { weekday: 'short', hour: 'numeric', minute: '2-digit' });
   return (
     <div class="mg-card">
@@ -336,9 +354,12 @@ function Preview({ channel }: { channel: ChannelStatus }) {
       {blocks && !blocks.length && <p class="mg-dim">Nothing scheduled yet.</p>}
       <ol class="mg-preview">
         {blocks?.map((b) => (
-          <li key={b.startMs} class={b.kind}>
+          <li key={b.startMs} class={`${b.kind} ${b.slot ? 'slot' : ''}`}>
             <span class="mg-preview-time">{fmt(b.startMs)}</span>
-            <span>{b.title}</span>
+            <span>
+              {b.title}
+              {b.slot && <span class="mg-badge">time slot</span>}
+            </span>
           </li>
         ))}
       </ol>

@@ -427,6 +427,21 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 - Plex PIN sign-in, library browser, Plex adapter + proxy, transcode vs direct play.
 - Plex shows/collections as channel content (e.g. "next episode" series slots).
 
+**Time slots** — ✅ *done*
+- Slots (days, start, length, content, next/random) on top of regular programming,
+  in a house time zone (`settings.timeZone`, DST-safe via Intl). Fill stops when the
+  next show won't fit; gaps are padded (≤ 6 min of commercials, then a "Coming up
+  next" card); shuffled channels fit a shorter show first and always keep slots on
+  time; in-order channels let a long show run over only when the gap is > 30 min.
+  Slots fit as many episodes as they can, padded to their end. Slot-only channels
+  are "off the air" between slots. Missed slots start late rather than vanish.
+- Lineup airings carry slot bookkeeping so regenerating (settings/slot edits) resumes
+  exactly; overlapping slots are rejected (wrapping midnight and the week).
+- Manager: weekly grid + per-slot form; TV: "Coming up next" card, off-air bars,
+  slot shows marked in the guide.
+- Not yet: drag-to-reschedule on the grid, programming blocks (pools of shows in a
+  time range), era-matched commercials.
+
 **Phase 4 — Real scheduling + editor**
 - Time-slot and block modes with filler padding.
 - Channel editor: weekly slot grid, drag to reschedule, 24h preview.

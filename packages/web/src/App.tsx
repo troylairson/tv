@@ -326,7 +326,35 @@ export function App() {
   return (
     <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''}`}>
       <video ref={video} class="screen" playsInline />
-      {poweredOn && status === 'standby' && !filler && <div class="bars" />}
+      {poweredOn && ((status === 'standby' && !filler) || (status === 'interstitial' && airing?.kind === 'offair')) && <div class="bars" />}
+      {status === 'interstitial' && airing?.kind === 'ident' && channel && (
+        <div class="ident">
+          <div class="ident-channel">
+            <span class="ident-number">{channel.number}</span> {channel.name}
+          </div>
+          {nextShow ? (
+            <>
+              <div class="ident-label">COMING UP NEXT</div>
+              <div class="ident-title">{nextShow.item.title}</div>
+              <div class="ident-time">at {fmtTime(nextShow.startMs)}</div>
+            </>
+          ) : (
+            <>
+              <div class="ident-label">THANKS FOR WATCHING</div>
+              <div class="ident-title">{channel.name}</div>
+            </>
+          )}
+        </div>
+      )}
+      {status === 'interstitial' && airing?.kind === 'offair' && (
+        <div class="card">
+          <h1>OFF THE AIR</h1>
+          <p>
+            {channel?.name} returns at {fmtTime(airing.endMs)}
+            {nextShow ? ` with ${nextShow.item.title}` : ''}
+          </p>
+        </div>
+      )}
       <Static visible={poweredOn && (status === 'tuning' || status === 'idle')} />
 
       {!poweredOn && (
@@ -375,10 +403,12 @@ export function App() {
             </span>
             <span class="banner-clock">{fmtTime(now())}</span>
           </div>
-          <div class="banner-title">{isBreak ? 'Commercial Break' : airing.item.title}</div>
+          <div class="banner-title">
+            {isBreak ? 'Commercial Break' : airing.kind === 'ident' ? 'Coming Up Next' : airing.kind === 'offair' ? 'Off the Air' : airing.item.title}
+          </div>
           <div class="banner-row dim">
             <span>
-              {isBreak ? airing.item.title : `${fmtTime(airing.startMs)} – ${fmtTime(airing.endMs)}`}
+              {isBreak ? airing.item.title : airing.kind === 'show' ? `${fmtTime(airing.startMs)} – ${fmtTime(airing.endMs)}` : `until ${fmtTime(airing.endMs)}`}
             </span>
             {nextShow && (
               <span>

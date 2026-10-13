@@ -22,7 +22,7 @@ import { serveFile } from './media';
 import * as ia from './ia';
 import * as plex from './plex';
 import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
-import { getSettings, loadSettings, updateSettings } from './settings';
+import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
 
 const app = new Hono();
 
@@ -34,7 +34,7 @@ app.use('/api/*', async (c, next) => {
 });
 
 app.onError((err, c) => {
-  if (err instanceof ValidationError) return c.json({ error: err.message }, 400);
+  if (err instanceof ValidationError || err instanceof SettingsError) return c.json({ error: err.message }, 400);
   console.error(`${c.req.method} ${c.req.path}:`, err.message);
   return c.json({ error: err.message }, 500);
 });

@@ -226,3 +226,18 @@ html, body, #app {
 .manage-qr-code svg { width: 100%; height: 100%; display: block; }
 .manage-qr p { margin: 0.6vh 0; font-size: 2.4vh; }
 .manage-qr-url { font-size: 3.4vh !important; font-weight: bold; color: var(--accent); }
+
+/* "Coming up next": pads the time before a scheduled slot. */
+.ident {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh;
+  background: radial-gradient(ellipse at center, #3446d6 0%, #1c0a57 60%, #0a0530 100%); text-align: center;
+}
+.ident-channel { font-size: 3.4vh; font-weight: bold; color: var(--fg); letter-spacing: 0.1em; }
+.ident-number { color: var(--accent); font-size: 6vh; vertical-align: middle; margin-right: 1vw; }
+.ident-label { font-size: 3vh; color: var(--accent); letter-spacing: 0.5em; margin-top: 3vh; }
+.ident-title { font-size: 6vh; font-weight: bold; max-width: 80vw; line-height: 1.15; }
+.ident-time { font-size: 3.4vh; color: var(--dim); }
+.tv.guide-open .ident { display: none; }
+
+.guide-cell.offair { background: repeating-linear-gradient(45deg, #1a1a40 0 1vh, #22224d 1vh 2vh); color: var(--dim); }
+.guide-cell.slot:not(.focused) { box-shadow: inset 0.35vw 0 0 var(--accent); }

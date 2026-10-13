@@ -9,7 +9,7 @@ import path from 'node:path';
 import { hashString, type ChannelMode } from '@retro-tv/schedule';
 import { config as serverConfig } from './config';
 import { resolveSources } from './sources';
-import type { Channel, ChannelConfig, ChannelItem, SourceRef } from './types';
+import type { Channel, ChannelConfig, ChannelItem, SlotConfig, SourceRef } from './types';
 
 /** Original lineup channels keep this anchor so their schedules don't jump. */
 const LEGACY_ANCHOR_MS = Date.UTC(2026, 0, 1);
@@ -28,6 +28,8 @@ const DEFAULT_CHANNELS: Omit<ChannelConfig, 'anchorMs' | 'excluded'>[] = [
 interface Resolved {
   configHash: string;
   items: ChannelItem[];
+  /** Items for each time slot, by slot id. */
+  slotItems?: Record<string, ChannelItem[]>;
   resolvedAt: string;
   errors: string[];
 }
@@ -40,7 +42,8 @@ const configFile = () => path.join(serverConfig.dataDir, 'channels-config.json')
 const cacheFile = () => path.join(serverConfig.dataDir, 'channels.json');
 
 /** Only what changes the items: renaming or renumbering doesn't need a re-resolve. */
-const contentHash = (c: ChannelConfig) => hashString(JSON.stringify([c.sources, [...c.excluded].sort()])).toString(36);
+const contentHash = (c: ChannelConfig) =>
+  hashString(JSON.stringify([c.sources, [...c.excluded].sort(), (c.slots ?? []).map((s) => [s.id, s.source])])).toString(36);
 
 async function writeJson(file: string, data: unknown) {
   await fs.mkdir(serverConfig.dataDir, { recursive: true });
@@ -53,9 +56,20 @@ const saveConfigs = () => writeJson(configFile(), { channels: configs });
 const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, resolved: Object.fromEntries(resolved) });
 
 function toChannel(c: ChannelConfig): Channel | null {
-  const items = resolved.get(c.id)?.items;
-  if (!items?.length) return null;
-  return { id: c.id, number: c.number, name: c.name, mode: c.mode, anchorMs: c.anchorMs, breaks: c.breaks, items };
+  const r = resolved.get(c.id);
+  if (!r) return null;
+  const slots = (c.slots ?? []).map((s) => ({
+    id: s.id,
+    days: s.days,
+    start: s.start,
+    durationMin: s.durationMin,
+    order: s.order,
+    title: s.source.title,
+    items: r.slotItems?.[s.id] ?? [],
+  }));
+  // A channel needs regular programming or at least one slot with something in it.
+  if (!r.items.length && !slots.some((s) => s.items.length)) return null;
+  return { id: c.id, number: c.number, name: c.name, mode: c.mode, anchorMs: c.anchorMs, breaks: c.breaks, items: r.items, slots: slots.length ? slots : undefined };
 }
 
 /** Playable channels (those with resolved items), by number. */
@@ -70,6 +84,8 @@ export function getChannels() {
 
 export interface ChannelStatus extends ChannelConfig {
   itemCount: number;
+  /** Episode counts per slot id. */
+  slotItemCounts: Record<string, number>;
   totalSec: number;
   resolving: boolean;
   resolvedAt: string | null;
@@ -85,6 +101,7 @@ export function channelStatuses(): ChannelStatus[] {
       return {
         ...c,
         itemCount: r?.items.length ?? 0,
+        slotItemCounts: Object.fromEntries(Object.entries(r?.slotItems ?? {}).map(([id, items]) => [id, items.length])),
         totalSec: Math.round(r?.items.reduce((sum, i) => sum + i.durationSec, 0) ?? 0),
         resolving: resolving.has(c.id),
         resolvedAt: r?.resolvedAt ?? null,
@@ -111,14 +128,21 @@ export function resolveChannel(id: string): Promise<void> {
     try {
       const hash = contentHash(c);
       const { items, errors } = await resolveSources(c.sources, c.excluded);
+      const slotItems: Record<string, ChannelItem[]> = {};
+      for (const slot of c.slots ?? []) {
+        const r = await resolveSources([slot.source], c.excluded);
+        slotItems[slot.id] = r.items;
+        errors.push(...r.errors.map((e) => `Time slot: ${e}`));
+      }
       // The config may have been edited or deleted meanwhile; only store results that still apply.
       const now = getConfig(id);
       if (!now || contentHash(now) !== hash) return;
       // Keep the previous items if a temporary failure left the channel empty.
-      if (!items.length && errors.length && resolved.get(id)?.items.length) {
+      const hasContent = items.length || Object.values(slotItems).some((list) => list.length);
+      if (!hasContent && errors.length && resolved.get(id)?.items.length) {
         resolved.set(id, { ...resolved.get(id)!, errors });
       } else {
-        resolved.set(id, { configHash: hash, items, resolvedAt: new Date().toISOString(), errors });
+        resolved.set(id, { configHash: hash, items, slotItems, resolvedAt: new Date().toISOString(), errors });
       }
       console.log(`channel ${c.number} ${c.name}: ${items.length} items${errors.length ? ` (${errors.join('; ')})` : ''}`);
       await saveCache();
@@ -155,6 +179,7 @@ export interface ChannelInput {
   breaks?: unknown;
   sources?: unknown;
   excluded?: unknown;
+  slots?: unknown;
 }
 
 const SOURCE_KINDS = new Set(['plex-show', 'plex-collection', 'plex-library', 'plex-item', 'plex-sample', 'ia-search', 'ia-item']);
@@ -167,6 +192,54 @@ function validSources(value: unknown): SourceRef[] {
     }
   }
   return value as SourceRef[];
+}
+
+const WEEK_MIN = 7 * 24 * 60;
+
+function validSlots(value: unknown): SlotConfig[] {
+  if (!Array.isArray(value)) throw new ValidationError('slots must be a list');
+  const slots = value.map((raw, i): SlotConfig => {
+    const s = raw as Partial<SlotConfig>;
+    const label = `Time slot ${i + 1}`;
+    if (!Array.isArray(s.days) || !s.days.length || s.days.some((d) => !Number.isInteger(d) || d < 0 || d > 6)) {
+      throw new ValidationError(`${label}: pick at least one day`);
+    }
+    const m = /^(\d{1,2}):(\d{2})$/.exec(String(s.start ?? ''));
+    if (!m || Number(m[1]) > 23 || Number(m[2]) > 59) throw new ValidationError(`${label}: start time must be HH:MM`);
+    const durationMin = Number(s.durationMin);
+    if (!Number.isInteger(durationMin) || durationMin < 5 || durationMin > 12 * 60) throw new ValidationError(`${label}: length must be 5 minutes to 12 hours`);
+    if (s.order !== 'next' && s.order !== 'random') throw new ValidationError(`${label}: order must be next or random`);
+    const [source] = validSources([s.source]);
+    return {
+      id: typeof s.id === 'string' && s.id ? s.id : `slot-${Date.now().toString(36)}${Math.random().toString(36).slice(2, 6)}`,
+      days: [...new Set(s.days)].sort(),
+      start: `${m[1]!.padStart(2, '0')}:${m[2]}`,
+      durationMin,
+      order: s.order,
+      source: source!,
+    };
+  });
+  // No two slots may overlap (minutes into the week, wrapping Saturday night into Sunday).
+  const spans = slots.flatMap((slot, i) =>
+    slot.days.map((day) => {
+      const [h, min] = slot.start.split(':').map(Number) as [number, number];
+      const start = day * 1440 + h * 60 + min;
+      return { i, start, end: start + slot.durationMin };
+    }),
+  );
+  const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+  for (const a of spans) {
+    for (const b of spans) {
+      if (a.i >= b.i) continue;
+      for (const shift of [-WEEK_MIN, 0, WEEK_MIN]) {
+        if (a.start < b.end + shift && b.start + shift < a.end) {
+          const day = dayNames[Math.floor((((a.start % WEEK_MIN) + WEEK_MIN) % WEEK_MIN) / 1440)];
+          throw new ValidationError(`Time slots ${a.i + 1} and ${b.i + 1} overlap (${day})`);
+        }
+      }
+    }
+  }
+  return slots;
 }
 
 function applyInput(base: ChannelConfig, input: ChannelInput, selfId?: string): ChannelConfig {
@@ -189,6 +262,7 @@ function applyInput(base: ChannelConfig, input: ChannelInput, selfId?: string): 
   }
   if (input.breaks !== undefined) next.breaks = Boolean(input.breaks);
   if (input.sources !== undefined) next.sources = validSources(input.sources);
+  if (input.slots !== undefined) next.slots = validSlots(input.slots);
   if (input.excluded !== undefined) {
     if (!Array.isArray(input.excluded)) throw new ValidationError('excluded must be a list');
     next.excluded = input.excluded.map(String);

@@ -5,7 +5,7 @@ server. Every screen in the house shows the same thing at the same moment: tune 
 at 3:17 am and you land mid-episode, like real TV.
 
 See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0 and Phase 1 done; channel management (Plex and Internet
-Archive sources) is in.** (spikes on
+Archive sources) and time-slot scheduling are in.** (spikes on
 the real hardware). See [docs/phase0.md](docs/phase0.md) for what to test.
 
 ## What's here
@@ -80,6 +80,16 @@ guide → Settings → *Manage channels* shows the address and a QR code).
 - **What plays:** the resolved episode list; ✕ removes an episode without
   removing its show.
 - **Next 24 hours:** the schedule as the guide will show it.
+
+- **Time slots:** "these days, at this time, for this long, play this", e.g.
+  weeknights 8:00 pm, 30 min, *Cheers*, next episode. Slots sit on top of the
+  regular programming: it plays around them and is padded with commercials and a
+  "Coming up next" card so each slot starts on time (shuffled channels fit in a
+  shorter show when they can). A long slot plays as many episodes as fit;
+  "next episode" carries on from night to night. A channel with only slots is
+  *off the air* between them. A weekly grid shows the whole week. Slot times are
+  in the house time zone (shown in the manager, with a button to use your
+  device's).
 
 Changes take effect after whatever is on now. A new channel starts at its first
 episode the moment it's created. Sources are refreshed nightly (new Plex

@@ -18,8 +18,11 @@ interface Playback {
 }
 
 export interface TunerState {
-  /** standby: the scheduled airing won't play, so we're filling time until the next one. */
-  status: 'idle' | 'tuning' | 'playing' | 'blocked' | 'standby';
+  /**
+   * standby: the scheduled airing won't play, so we're filling time until the next one.
+   * interstitial: a "coming up next" card or off-air screen (nothing to play).
+   */
+  status: 'idle' | 'tuning' | 'playing' | 'blocked' | 'standby' | 'interstitial';
   channel?: ChannelInfo;
   airing?: Airing;
   /** Airings after the current one (for "Next:" and the guide). */
@@ -108,6 +111,10 @@ export class Tuner {
     this.set({ airing, upcoming: airings.filter((a) => a.startMs >= airing.endMs) });
     // The schedule, not the video's 'ended' event, decides when the next airing starts.
     this.timers.push(setTimeout(() => token === this.token && void this.tune(channel), airing.endMs - t + 50));
+    if (airing.kind === 'ident' || airing.kind === 'offair') {
+      this.set({ status: 'interstitial' });
+      return;
+    }
 
     const errors: string[] = [];
     for (const mode of this.attemptModes(airing.item)) {

@@ -12,13 +12,31 @@ export interface Cursor {
   index: number;
 }
 
+/**
+ * show: a programme. commercial: part of a break. ident: a "coming up next"
+ * card that pads to a time slot. offair: nothing scheduled (slot-only channels).
+ */
+export type AiringKind = 'show' | 'commercial' | 'ident' | 'offair';
+
+/** Time-slot bookkeeping, snapshotted on airings so regenerating from any point resumes correctly. */
+export interface SlotState {
+  /** Next episode index per slot id (for "next episode" slots). */
+  progress: Record<string, number>;
+  /** Fill items already played out of order this cycle (to fit before a slot), to skip when reached. */
+  skip: string[];
+}
+
 export interface LineupAiring<T extends ScheduleItem = ScheduleItem> {
-  kind: 'show' | 'commercial';
+  kind: AiringKind;
   item: T;
   startMs: number;
   endMs: number;
   /** The show that follows this airing (and its break). */
   next: Cursor;
+  /** Set when the airing belongs to a time slot. */
+  slotId?: string;
+  /** Slot bookkeeping after this airing (slot channels only). */
+  state?: SlotState;
 }
 
 export interface Lineup<T extends ScheduleItem = ScheduleItem> {
@@ -29,6 +47,9 @@ export interface Lineup<T extends ScheduleItem = ScheduleItem> {
   /** Next show to schedule, and when it starts. */
   cursor: Cursor;
   cursorMs: number;
+  /** Fingerprint of the channel's time slots (timing and content); a change regenerates the future. */
+  slotsKey?: string;
+  slotState?: SlotState;
 }
 
 export interface BreakOptions<T extends ScheduleItem = ScheduleItem> {
@@ -44,7 +65,7 @@ export function itemsKey(channel: ScheduleChannel): string {
   return hashString(channel.mode + '|' + channel.items.map((i) => `${i.id}:${i.durationSec}`).join('|')).toString(36);
 }
 
-function successor(channel: ScheduleChannel, { cycle, index }: Cursor): Cursor {
+export function successor(channel: ScheduleChannel, { cycle, index }: Cursor): Cursor {
   return index + 1 < cycleOrder(channel, cycle).length ? { cycle, index: index + 1 } : { cycle: cycle + 1, index: 0 };
 }
 
@@ -125,7 +146,7 @@ export function truncateLineup<T extends ScheduleItem>(lineup: Lineup<T>, atMs: 
   const keep = lineup.airings.filter((a) => a.startMs <= atMs);
   const last = keep[keep.length - 1];
   if (!last) return { ...lineup, airings: [] };
-  return { ...lineup, airings: keep, cursor: last.next, cursorMs: last.endMs };
+  return { ...lineup, airings: keep, cursor: last.next, cursorMs: last.endMs, slotState: last.state ?? lineup.slotState };
 }
 
 /** After the channel's items changed: finish the current airing, then join the new item list's schedule. */

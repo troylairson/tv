@@ -7,7 +7,8 @@ interface GuideBlock {
   title: string;
   startMs: number;
   endMs: number;
-  kind: 'show' | 'break';
+  kind: 'show' | 'break' | 'offair';
+  slot?: boolean;
 }
 
 interface GuideRow {
@@ -220,7 +221,7 @@ export function Guide({ currentNumber, actionRef, onTune, onSettings, onClose }:
                   .map((b) => (
                     <div
                       key={b.startMs}
-                      class={`guide-cell ${b.kind} ${index === row && b === focused ? 'focused' : ''}`}
+                      class={`guide-cell ${b.kind} ${b.slot ? 'slot' : ''} ${index === row && b === focused ? 'focused' : ''}`}
                       style={{ left: `${pct(b.startMs)}%`, width: `${pct(b.endMs) - pct(b.startMs)}%` }}
                     >
                       {b.startMs < windowStart && <span class="guide-more">◀</span>}
