@@ -4,8 +4,8 @@ Always-on, cable-TV-style channels built from the Internet Archive and your Plex
 server. Every screen in the house shows the same thing at the same moment: tune in
 at 3:17 am and you land mid-episode, like real TV.
 
-See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0 done; commercial breaks from Phase 1 are in.** Known issue:
-the Plex channel doesn't play yet (tracked in the plan, Phase 3) (spikes on
+See [PLAN.md](PLAN.md) for the design and roadmap. **Status: Phase 0 done; Phase 1 (stored schedule, commercial breaks, TV guide)
+is in.** Plex plays. (spikes on
 the real hardware). See [docs/phase0.md](docs/phase0.md) for what to test.
 
 ## What's here
@@ -52,13 +52,16 @@ to turn the TV on.
 |---|---|
 | ↑ / ↓ (also PgUp/PgDn, CH+/CH−) | Channel up / down |
 | 0–9 | Type a channel number |
-| Enter / OK | Info banner; **OK again** opens **Settings** |
+| Enter / OK | Open the **TV guide** |
 | → | Diagnostics panel |
 | ← | CRT effect on/off |
 | Esc / Back | Close panels |
 
-**Settings** (OK, OK): commercial breaks on/off (applies to every TV in the
-house), CRT effect and Plex playback mode (this TV only), diagnostics.
+**In the guide:** ▲▼ move between channels, ◀▶ move through programmes (the
+grid pages through time), OK watches the highlighted channel, Back closes. The
+live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
+commercial breaks on/off (applies to every TV in the house), CRT effect and Plex
+playback mode (this TV only), diagnostics.
 
 ## Commercial breaks
 

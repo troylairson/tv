@@ -105,3 +105,25 @@ export function referencedCommercials(): Set<string> {
   }
   return ids;
 }
+
+export interface GuideBlock {
+  title: string;
+  startMs: number;
+  /** Includes the commercial break that follows, like a printed TV listing. */
+  endMs: number;
+  kind: 'show' | 'break';
+}
+
+/** The channel's programmes for a guide row: shows only, each spanning up to the next show. */
+export function guideBlocks(channel: Channel, fromMs: number, toMs: number): GuideBlock[] {
+  // Look back far enough to find the show that owns a break in progress at `fromMs`.
+  const airings = airingsFor(channel, fromMs - 4 * 3600_000, toMs);
+  const blocks: GuideBlock[] = [];
+  for (const a of airings) {
+    const last = blocks[blocks.length - 1];
+    if (a.kind === 'show') blocks.push({ title: a.item.title, startMs: a.startMs, endMs: a.endMs, kind: 'show' });
+    else if (last && last.endMs === a.startMs) last.endMs = a.endMs;
+    else blocks.push({ title: 'Commercial Break', startMs: a.startMs, endMs: a.endMs, kind: 'break' });
+  }
+  return blocks.filter((b) => b.endMs > fromMs && b.startMs < toMs);
+}

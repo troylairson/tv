@@ -8,7 +8,7 @@ import { mediaPath, poolStatus, readyCommercials, startCommercialPool } from './
 import { config, plexConfigured } from './config';
 import { serveFile } from './media';
 import * as plex from './plex';
-import { airingsFor, ensureLineup, loadLineups, referencedCommercials, regenerate } from './scheduler';
+import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
 import { getSettings, loadSettings, updateSettings } from './settings';
 
 const app = new Hono();
@@ -55,6 +55,19 @@ app.get('/api/channels/:id/airings', (c) => {
   const to = Math.min(Number(c.req.query('to')) || now + 3 * 3600_000, now + 48 * 3600_000);
   c.header('cache-control', 'no-store');
   return c.json({ airings: airingsFor(channel, from, to) });
+});
+
+/** Every channel's programmes for the guide grid, in one request. */
+app.get('/api/guide', (c) => {
+  const now = Date.now();
+  const from = Number(c.req.query('from')) || now;
+  const to = Math.min(Number(c.req.query('to')) || from + 3 * 3600_000, now + 48 * 3600_000);
+  c.header('cache-control', 'no-store');
+  const channels = getChannels()
+    .channels.slice()
+    .sort((a, b) => a.number - b.number)
+    .map((ch) => ({ id: ch.id, number: ch.number, name: ch.name, blocks: guideBlocks(ch, from, to) }));
+  return c.json({ from, to, channels });
 });
 
 // ── Settings (house-wide: they change the shared schedule) ──────────────────

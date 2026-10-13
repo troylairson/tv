@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { clockStats, now, syncClock } from './clock';
 import { capabilities, report } from './diag';
+import { Guide } from './Guide';
 import { lastKeyInfo, toAction, type Action, type KeyInfo } from './keys';
 import { Settings, type SettingRow } from './Settings';
 import { initStaticAudio, Static } from './Static';
@@ -47,6 +48,8 @@ export function App() {
   const [infoUntil, setInfoUntil] = useState(0);
   const [showDiag, setShowDiag] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
+  const [showGuide, setShowGuide] = useState(false);
+  const guideAction = useRef<((action: Action) => boolean) | null>(null);
   const [settingsFocus, setSettingsFocus] = useState(0);
   const [house, setHouse] = useState<HouseSettings | null>(null);
   const [pool, setPool] = useState<PoolStatus | null>(null);
@@ -122,6 +125,19 @@ export function App() {
     void tuner.current.tune(channel);
   }
 
+  function openGuide() {
+    setInfoUntil(0);
+    setShowDiag(false);
+    setShowGuide(true);
+  }
+
+  function tuneToNumber(number: number) {
+    const i = channels.findIndex((c) => c.number === number);
+    setShowGuide(false);
+    if (i >= 0 && i !== index) tuneTo(channels, i);
+    else setInfoUntil(Date.now() + 5000);
+  }
+
   function openSettings() {
     setInfoUntil(0);
     setSettingsFocus(0);
@@ -179,7 +195,11 @@ export function App() {
       label: 'Diagnostics',
       value: showDiag ? 'Shown' : 'Hidden',
       note: 'Playback details for troubleshooting (also: ▶ while watching)',
-      activate: () => setShowDiag(!showDiag),
+      activate: () => {
+        setShowDiag(!showDiag);
+        setShowSettings(false);
+        setShowGuide(false);
+      },
     },
   ];
 
@@ -213,6 +233,7 @@ export function App() {
           return true;
       }
     }
+    if (showGuide) return guideAction.current?.(action) ?? true;
     switch (action.type) {
       case 'channelUp':
         tuneTo(channels, (index + 1) % channels.length);
@@ -221,9 +242,7 @@ export function App() {
         tuneTo(channels, (index - 1 + channels.length) % channels.length);
         return true;
       case 'ok':
-        // First OK shows the info banner; OK again (while it's up) opens Settings.
-        if (infoUntil > Date.now()) openSettings();
-        else setInfoUntil(Date.now() + 8000);
+        openGuide();
         return true;
       case 'right':
         setShowDiag(!showDiag);
@@ -277,7 +296,7 @@ export function App() {
   const isBreak = airing?.kind === 'commercial';
 
   return (
-    <div class={`tv ${crt ? 'crt' : ''}`}>
+    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''}`}>
       <video ref={video} class="screen" playsInline />
       {poweredOn && status === 'standby' && !filler && <div class="bars" />}
       <Static visible={poweredOn && (status === 'tuning' || status === 'idle')} />
@@ -342,8 +361,17 @@ export function App() {
           <div class="progress">
             <div class="progress-fill" style={{ width: `${progress * 100}%` }} />
           </div>
-          <div class="banner-hint">OK again for Settings</div>
         </div>
+      )}
+
+      {showGuide && (
+        <Guide
+          currentNumber={channel?.number}
+          actionRef={guideAction}
+          onTune={tuneToNumber}
+          onSettings={openSettings}
+          onClose={() => setShowGuide(false)}
+        />
       )}
 
       {showSettings && <Settings rows={settingsRows} focus={settingsFocus} />}
@@ -353,7 +381,7 @@ export function App() {
       )}
 
       {poweredOn && !showDiag && !showSettings && infoUntil > t && (
-        <div class="hint">▲▼ channel · OK info · OK OK settings</div>
+        <div class="hint">▲▼ channel · OK guide</div>
       )}
     </div>
   );

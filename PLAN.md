@@ -356,8 +356,7 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   and every Internet Archive channel plays. The TV-side failure handling
   (decision check, fallback to the other Plex mode, commercials or colour bars
   instead of endless retries) and title cleanup came out of this round.
-- **Plex channel didn't play: root cause found and fixed (awaiting a check on
-  the real setup).** `/api/plex/test` showed every step working server→Plex
+- **Plex channel didn't play: fixed and confirmed on the real setup.** `/api/plex/test` showed every step working server→Plex
   directly but failing through our `/plex` proxy. Plex gzips its playlists;
   `fetch()` decompresses them, but the proxy forwarded Plex's original
   (compressed) `content-length`, so the TV received a truncated playlist,
@@ -398,7 +397,10 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   Commercials". Year folders allow era-matched breaks later.
 - A few hand-seeded channels (e.g. classic TV, Prelinger, cartoons) in loop/shuffle.
 - TV UI: full-screen player, channel up/down, number entry, static transition, OSD,
-  guide grid with D-pad navigation.
+  guide grid with D-pad navigation. *Guide done: OK opens it; live channel in
+  the corner, programme details beside it, channels × half-hours grid with a
+  now line; breaks fold into the preceding show's block; Settings lives in
+  the guide header (`GET /api/guide`).*
 
 **Phase 2 — Discover (IA channel building)**
 - Search/filter UI, expand items into episodes, preview, bench, screening,
