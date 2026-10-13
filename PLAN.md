@@ -189,6 +189,9 @@ engine already produces exactly what XMLTV needs.
   is an opt-in.
 - **Channel-change latency:** show a static/"snow" clip + channel number OSD
   while the next source buffers; optionally pre-warm channel ±1.
+- **The Chromecast with Google TV remote has no channel or number keys**: D-pad
+  ↑/↓ changes channel while watching, so the guide needs another way in (e.g. OK
+  opens it). Channel/number keys still work on other remotes and keyboards.
 - **D-pad navigation:** use a spatial-navigation library (e.g.
   `@noriginmedia/norigin-spatial-navigation`) rather than hand-rolled focus.
 - **Overscan / safe area:** keep UI inside ~5% margins.
