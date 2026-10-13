@@ -1,0 +1,10 @@
+node_modules/
+dist/
+data/
+*.log
+.env
+# Android
+android-tv/.gradle/
+android-tv/build/
+android-tv/app/build/
+android-tv/local.properties

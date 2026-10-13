@@ -1,0 +1,22 @@
+{
+  "name": "retro-tv",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@10.28.0",
+  "scripts": {
+    "dev": "pnpm --parallel --filter @retro-tv/server --filter @retro-tv/web dev",
+    "build": "pnpm -r build",
+    "test": "pnpm -r test",
+    "typecheck": "pnpm -r typecheck",
+    "start": "node packages/server/dist/server.js"
+  },
+  "devDependencies": {
+    "typescript": "~5.8.3",
+    "vitest": "^3.2.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild"
+    ]
+  }
+}

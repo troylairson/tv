@@ -1,0 +1,99 @@
+:root {
+  --fg: #f4f1e6;
+  --dim: #b9b39f;
+  --accent: #ffd23f;
+  --panel: rgba(12, 18, 60, 0.88);
+  --edge: #6d7dff;
+  /* Keep UI inside the TV's overscan-safe area. */
+  --safe-x: 5vw;
+  --safe-y: 5vh;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #app {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  color: var(--fg);
+  font-family: 'Courier New', ui-monospace, monospace;
+  overflow: hidden;
+  cursor: none;
+}
+
+.tv { position: relative; width: 100%; height: 100%; }
+
+.screen { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
+
+.static {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  image-rendering: pixelated; opacity: 0; pointer-events: none;
+  transition: opacity 120ms linear;
+}
+.static.on { opacity: 1; }
+
+/* CRT: scanlines + vignette. Pure CSS, no per-frame work. */
+.tv.crt::after {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.65) 100%);
+}
+.tv.crt .screen { filter: saturate(1.15) contrast(1.05); }
+
+.power {
+  position: absolute; inset: 0; display: flex; flex-direction: column; gap: 2vh;
+  align-items: center; justify-content: center; border: 0; background: #000;
+  color: var(--dim); font: inherit; font-size: 3.2vh; cursor: pointer;
+}
+.power:focus { outline: none; color: var(--fg); }
+.power-icon { font-size: 12vh; color: #d33; text-shadow: 0 0 2vh #f33; }
+
+.card {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  min-width: 50vw; padding: 4vh 4vw; text-align: center;
+  background: var(--panel); border: 0.4vh solid var(--edge);
+}
+.card h1 { margin: 0 0 2vh; font-size: 5vh; letter-spacing: 0.3em; color: var(--accent); }
+.card p { margin: 1vh 0; font-size: 2.6vh; }
+
+.dim { color: var(--dim); }
+
+.osd {
+  position: absolute; top: var(--safe-y); right: var(--safe-x); text-align: right;
+  color: #6f6; text-shadow: 0.3vh 0.3vh 0 #000, 0 0 1vh #3f3;
+}
+.osd-number { font-size: 9vh; font-weight: bold; line-height: 1; }
+.osd-name { font-size: 3vh; font-weight: bold; }
+
+.banner {
+  position: absolute; left: var(--safe-x); right: var(--safe-x); bottom: var(--safe-y);
+  padding: 2vh 2vw; background: var(--panel); border: 0.4vh solid var(--edge);
+  font-size: 2.6vh;
+}
+.banner-row { display: flex; justify-content: space-between; gap: 2vw; }
+.banner-row span:last-child { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.banner-ch { color: var(--accent); font-weight: bold; }
+.banner-title { font-size: 4vh; font-weight: bold; margin: 1vh 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.progress { margin-top: 1.5vh; height: 0.8vh; background: rgba(255, 255, 255, 0.15); }
+.progress-fill { height: 100%; background: var(--accent); }
+
+.hint {
+  position: absolute; top: var(--safe-y); left: var(--safe-x); font-size: 2vh;
+  color: var(--dim); text-shadow: 0.2vh 0.2vh 0 #000;
+}
+
+.diag {
+  position: absolute; top: var(--safe-y); right: var(--safe-x); bottom: var(--safe-y);
+  width: 52vw; padding: 2vh 1.5vw; overflow: auto; font-size: 1.8vh;
+  background: rgba(0, 0, 0, 0.85); border: 0.3vh solid var(--edge);
+}
+.diag h2 { margin: 0 0 1vh; font-size: 2.6vh; color: var(--accent); }
+.diag dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.6vh 1.2vw; margin: 0; }
+.diag dt { color: var(--dim); }
+.diag dd { margin: 0; word-break: break-word; }
+.diag .codecs { display: flex; flex-wrap: wrap; gap: 0.4vh 1vw; }
+.diag .ok { color: #7f7; }
+.diag .no { color: #f77; }
+.diag .small { font-size: 1.4vh; }

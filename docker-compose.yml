@@ -1,0 +1,33 @@
+# Retro TV for ZimaOS (or any Docker host). Import in the ZimaOS App Store via
+# "Custom Install" → "Import" (docker-compose), or run `docker compose up -d`.
+name: retro-tv
+services:
+  retro-tv:
+    image: ${RETRO_TV_IMAGE:-ghcr.io/troylairson/tv:latest}
+    build: .
+    container_name: retro-tv
+    restart: unless-stopped
+    ports:
+      - "8420:8420"
+    volumes:
+      - /DATA/AppData/retro-tv:/data
+    environment:
+      # Plex on the same machine. Find your token: https://support.plex.tv/articles/204059436
+      PLEX_URL: ${PLEX_URL:-http://host.docker.internal:32400}
+      PLEX_TOKEN: ${PLEX_TOKEN:-}
+      TZ: ${TZ:-America/New_York}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+x-casaos:
+  architectures: [amd64, arm64]
+  main: retro-tv
+  category: Media
+  author: troylairson
+  developer: troylairson
+  title:
+    en_us: Retro TV
+  tagline:
+    en_us: Always-on retro TV channels from the Internet Archive and Plex
+  port_map: "8420"
+  scheme: http
+  index: /

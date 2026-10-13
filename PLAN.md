@@ -281,7 +281,7 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 
 ## 6. Phased roadmap
 
-**Phase 0 — Spikes (de-risk on the real hardware)**
+**Phase 0 — Spikes (de-risk on the real hardware)** — *code done, awaiting on-device results; see `docs/phase0.md`*
 - Schedule engine: loop mode + offset calculation, with unit tests.
 - A minimal server in Docker on the ZimaOS laptop serving a test page + `/api/time`.
 - On the Chromecast with Google TV, via a minimal WebView APK: play an archive.org

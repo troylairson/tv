@@ -1,0 +1,22 @@
+{
+  "name": "@retro-tv/server",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "esbuild src/server.ts --bundle --platform=node --format=esm --target=node22 --outfile=dist/server.js",
+    "test": "vitest run",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "@hono/node-server": "^1.14.0",
+    "hono": "^4.7.0"
+  },
+  "devDependencies": {
+    "@retro-tv/schedule": "workspace:*",
+    "@types/node": "^22.0.0",
+    "esbuild": "^0.25.0",
+    "tsx": "^4.19.0"
+  }
+}

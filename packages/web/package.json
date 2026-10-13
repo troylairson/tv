@@ -1,0 +1,20 @@
+{
+  "name": "@retro-tv/web",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc -p ."
+  },
+  "dependencies": {
+    "hls.js": "^1.6.0",
+    "preact": "^10.26.0"
+  },
+  "devDependencies": {
+    "@preact/preset-vite": "^2.10.0",
+    "@retro-tv/schedule": "workspace:*",
+    "vite": "^6.3.0"
+  }
+}
