@@ -8,8 +8,8 @@ export interface SettingRow {
 /** A D-pad friendly list: ▲▼ to move, OK to change, Back to close. */
 export function Settings({ rows, focus }: { rows: SettingRow[]; focus: number }) {
   return (
-    <div class="settings">
-      <h2>Settings</h2>
+    <div class="settings panel">
+      <h2 class="heading">Settings</h2>
       <ul>
         {rows.map((row, i) => (
           <li key={row.label} class={i === focus ? 'focused' : ''}>

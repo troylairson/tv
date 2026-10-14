@@ -5,7 +5,7 @@ import { capabilities, report } from './diag';
 import { Guide } from './Guide';
 import { lastKeyInfo, toAction, type Action, type KeyInfo } from './keys';
 import { Settings, type SettingRow } from './Settings';
-import { initStaticAudio, Static } from './Static';
+import { initStaticAudio, setStaticMuted, Static } from './Static';
 import { Tuner, type ChannelInfo, type PlexMode, type TunerState } from './tuner';
 
 const params = new URLSearchParams(location.search);
@@ -14,6 +14,15 @@ const IN_TV_APP = params.get('tv') === '1';
 const LAST_CHANNEL_KEY = 'retro-tv:last-channel';
 const CRT_KEY = 'retro-tv:crt';
 const PLEX_MODE_KEY = 'retro-tv:plex-mode';
+const THEME_KEY = 'retro-tv:theme';
+const STATIC_SOUND_KEY = 'retro-tv:static-sound';
+
+const THEMES = [
+  { id: 'retro', name: 'Retro' },
+  { id: 'modern', name: 'Modern' },
+  { id: 'seventies', name: '70s' },
+] as const;
+type ThemeId = (typeof THEMES)[number]['id'];
 
 function store(key: string, value?: string): string | null {
   try {
@@ -59,6 +68,9 @@ export function App() {
   const [pool, setPool] = useState<PoolStatus | null>(null);
   const [crt, setCrt] = useState(store(CRT_KEY) !== 'off');
   const [plexMode, setPlexMode] = useState<PlexMode>(store(PLEX_MODE_KEY) === 'direct' ? 'direct' : 'transcode');
+  const [theme, setTheme] = useState<ThemeId>(() => THEMES.find((t) => t.id === store(THEME_KEY))?.id ?? 'retro');
+  const [staticSound, setStaticSound] = useState(store(STATIC_SOUND_KEY) !== 'off');
+  useEffect(() => setStaticMuted(!staticSound), [staticSound]);
   const [digits, setDigits] = useState('');
   const [lastKey, setLastKey] = useState<KeyInfo | null>(null);
   const [, setTick] = useState(0);
@@ -196,6 +208,25 @@ export function App() {
       },
     },
     {
+      label: 'Theme',
+      value: THEMES.find((t) => t.id === theme)!.name,
+      note: 'Look of the guide, banners and menus: Retro, Modern or 70s. This TV only',
+      activate: () => {
+        const next = THEMES[(THEMES.findIndex((t) => t.id === theme) + 1) % THEMES.length]!.id;
+        store(THEME_KEY, next);
+        setTheme(next);
+      },
+    },
+    {
+      label: 'Static sound',
+      value: staticSound ? 'On' : 'Off',
+      note: 'The hiss of static while changing channels. This TV only',
+      activate: () => {
+        store(STATIC_SOUND_KEY, staticSound ? 'off' : 'on');
+        setStaticSound(!staticSound);
+      },
+    },
+    {
       label: 'Plex playback',
       value: plexMode === 'transcode' ? 'Convert' : 'Direct',
       note: 'Convert: Plex converts video for this TV. Direct: play files as-is. Falls back to the other if one fails',
@@ -324,31 +355,33 @@ export function App() {
   const isBreak = airing?.kind === 'commercial';
 
   return (
-    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''}`}>
+    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''}`} data-theme={theme}>
       <video ref={video} class="screen" playsInline />
       {poweredOn && ((status === 'standby' && !filler) || (status === 'interstitial' && airing?.kind === 'offair')) && <div class="bars" />}
       {status === 'interstitial' && airing?.kind === 'ident' && channel && (
         <div class="ident">
-          <div class="ident-channel">
-            <span class="ident-number">{channel.number}</span> {channel.name}
+          <div class="ident-panel">
+            <div class="ident-channel">
+              <span class="ident-number">{channel.number}</span> {channel.name}
+            </div>
+            {nextShow ? (
+              <>
+                <div class="ident-label heading">Coming up next</div>
+                <div class="ident-title">{nextShow.item.title}</div>
+                <div class="ident-time">at {fmtTime(nextShow.startMs)}</div>
+              </>
+            ) : (
+              <>
+                <div class="ident-label heading">Thanks for watching</div>
+                <div class="ident-title">{channel.name}</div>
+              </>
+            )}
           </div>
-          {nextShow ? (
-            <>
-              <div class="ident-label">COMING UP NEXT</div>
-              <div class="ident-title">{nextShow.item.title}</div>
-              <div class="ident-time">at {fmtTime(nextShow.startMs)}</div>
-            </>
-          ) : (
-            <>
-              <div class="ident-label">THANKS FOR WATCHING</div>
-              <div class="ident-title">{channel.name}</div>
-            </>
-          )}
         </div>
       )}
       {status === 'interstitial' && airing?.kind === 'offair' && (
-        <div class="card">
-          <h1>OFF THE AIR</h1>
+        <div class="card panel">
+          <h1 class="heading">Off the Air</h1>
           <p>
             {channel?.name} returns at {fmtTime(airing.endMs)}
             {nextShow ? ` with ${nextShow.item.title}` : ''}
@@ -365,15 +398,15 @@ export function App() {
       )}
 
       {poweredOn && !channels.length && (
-        <div class="card">
-          <h1>PLEASE STAND BY</h1>
+        <div class="card panel">
+          <h1 class="heading">Please Stand By</h1>
           <p>{building ? 'Building the channel lineup from the Internet Archive…' : 'Waiting for the server…'}</p>
         </div>
       )}
 
       {status === 'standby' && !filler && (
-        <div class="card">
-          <h1>PLEASE STAND BY</h1>
+        <div class="card panel">
+          <h1 class="heading">Please Stand By</h1>
           <p>We're experiencing technical difficulties.</p>
           {nextShow && <p class="dim">Back at {fmtTime(airing?.endMs ?? nextShow.startMs)} with {nextShow.item.title}</p>}
         </div>
@@ -382,8 +415,8 @@ export function App() {
       {status === 'standby' && filler && <div class="bug">We'll be right back</div>}
 
       {status === 'blocked' && (
-        <div class="card">
-          <h1>PRESS OK</h1>
+        <div class="card panel">
+          <h1 class="heading">Press OK</h1>
           <p>The browser needs a button press before it will play sound.</p>
         </div>
       )}
@@ -396,28 +429,29 @@ export function App() {
       )}
 
       {channel && airing && infoUntil > t && (
-        <div class="banner">
-          <div class="banner-row">
-            <span class="banner-ch">
-              {channel.number} {channel.name}
-            </span>
-            <span class="banner-clock">{fmtTime(now())}</span>
+        <div class="banner panel">
+          <div class="banner-badge">
+            <span class="banner-badge-number">{channel.number}</span>
+            <span class="banner-badge-name">{channel.name}</span>
           </div>
-          <div class="banner-title">
-            {isBreak ? 'Commercial Break' : airing.kind === 'ident' ? 'Coming Up Next' : airing.kind === 'offair' ? 'Off the Air' : airing.item.title}
-          </div>
-          <div class="banner-row dim">
-            <span>
-              {isBreak ? airing.item.title : airing.kind === 'show' ? `${fmtTime(airing.startMs)} – ${fmtTime(airing.endMs)}` : `until ${fmtTime(airing.endMs)}`}
-            </span>
-            {nextShow && (
-              <span>
-                {isBreak ? 'Up next' : 'Next'}: {nextShow.item.title}
+          <div class="banner-body">
+            <div class="banner-row">
+              <span class="banner-label">
+                {isBreak ? 'Commercial break' : airing.kind === 'ident' ? 'Coming up next' : airing.kind === 'offair' ? 'Off the air' : 'Now playing'}
               </span>
-            )}
-          </div>
-          <div class="progress">
-            <div class="progress-fill" style={{ width: `${progress * 100}%` }} />
+              <span class="dim">{fmtTime(now())}</span>
+            </div>
+            <div class="banner-title">{airing.kind === 'show' || isBreak ? airing.item.title : (nextShow?.item.title ?? channel.name)}</div>
+            <div class="banner-row dim">
+              <span>
+                {airing.kind === 'show' ? `${fmtTime(airing.startMs)} – ${fmtTime(airing.endMs)}` : `until ${fmtTime(airing.endMs)}`}
+              </span>
+              {nextShow && airing.kind === 'show' && <span>Next: {nextShow.item.title}</span>}
+              {nextShow && isBreak && <span>Up next: {nextShow.item.title}</span>}
+            </div>
+            <div class="progress">
+              <div class="progress-fill" style={{ width: `${progress * 100}%` }} />
+            </div>
           </div>
         </div>
       )}
@@ -457,8 +491,8 @@ function ManageQr() {
     return qr.createSvgTag({ cellSize: 8, margin: 2, scalable: true });
   }, [url]);
   return (
-    <div class="manage-qr">
-      <h2>Manage channels</h2>
+    <div class="manage-qr panel">
+      <h2 class="heading">Manage channels</h2>
       <div class="manage-qr-code" dangerouslySetInnerHTML={{ __html: svg }} />
       <p>Scan with your phone, or open</p>
       <p class="manage-qr-url">{url}</p>
@@ -493,8 +527,8 @@ function Diagnostics({
     }
   }
   return (
-    <div class="diag">
-      <h2>Diagnostics</h2>
+    <div class="diag panel">
+      <h2 class="heading">Diagnostics</h2>
       <dl>
         <dt>Status</dt>
         <dd>

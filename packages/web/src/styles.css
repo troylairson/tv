@@ -1,14 +1,130 @@
+/*
+ * The TV interface. Everything visual comes from the theme variables below, so a
+ * theme is just a block of variables on .tv[data-theme=…]. Sizes are in vh/vw so
+ * the layout scales from a laptop window to a 4K TV.
+ */
+
 :root {
-  --fg: #f4f1e6;
-  --dim: #b9b39f;
-  --accent: #ffd23f;
-  --panel: rgba(12, 18, 60, 0.88);
-  --edge: #6d7dff;
   /* Keep UI inside the TV's overscan-safe area. */
   --safe-x: 5vw;
   --safe-y: 5vh;
+  --preview-h: 38vh;
+  --preview-w: calc(var(--preview-h) * 16 / 9);
+  --label-w: 18vw;
   color-scheme: dark;
 }
+
+/* ── Themes ─────────────────────────────────────────────────────────────── */
+
+/* Retro (default): the 90s on-screen TV guide. */
+.tv {
+  --font: 'Courier New', ui-monospace, monospace;
+  --font-display: var(--font);
+  --fg: #f4f1e6;
+  --dim: #b9b39f;
+  --accent: #ffd23f;
+  --focus-bg: #ffd23f;
+  --focus-fg: #10063d;
+  --focus-edge: #fff;
+  --panel: #0c123c;
+  --panel-soft: rgba(12, 18, 60, 0.9);
+  --edge: #6d7dff;
+  --border: 0.4vh;
+  --radius: 0;
+  --shadow: none;
+  --heading-spacing: 0.25em;
+  --heading-case: uppercase;
+  --osd-fg: #6f6;
+  --osd-shadow: 0.3vh 0.3vh 0 #000, 0 0 1vh #3f3;
+  --progress-track: rgba(255, 255, 255, 0.15);
+  --bg: linear-gradient(180deg, #1c0a57 0%, #10063d 45%);
+  --ident-bg: radial-gradient(ellipse at center, #3446d6 0%, #1c0a57 60%, #0a0530 100%);
+  --guide-line: #0a0530;
+  --guide-row: #1d2a8c;
+  --guide-row-alt: #18237a;
+  --guide-row-focus: #3446d6;
+  --guide-cell: #2e3fc4;
+  --guide-break: #24308f;
+  --guide-offair: repeating-linear-gradient(45deg, #1a1a40 0 1vh, #22224d 1vh 2vh);
+  --guide-time-edge: #3a3a8a;
+  --now-line: #ff4040;
+  --live-mark: #6f6;
+  --power: #d33;
+}
+
+/* Modern: flat, quiet, streaming-app style. */
+.tv[data-theme='modern'] {
+  --font: Roboto, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
+  --font-display: var(--font);
+  --fg: #f5f5f7;
+  --dim: rgba(245, 245, 247, 0.6);
+  --accent: #6cb4ff;
+  --focus-bg: #f5f5f7;
+  --focus-fg: #111114;
+  --focus-edge: #f5f5f7;
+  --panel: #18181d;
+  --panel-soft: rgba(18, 18, 22, 0.92);
+  --edge: transparent;
+  --border: 0;
+  --radius: 1.4vh;
+  --shadow: 0 1vh 4vh rgba(0, 0, 0, 0.55);
+  --heading-spacing: 0.02em;
+  --heading-case: none;
+  --osd-fg: #fff;
+  --osd-shadow: 0 0.3vh 1.2vh rgba(0, 0, 0, 0.8);
+  --progress-track: rgba(255, 255, 255, 0.18);
+  --bg: #0e0e11;
+  --ident-bg: radial-gradient(ellipse at center, #2a2a33 0%, #0e0e11 70%);
+  --guide-line: #0e0e11;
+  --guide-row: #1b1b21;
+  --guide-row-alt: #18181d;
+  --guide-row-focus: #2c2c35;
+  --guide-cell: #24242c;
+  --guide-break: #1d1d24;
+  --guide-offair: repeating-linear-gradient(45deg, #17171c 0 1vh, #1c1c22 1vh 2vh);
+  --guide-time-edge: #2c2c35;
+  --now-line: #6cb4ff;
+  --live-mark: #6cb4ff;
+  --power: #f5f5f7;
+}
+
+/* 70s: warm browns, harvest orange, rounded everything. */
+.tv[data-theme='seventies'] {
+  --font: 'Trebuchet MS', 'Gill Sans', 'Segoe UI', sans-serif;
+  --font-display: 'Cooper Black', 'Cooper Std', 'Rockwell Extra Bold', Georgia, serif;
+  --fg: #fbecd0;
+  --dim: #d6b98e;
+  --accent: #f6a623;
+  --focus-bg: #f6a623;
+  --focus-fg: #3b1f0e;
+  --focus-edge: #fbecd0;
+  --panel: #3b1f0e;
+  --panel-soft: rgba(59, 31, 14, 0.94);
+  --edge: #c9651b;
+  --border: 0.5vh;
+  --radius: 2.4vh;
+  --shadow: 0 0 0 0.5vh #7a3a12;
+  --heading-spacing: 0.08em;
+  --heading-case: none;
+  --osd-fg: #f6a623;
+  --osd-shadow: 0.3vh 0.3vh 0 #3b1f0e, 0 0 1.2vh #e8452c;
+  --progress-track: rgba(251, 236, 208, 0.18);
+  --bg: radial-gradient(ellipse at 50% 120%, #c9651b 0%, #6b3417 45%, #2b1508 100%);
+  --ident-bg: repeating-conic-gradient(from 0deg at 50% 110%, #e8452c 0 6deg, #f6a623 6deg 12deg, #c9651b 12deg 18deg, #6b3417 18deg 24deg);
+  --guide-line: #2b1508;
+  --guide-row: #6b3a18;
+  --guide-row-alt: #5e3214;
+  --guide-row-focus: #8a4b1f;
+  --guide-cell: #84461c;
+  --guide-break: #6e3c19;
+  --guide-offair: repeating-linear-gradient(45deg, #3b1f0e 0 1vh, #4a2711 1vh 2vh);
+  --guide-time-edge: #7a3a12;
+  --now-line: #e8452c;
+  --live-mark: #f6a623;
+  --power: #e8452c;
+}
+
+/* ── Base ───────────────────────────────────────────────────────────────── */
 
 * { box-sizing: border-box; }
 
@@ -16,13 +132,31 @@ html, body, #app {
   margin: 0;
   height: 100%;
   background: #000;
-  color: var(--fg);
-  font-family: 'Courier New', ui-monospace, monospace;
+  color: #f4f1e6;
   overflow: hidden;
   cursor: none;
 }
 
-.tv { position: relative; width: 100%; height: 100%; }
+.tv { position: relative; width: 100%; height: 100%; color: var(--fg); font-family: var(--font); }
+
+.dim { color: var(--dim); }
+
+/* One look for every floating panel: cards, banner, settings, QR code, diagnostics. */
+.panel {
+  background: var(--panel-soft);
+  border: var(--border) solid var(--edge);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+.heading {
+  font-family: var(--font-display);
+  color: var(--accent);
+  letter-spacing: var(--heading-spacing);
+  text-transform: var(--heading-case);
+}
+
+/* ── Video, static, CRT ─────────────────────────────────────────────────── */
 
 .screen { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; background: #000; }
 
@@ -35,12 +169,22 @@ html, body, #app {
 
 /* CRT: scanlines + vignette. Pure CSS, no per-frame work. */
 .tv.crt::after {
-  content: ''; position: absolute; inset: 0; pointer-events: none;
+  content: ''; position: absolute; inset: 0; pointer-events: none; z-index: 10;
   background:
     repeating-linear-gradient(to bottom, rgba(0, 0, 0, 0.22) 0 1px, transparent 1px 3px),
     radial-gradient(ellipse at center, transparent 55%, rgba(0, 0, 0, 0.65) 100%);
 }
 .tv.crt .screen { filter: saturate(1.15) contrast(1.05); }
+
+/* SMPTE-style colour bars for "technical difficulties" and off-air. */
+.bars {
+  position: absolute; inset: 0;
+  background: linear-gradient(to right,
+    #c0c0c0 0 14.28%, #c0c000 14.28% 28.57%, #00c0c0 28.57% 42.85%, #00c000 42.85% 57.14%,
+    #c000c0 57.14% 71.42%, #c00000 71.42% 85.71%, #0000c0 85.71% 100%);
+}
+
+/* ── Power ──────────────────────────────────────────────────────────────── */
 
 .power {
   position: absolute; inset: 0; display: flex; flex-direction: column; gap: 2vh;
@@ -48,48 +192,118 @@ html, body, #app {
   color: var(--dim); font: inherit; font-size: 3.2vh; cursor: pointer;
 }
 .power:focus { outline: none; color: var(--fg); }
-.power-icon { font-size: 12vh; color: #d33; text-shadow: 0 0 2vh #f33; }
+.power-icon { font-size: 12vh; color: var(--power); text-shadow: 0 0 2vh var(--power); }
+
+/* ── Cards (stand by, off the air, press OK) ────────────────────────────── */
 
 .card {
   position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
-  min-width: 50vw; padding: 4vh 4vw; text-align: center;
-  background: var(--panel); border: 0.4vh solid var(--edge);
+  min-width: 50vw; max-width: 80vw; padding: 4vh 4vw; text-align: center;
 }
-.card h1 { margin: 0 0 2vh; font-size: 5vh; letter-spacing: 0.3em; color: var(--accent); }
+.card h1 { margin: 0 0 2vh; font-size: 5vh; }
 .card p { margin: 1vh 0; font-size: 2.6vh; }
 
-.dim { color: var(--dim); }
+/* ── Channel number OSD ─────────────────────────────────────────────────── */
 
 .osd {
   position: absolute; top: var(--safe-y); right: var(--safe-x); text-align: right;
-  color: #6f6; text-shadow: 0.3vh 0.3vh 0 #000, 0 0 1vh #3f3;
+  color: var(--osd-fg); text-shadow: var(--osd-shadow); font-family: var(--font-display);
 }
 .osd-number { font-size: 9vh; font-weight: bold; line-height: 1; }
 .osd-name { font-size: 3vh; font-weight: bold; }
 
+/* ── Info banner ────────────────────────────────────────────────────────── */
+
 .banner {
   position: absolute; left: var(--safe-x); right: var(--safe-x); bottom: var(--safe-y);
-  padding: 2vh 2vw; background: var(--panel); border: 0.4vh solid var(--edge);
-  font-size: 2.6vh;
+  display: flex; align-items: stretch; gap: 2vw; padding: 2vh 2vw; font-size: 2.6vh;
 }
+.banner-badge {
+  flex: none; min-width: 11vh; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 0 1.2vw; border-radius: var(--radius); background: var(--focus-bg); color: var(--focus-fg);
+  font-family: var(--font-display);
+}
+.banner-badge-number { font-size: 6vh; font-weight: bold; line-height: 1; }
+.banner-badge-name { font-size: 1.7vh; font-weight: bold; max-width: 14vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.banner-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .banner-row { display: flex; justify-content: space-between; gap: 2vw; }
-.banner-row span:last-child { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.banner-ch { color: var(--accent); font-weight: bold; }
-.banner-title { font-size: 4vh; font-weight: bold; margin: 1vh 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.progress { margin-top: 1.5vh; height: 0.8vh; background: rgba(255, 255, 255, 0.15); }
+.banner-row > span:last-child { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.banner-label { color: var(--accent); font-weight: bold; font-family: var(--font-display); letter-spacing: var(--heading-spacing); text-transform: var(--heading-case); font-size: 2vh; }
+.banner-title { font-size: 4vh; font-weight: bold; margin: 0.6vh 0 1vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-display); }
+.progress { margin-top: 1.5vh; height: 0.8vh; border-radius: 0.4vh; background: var(--progress-track); overflow: hidden; }
 .progress-fill { height: 100%; background: var(--accent); }
 
 .hint {
-  position: absolute; top: var(--safe-y); left: var(--safe-x); font-size: 2vh;
-  color: var(--dim); text-shadow: 0.2vh 0.2vh 0 #000;
+  position: absolute; top: var(--safe-y); left: var(--safe-x); font-size: 2vh; padding: 0.6vh 1vw;
+  color: var(--dim); background: rgba(0, 0, 0, 0.45); border-radius: var(--radius);
 }
+
+/* "We'll be right back" while filling a broken slot with commercials. */
+.bug {
+  position: absolute; left: 50%; transform: translateX(-50%); top: var(--safe-y); padding: 0.8vh 1.2vw;
+  font-size: 2.2vh; font-weight: bold; color: var(--accent);
+  background: rgba(0, 0, 0, 0.6); border: 0.3vh solid var(--accent); border-radius: var(--radius);
+}
+
+/* ── "Coming up next" card (pads the time before a slot) ────────────────── */
+
+.ident {
+  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh;
+  background: var(--ident-bg); text-align: center;
+}
+.ident-panel { padding: 5vh 5vw; display: flex; flex-direction: column; align-items: center; gap: 2vh; max-width: 80vw; }
+/* The sunburst is too busy to read text on directly. */
+.tv[data-theme='seventies'] .ident-panel {
+  background: var(--panel-soft); border: var(--border) solid var(--edge); border-radius: var(--radius); box-shadow: var(--shadow);
+}
+.ident-channel { font-size: 3.4vh; font-weight: bold; color: var(--fg); letter-spacing: 0.1em; font-family: var(--font-display); }
+.ident-number { color: var(--accent); font-size: 6vh; vertical-align: middle; margin-right: 1vw; }
+.ident-label { font-size: 3vh; margin-top: 2vh; }
+.ident-title { font-size: 6vh; font-weight: bold; line-height: 1.15; font-family: var(--font-display); }
+.ident-time { font-size: 3.4vh; color: var(--dim); }
+
+/* ── Settings ───────────────────────────────────────────────────────────── */
+
+.settings {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 4;
+  width: min(72vw, 1100px); max-height: 90vh; overflow: hidden; padding: 3vh 3vw;
+  background: var(--panel);
+}
+.settings h2 { margin: 0 0 2vh; font-size: 4vh; }
+.settings ul { list-style: none; margin: 0; padding: 0; }
+.settings li { padding: 1.2vh 1.2vw; border: 0.3vh solid transparent; border-radius: var(--radius); margin-bottom: 0.6vh; }
+.settings li.focused { border-color: var(--focus-bg); background: rgba(255, 255, 255, 0.07); background: color-mix(in srgb, var(--focus-bg) 14%, transparent); }
+.settings-row { display: flex; justify-content: space-between; align-items: center; gap: 2vw; font-size: 2.8vh; font-weight: bold; }
+.settings-value {
+  flex: none; padding: 0.3vh 1vw; border-radius: var(--radius); font-size: 2.4vh;
+  color: var(--focus-fg); background: var(--focus-bg);
+}
+.settings li:not(.focused) .settings-value { color: var(--accent); background: transparent; }
+.settings-note { margin-top: 0.4vh; font-size: 1.8vh; color: var(--dim); }
+.settings-hint { margin-top: 1.6vh; font-size: 1.8vh; color: var(--dim); text-align: center; }
+
+/* Opaque, with the rest of the screen dimmed behind. */
+.settings, .manage-qr { box-shadow: var(--shadow), 0 0 0 100vmax rgba(0, 0, 0, 0.5); }
+
+/* ── Manage-channels QR code ────────────────────────────────────────────── */
+
+.manage-qr {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5;
+  padding: 3vh 3vw; text-align: center; background: var(--panel);
+}
+.manage-qr h2 { margin: 0 0 2vh; font-size: 4vh; }
+.manage-qr-code { width: 34vh; height: 34vh; margin: 0 auto 2vh; padding: 1vh; background: #fff; border-radius: calc(var(--radius) / 2); }
+.manage-qr-code svg { width: 100%; height: 100%; display: block; }
+.manage-qr p { margin: 0.6vh 0; font-size: 2.4vh; }
+.manage-qr-url { font-size: 3.4vh !important; font-weight: bold; color: var(--accent); }
+
+/* ── Diagnostics ────────────────────────────────────────────────────────── */
 
 .diag {
   position: absolute; top: var(--safe-y); right: var(--safe-x); bottom: var(--safe-y);
-  width: 52vw; padding: 2vh 1.5vw; overflow: auto; font-size: 1.8vh;
-  background: rgba(0, 0, 0, 0.85); border: 0.3vh solid var(--edge);
+  width: 52vw; padding: 2vh 1.5vw; overflow: auto; font-size: 1.8vh; font-family: ui-monospace, 'Courier New', monospace;
 }
-.diag h2 { margin: 0 0 1vh; font-size: 2.6vh; color: var(--accent); }
+.diag h2 { margin: 0 0 1vh; font-size: 2.6vh; }
 .diag dl { display: grid; grid-template-columns: max-content 1fr; gap: 0.6vh 1.2vw; margin: 0; }
 .diag dt { color: var(--dim); }
 .diag dd { margin: 0; word-break: break-word; }
@@ -98,55 +312,13 @@ html, body, #app {
 .diag .no { color: #f77; }
 .diag .small { font-size: 1.4vh; }
 
-/* SMPTE-style colour bars for "technical difficulties". */
-.bars {
-  position: absolute; inset: 0;
-  background: linear-gradient(to right,
-    #c0c0c0 0 14.28%, #c0c000 14.28% 28.57%, #00c0c0 28.57% 42.85%, #00c000 42.85% 57.14%,
-    #c000c0 57.14% 71.42%, #c00000 71.42% 85.71%, #0000c0 85.71% 100%);
-}
-
-.bug {
-  position: absolute; left: var(--safe-x); top: var(--safe-y); padding: 0.8vh 1.2vw;
-  font-size: 2.2vh; font-weight: bold; color: var(--accent);
-  background: rgba(0, 0, 0, 0.6); border: 0.3vh solid var(--accent);
-}
-
-.banner-hint { margin-top: 1vh; font-size: 1.8vh; color: var(--dim); text-align: right; }
-
-.settings {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-  width: min(70vw, 1100px); padding: 3vh 3vw;
-  background: var(--panel); border: 0.4vh solid var(--edge);
-}
-.settings h2 { margin: 0 0 2vh; font-size: 4vh; color: var(--accent); letter-spacing: 0.2em; }
-.settings ul { list-style: none; margin: 0; padding: 0; }
-.settings li { padding: 1.4vh 1.2vw; border: 0.3vh solid transparent; margin-bottom: 0.8vh; }
-.settings li.focused { border-color: var(--accent); background: rgba(255, 210, 63, 0.12); }
-.settings-row { display: flex; justify-content: space-between; font-size: 3vh; font-weight: bold; }
-.settings-value { color: var(--accent); }
-.settings-note { margin-top: 0.5vh; font-size: 1.9vh; color: var(--dim); }
-.settings-hint { margin-top: 2vh; font-size: 1.9vh; color: var(--dim); text-align: center; }
-
-/* ── Guide ─────────────────────────────────────────────────────────────── */
-
-:root {
-  --guide-bg: #10063d;
-  --guide-row: #1d2a8c;
-  --guide-row-alt: #18237a;
-  --guide-cell: #2e3fc4;
-  --guide-break: #24308f;
-  --guide-line: #0a0530;
-  --preview-h: 38vh;
-  --preview-w: calc(var(--preview-h) * 16 / 9);
-  --label-w: 18vw;
-}
+/* ── Guide ──────────────────────────────────────────────────────────────── */
 
 .guide {
   position: absolute; inset: 0; z-index: 1;
   display: flex; flex-direction: column; gap: 2vh;
   padding: var(--safe-y) var(--safe-x);
-  background: linear-gradient(180deg, #1c0a57 0%, var(--guide-bg) 45%);
+  background: var(--bg);
 }
 
 /* The live channel keeps playing in the guide's top-left corner. */
@@ -155,7 +327,7 @@ html, body, #app {
 .tv.guide-open .bars {
   top: var(--safe-y); left: var(--safe-x); right: auto; bottom: auto;
   width: var(--preview-w); height: var(--preview-h); z-index: 2;
-  border: 0.4vh solid var(--edge); box-sizing: border-box;
+  border: max(var(--border), 0.2vh) solid var(--edge); border-radius: var(--radius); overflow: hidden;
 }
 .tv.guide-open .static { z-index: 3; }
 .tv.guide-open .card,
@@ -163,14 +335,15 @@ html, body, #app {
 .tv.guide-open .banner,
 .tv.guide-open .hint,
 .tv.guide-open .bug,
-.tv.guide-open .diag { display: none; }
+.tv.guide-open .diag,
+.tv.guide-open .ident { display: none; }
 
 .guide-top { display: flex; gap: 2vw; height: var(--preview-h); flex: none; }
 .guide-preview { width: var(--preview-w); flex: none; }
 .guide-details { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 1.2vh; }
-.guide-details-ch { font-size: 2.8vh; font-weight: bold; color: var(--accent); letter-spacing: 0.1em; }
-.guide-details-title { font-size: 4.6vh; font-weight: bold; line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.guide-details-meta { font-size: 2.6vh; color: var(--fg); }
+.guide-details-ch { font-size: 2.8vh; font-weight: bold; }
+.guide-details-title { font-size: 4.6vh; font-weight: bold; line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; font-family: var(--font-display); }
+.guide-details-meta { font-size: 2.6vh; }
 .guide-details-next { font-size: 2.2vh; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .guide-details-hint { font-size: 1.9vh; color: var(--dim); }
 
@@ -180,64 +353,41 @@ html, body, #app {
 .guide-settings {
   width: var(--label-w); flex: none; display: flex; align-items: center; justify-content: center;
   margin-right: 0.5vw; font-size: 2.2vh; font-weight: bold; color: var(--dim);
-  background: var(--guide-line); border: 0.3vh solid transparent;
+  background: var(--guide-line); border: 0.3vh solid transparent; border-radius: var(--radius);
 }
-.guide-settings.focused { color: #10063d; background: var(--accent); border-color: #fff; }
-.guide-times { position: relative; flex: 1; background: var(--guide-line); }
-.guide-time { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; padding-left: 0.6vw; font-size: 2.4vh; font-weight: bold; color: var(--accent); border-left: 0.2vh solid #3a3a8a; }
+.guide-settings.focused { color: var(--focus-fg); background: var(--focus-bg); border-color: var(--focus-edge); }
+.guide-times { position: relative; flex: 1; background: var(--guide-line); border-radius: var(--radius); }
+.guide-time { position: absolute; top: 0; bottom: 0; display: flex; align-items: center; padding-left: 0.6vw; font-size: 2.4vh; font-weight: bold; color: var(--accent); border-left: 0.2vh solid var(--guide-time-edge); }
 .guide-day { position: absolute; right: 0.8vw; top: 0; bottom: 0; display: flex; align-items: center; font-size: 1.8vh; color: var(--dim); }
 
 .guide-row { display: flex; height: 6.2vh; flex: none; }
 .guide-channel {
   width: var(--label-w); flex: none; margin-right: 0.5vw; padding: 0 0.8vw;
   display: flex; align-items: center; gap: 0.8vw; overflow: hidden;
-  background: var(--guide-row); font-weight: bold;
+  background: var(--guide-row); font-weight: bold; border-radius: var(--radius);
 }
 .guide-row:nth-child(odd) .guide-channel { background: var(--guide-row-alt); }
-.guide-channel-number { font-size: 3vh; color: var(--accent); min-width: 2.2em; text-align: right; }
+.guide-channel-number { font-size: 3vh; color: var(--accent); min-width: 2.2em; text-align: right; font-family: var(--font-display); }
 .guide-channel-name { font-size: 2.1vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.guide-row.current .guide-channel { box-shadow: inset 0.5vw 0 0 #6f6; }
-.guide-row.focused-row .guide-channel { background: #3446d6; }
+.guide-row.current .guide-channel { box-shadow: inset 0.5vw 0 0 var(--live-mark); }
+.guide-row.focused-row .guide-channel { background: var(--guide-row-focus); }
 
 .guide-cells { position: relative; flex: 1; overflow: hidden; }
 .guide-cell {
-  position: absolute; top: 0; bottom: 0; box-sizing: border-box;
+  position: absolute; top: 0; bottom: 0;
   display: flex; align-items: center; gap: 0.4vw; padding: 0 0.7vw;
-  background: var(--guide-cell); border: 0.25vh solid var(--guide-line);
+  background: var(--guide-cell); border: 0.25vh solid var(--guide-line); border-radius: var(--radius);
   font-size: 2.2vh; white-space: nowrap; overflow: hidden;
 }
 .guide-cell.break { background: var(--guide-break); color: var(--dim); font-style: italic; }
-.guide-cell.focused { background: var(--accent); color: #10063d; border-color: #fff; z-index: 1; }
+.guide-cell.offair { background: var(--guide-offair); color: var(--dim); }
+.guide-cell.slot:not(.focused) { box-shadow: inset 0.35vw 0 0 var(--accent); }
+.guide-cell.focused { background: var(--focus-bg); color: var(--focus-fg); border-color: var(--focus-edge); z-index: 1; }
+/* Very short programmes: a plain block, no squeezed-up text. */
+.guide-cell.tiny { padding: 0; }
+.guide-cell.tiny > * { display: none; }
 .guide-cell-title { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
 .guide-more { flex: none; font-size: 1.6vh; opacity: 0.8; }
-.guide-now { position: absolute; top: 0; bottom: 0; width: 0.25vw; margin-left: -0.125vw; background: #ff4040; box-shadow: 0 0 0.6vw #ff4040; z-index: 2; pointer-events: none; }
+.guide-now { position: absolute; top: 0; bottom: 0; width: 0.25vw; margin-left: -0.125vw; background: var(--now-line); box-shadow: 0 0 0.6vw var(--now-line); z-index: 2; pointer-events: none; }
 
 .guide-hint { margin-top: auto; font-size: 1.9vh; color: var(--dim); text-align: center; }
-
-/* Settings (and the QR code) sit on top of the guide; keep them opaque so the grid doesn't show through. */
-.settings, .manage-qr { z-index: 4; background: #0c123c; box-shadow: 0 0 0 100vmax rgba(0, 0, 0, 0.45); }
-
-.manage-qr {
-  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 5;
-  padding: 3vh 3vw; text-align: center; background: var(--panel); border: 0.4vh solid var(--edge);
-}
-.manage-qr h2 { margin: 0 0 2vh; font-size: 4vh; color: var(--accent); letter-spacing: 0.2em; }
-.manage-qr-code { width: 34vh; height: 34vh; margin: 0 auto 2vh; padding: 1vh; background: #fff; }
-.manage-qr-code svg { width: 100%; height: 100%; display: block; }
-.manage-qr p { margin: 0.6vh 0; font-size: 2.4vh; }
-.manage-qr-url { font-size: 3.4vh !important; font-weight: bold; color: var(--accent); }
-
-/* "Coming up next": pads the time before a scheduled slot. */
-.ident {
-  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh;
-  background: radial-gradient(ellipse at center, #3446d6 0%, #1c0a57 60%, #0a0530 100%); text-align: center;
-}
-.ident-channel { font-size: 3.4vh; font-weight: bold; color: var(--fg); letter-spacing: 0.1em; }
-.ident-number { color: var(--accent); font-size: 6vh; vertical-align: middle; margin-right: 1vw; }
-.ident-label { font-size: 3vh; color: var(--accent); letter-spacing: 0.5em; margin-top: 3vh; }
-.ident-title { font-size: 6vh; font-weight: bold; max-width: 80vw; line-height: 1.15; }
-.ident-time { font-size: 3.4vh; color: var(--dim); }
-.tv.guide-open .ident { display: none; }
-
-.guide-cell.offair { background: repeating-linear-gradient(45deg, #1a1a40 0 1vh, #22224d 1vh 2vh); color: var(--dim); }
-.guide-cell.slot:not(.focused) { box-shadow: inset 0.35vw 0 0 var(--accent); }

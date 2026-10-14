@@ -60,8 +60,9 @@ to turn the TV on.
 **In the guide:** ▲▼ move between channels, ◀▶ move through programmes (the
 grid pages through time), OK watches the highlighted channel, Back closes. The
 live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
-commercial breaks on/off (applies to every TV in the house), CRT effect and Plex
-playback mode (this TV only), diagnostics.
+commercial breaks on/off (applies to every TV in the house); CRT effect,
+**theme** (Retro, Modern or 70s), **static sound** on/off and Plex playback mode
+(this TV only); diagnostics.
 
 ## Managing channels
 

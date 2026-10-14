@@ -4,6 +4,20 @@ const W = 160;
 const H = 90;
 
 let audio: { ctx: AudioContext; gain: GainNode } | null = null;
+let muted = false;
+let audible = false;
+
+const STATIC_VOLUME = 0.06;
+
+function applyVolume() {
+  if (audio) audio.gain.gain.setTargetAtTime(audible && !muted ? STATIC_VOLUME : 0, audio.ctx.currentTime, 0.02);
+}
+
+/** The "static sound" setting: snow still shows when muted, it's just silent. */
+export function setStaticMuted(value: boolean) {
+  muted = value;
+  applyVolume();
+}
 
 /** Must be called from a user gesture (the power button) so the browser allows audio. */
 export function initStaticAudio() {
@@ -27,7 +41,8 @@ export function Static({ visible }: { visible: boolean }) {
   const canvas = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
-    if (audio) audio.gain.gain.setTargetAtTime(visible ? 0.06 : 0, audio.ctx.currentTime, 0.02);
+    audible = visible;
+    applyVolume();
     if (!visible || !canvas.current) return;
     const ctx = canvas.current.getContext('2d');
     if (!ctx) return;

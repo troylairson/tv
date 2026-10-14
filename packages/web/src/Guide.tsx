@@ -171,13 +171,13 @@ export function Guide({ currentNumber, actionRef, onTune, onSettings, onClose }:
         <div class="guide-details">
           {row < 0 ? (
             <>
-              <div class="guide-details-ch">SETTINGS</div>
+              <div class="guide-details-ch heading">Settings</div>
               <div class="guide-details-title">Commercial breaks, CRT effect, Plex playback</div>
               <div class="guide-details-meta">Press OK to open</div>
             </>
           ) : focused && focusedRow ? (
             <>
-              <div class="guide-details-ch">
+              <div class="guide-details-ch heading">
                 {focusedRow.number} {focusedRow.name}
               </div>
               <div class="guide-details-title">{focused.title}</div>
@@ -221,7 +221,7 @@ export function Guide({ currentNumber, actionRef, onTune, onSettings, onClose }:
                   .map((b) => (
                     <div
                       key={b.startMs}
-                      class={`guide-cell ${b.kind} ${b.slot ? 'slot' : ''} ${index === row && b === focused ? 'focused' : ''}`}
+                      class={`guide-cell ${b.kind} ${b.slot ? 'slot' : ''} ${index === row && b === focused ? 'focused' : ''} ${pct(b.endMs) - pct(b.startMs) < 2.5 ? 'tiny' : ''}`}
                       style={{ left: `${pct(b.startMs)}%`, width: `${pct(b.endMs) - pct(b.startMs)}%` }}
                     >
                       {b.startMs < windowStart && <span class="guide-more">◀</span>}
