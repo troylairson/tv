@@ -1,0 +1,38 @@
+{
+  "id": "saturday-morning-cartoons",
+  "name": "Saturday Morning Cartoons",
+  "description": "Theatrical cartoons from the 1920s to the 60s: Fleischer Popeye and Betty Boop, early Looney Tunes and Merrie Melodies, Felix the Cat, Woody Woodpecker, Little Lulu and Casper. Short, loud and around the clock, with commercial breaks between them.",
+  "curated": "2026-10-14: about 60 hours from the Internet Archive's classic cartoons collection plus Popeye, Betty Boop, Superman, Looney Tunes, Merrie Melodies, Felix and friends (before 1970); compilations excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Classic cartoons collection",
+      "query": "collection:(classic_cartoons) AND NOT title:(compilation) AND NOT title:(\"Cartoon Network\" OR Boomerang OR Legendado OR Dublado OR \"Looney Tunes Show\")",
+      "items": 100,
+      "filesPerItem": 3,
+      "minMinutes": 3,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "Popeye, Betty Boop & Fleischer Superman",
+      "query": "(title:(Popeye) OR title:(\"Betty Boop\") OR (title:(Superman) AND title:(Fleischer OR \"Mechanical Monsters\" OR \"Mad Scientist\" OR Bulleteers))) AND NOT year:[1965 TO 2030] AND NOT title:(compilation OR best) AND NOT title:(\"Cartoon Network\" OR Boomerang OR Legendado OR Dublado OR \"Looney Tunes Show\")",
+      "items": 100,
+      "filesPerItem": 2,
+      "minMinutes": 3,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "Looney Tunes, Merrie Melodies, Felix & friends",
+      "query": "(title:(\"Looney Tunes\") OR title:(\"Merrie Melodies\") OR title:(\"Felix the Cat\") OR title:(\"Woody Woodpecker\") OR title:(Casper) OR title:(\"Little Lulu\")) AND NOT year:[1970 TO 2030] AND NOT title:(compilation) AND NOT title:(\"Cartoon Network\" OR Boomerang OR Legendado OR Dublado OR \"Looney Tunes Show\")",
+      "items": 100,
+      "filesPerItem": 2,
+      "minMinutes": 3,
+      "maxYear": 1975
+    }
+  ],
+  "slots": []
+}

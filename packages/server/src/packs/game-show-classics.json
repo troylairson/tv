@@ -1,0 +1,42 @@
+{
+  "id": "game-show-classics",
+  "name": "Game Show Classics",
+  "description": "What's My Line?, You Bet Your Life with Groucho Marx, I've Got a Secret, To Tell the Truth, Password, Concentration, Beat the Clock and Queen for a Day. What's My Line? airs weeknights at 7:30 pm.",
+  "curated": "2026-10-14: about 115 hours of 1950s-80s game shows matched by show title; board games and video games excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Classic game shows",
+      "query": "mediatype:movies AND title:(\"You Bet Your Life\" OR \"I've Got a Secret\" OR \"To Tell the Truth\" OR \"Truth or Consequences\" OR \"Beat the Clock\" OR \"Name That Tune\" OR \"Password\" OR \"Match Game\" OR \"Concentration\" OR \"Twenty One\" OR \"Queen for a Day\") AND NOT year:[2000 TO 2030] AND NOT title:(trailer OR clip OR documentary OR game OR board OR pc OR nes OR snes) AND NOT title:(Nazi OR camp OR Holocaust OR Rosie OR movie OR Grams)",
+      "items": 80,
+      "filesPerItem": 10,
+      "minMinutes": 15,
+      "maxYear": 1995
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "19:30",
+      "durationMin": 30,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "What's My Line?",
+        "query": "mediatype:movies AND title:(\"What's My Line\" OR \"Whats My Line\") AND NOT year:[2000 TO 2030] AND NOT title:(trailer OR clip OR documentary) AND NOT title:(Nazi OR camp OR Holocaust OR Rosie OR movie OR Grams)",
+        "items": 80,
+        "filesPerItem": 10,
+        "minMinutes": 15,
+        "maxYear": 1995
+      }
+    }
+  ]
+}

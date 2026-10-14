@@ -1,0 +1,40 @@
+{
+  "id": "classic-sitcoms",
+  "name": "Classic Sitcoms",
+  "description": "50s and 60s TV comedy: The Beverly Hillbillies, The Andy Griffith Show, The Dick Van Dyke Show, Burns and Allen, Jack Benny, Lucy, Mister Ed, Petticoat Junction, Green Acres, Our Miss Brooks and more. Get Smart airs weeknights at 8:00 pm, in episode order.",
+  "curated": "2026-10-14: about 65 hours from the Internet Archive's Classic TV collection, matched by show title; Get Smart slot from the complete series item.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Classic TV sitcoms",
+      "query": "collection:(classic_tv) AND title:(\"Beverly Hillbillies\" OR \"Andy Griffith\" OR \"Dick Van Dyke\" OR \"Burns and Allen\" OR \"Jack Benny\" OR \"Lucy\" OR \"Petticoat Junction\" OR \"Green Acres\" OR \"Honeymooners\" OR \"Mister Ed\" OR \"Car 54\" OR \"Make Room for Daddy\" OR \"My Little Margie\" OR \"Life of Riley\" OR \"Ozzie and Harriet\" OR \"Dobie Gillis\" OR \"Our Miss Brooks\" OR \"Private Secretary\" OR \"McHale\")",
+      "items": 60,
+      "filesPerItem": 15,
+      "minMinutes": 15,
+      "maxYear": 1975
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "20:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "Get Smart",
+        "identifier": "get-smart",
+        "minMinutes": 15,
+        "maxYear": 1975
+      }
+    }
+  ]
+}

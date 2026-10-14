@@ -1,0 +1,39 @@
+{
+  "id": "shock-theater",
+  "name": "Shock Theater",
+  "description": "Classic horror from the silent era to the early 70s: Nosferatu, The Cabinet of Dr. Caligari, White Zombie, Night of the Living Dead, Carnival of Souls, House on Haunted Hill, Dementia 13 and a crypt full of Lugosi and Karloff programmers. Creature Double Feature Friday and Saturday nights at 11:00 pm.",
+  "curated": "2026-10-14: about 150 hours of hand-listed public-domain horror titles (1970 and earlier); trailers, clips, remakes and the 1979 Nosferatu excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Classic horror films (to 1970)",
+      "query": "mediatype:movies AND title:(\"Nosferatu\" OR \"Night of the Living Dead\" OR \"Carnival of Souls\" OR \"House on Haunted Hill\" OR \"The Last Man on Earth\" OR \"White Zombie\" OR \"The Bat\" OR \"Dementia 13\" OR \"The Little Shop of Horrors\" OR \"The Cabinet of Dr. Caligari\" OR \"Phantom of the Opera\" OR \"The Hunchback of Notre Dame\" OR \"Vampyr\" OR \"The Ape Man\" OR \"Bluebeard\" OR \"The Devil Bat\" OR \"The Terror\" OR \"Black Sunday\" OR \"Horror Hotel\" OR \"The Screaming Skull\" OR \"The Corpse Vanishes\" OR \"Dead Men Walk\" OR \"Haxan\" OR \"The Invisible Ghost\" OR \"The Mad Monster\" OR \"Bowery at Midnight\" OR \"The Human Monster\" OR \"The Monster Walks\" OR \"The Vampire Bat\") AND NOT year:[1971 TO 2030] AND NOT title:(1979) AND NOT title:(trailer OR clip OR review OR remake OR colorized OR compilation)",
+      "items": 130,
+      "filesPerItem": 1,
+      "minMinutes": 45,
+      "maxYear": 1975
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        5,
+        6
+      ],
+      "start": "23:00",
+      "durationMin": 180,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "Creature Double Feature",
+        "query": "collection:(SciFi_Horror) AND subject:(horror) AND NOT year:[1971 TO 2030] AND NOT title:(Naked OR Virgins OR Bloody OR Werewolf) AND NOT title:(trailer OR clip OR review OR remake OR colorized OR compilation)",
+        "items": 100,
+        "filesPerItem": 1,
+        "minMinutes": 50,
+        "maxYear": 1975
+      }
+    }
+  ]
+}

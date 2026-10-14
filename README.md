@@ -93,11 +93,19 @@ guide → Settings → *Manage channels* shows the address and a QR code).
 
 - **Channel ideas:** ready-made, hand-curated channels you add with one tap
   (content, order and time slots included), then tweak like any other channel.
-  First up: **Retro Pro Wrestling**: about 690 hours of 1979–1999 wrestling TV
-  (WWF Prime Time / Challenge / Superstars, WCW Saturday Night, Memphis, Mid-South,
-  Georgia, Florida, Portland, World Class), *Saturday Night's Main Event* on
-  Saturdays at 11:30 pm, NWA supercards on Sunday nights and the *Rock 'n'
-  Wrestling* cartoon on Saturday mornings. Packs live in
+  Available now:
+  - **Retro Pro Wrestling**: 1979–1999 wrestling TV (~690 h); *Saturday Night's Main
+    Event* Saturdays 11:30 pm, NWA supercards Sunday nights, *Rock 'n' Wrestling* cartoon
+    Saturday mornings.
+  - **Atomic Age Theater**: black-and-white sci-fi to 1965 (~120 h); the 1936 *Flash
+    Gordon* serial Saturdays at noon.
+  - **Saturday Morning Cartoons**: Fleischer, early Looney Tunes, Felix, Woody (~45 h).
+  - **Classic Sitcoms**: 50s–60s TV comedy (~85 h); *Get Smart* weeknights at 8 pm.
+  - **Film Noir After Dark**: 40s–50s noir (~190 h).
+  - **Shock Theater**: classic horror to 1970 (~160 h); Creature Double Feature Fri & Sat 11 pm.
+  - **Saddle Up**: western TV and B-westerns (~205 h); *The Lone Ranger* Saturdays 10 am.
+  - **Game Show Classics**: *What's My Line?*, *You Bet Your Life* and friends (~120 h);
+    *What's My Line?* weeknights 7:30 pm. Packs live in
   `packages/server/src/packs/`; new ones are curated by researching the Internet
   Archive (ask Claude for a theme).
 

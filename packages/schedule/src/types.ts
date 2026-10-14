@@ -41,10 +41,12 @@ export type SourceRef =
       title: string;
       /** Skip videos shorter than this (clips, promos). */
       minMinutes?: number;
+      /** Skip videos whose title only mentions years after this ("Looney Tunes Show (2014)"). */
+      maxYear?: number;
       /** Which results to take, and their order: popular first (default), or archive order (oldest first). */
       sort?: IaSort;
     }
-  | { kind: 'ia-item'; identifier: string; title: string; minMinutes?: number };
+  | { kind: 'ia-item'; identifier: string; title: string; minMinutes?: number; maxYear?: number };
 
 export type IaSort = 'popular' | 'identifier' | 'date' | 'title';
 

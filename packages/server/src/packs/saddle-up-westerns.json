@@ -1,0 +1,45 @@
+{
+  "id": "saddle-up-westerns",
+  "name": "Saddle Up",
+  "description": "Westerns from the golden age of cowboys: The Cisco Kid, Hopalong Cassidy, Roy Rogers, Gene Autry, Annie Oakley, Wild Bill Hickok, Bonanza and Tales of Wells Fargo on TV, plus B-western features with John Wayne, Tim McCoy and Bob Steele. The Lone Ranger rides every Saturday morning at 10:00.",
+  "curated": "2026-10-14: about 160 hours of western TV episodes and pre-1966 B-western features; two 1960s adult films that mention 'western' excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Western TV series",
+      "query": "mediatype:movies AND title:(\"Cisco Kid\" OR \"Hopalong Cassidy\" OR \"Roy Rogers\" OR \"Gene Autry\" OR \"Annie Oakley\" OR \"Wild Bill Hickok\" OR \"Range Rider\" OR \"Sky King\" OR \"Rifleman\" OR \"Bonanza\" OR \"Death Valley Days\" OR \"Tales of Wells Fargo\") AND NOT year:[1975 TO 2030] AND NOT title:(trailer OR clip OR documentary)",
+      "items": 80,
+      "filesPerItem": 12,
+      "minMinutes": 15,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "B-western features (to 1965)",
+      "query": "collection:(feature_films) AND subject:(western) AND NOT year:[1966 TO 2030] AND NOT title:(Naked OR Virgins) AND NOT title:(trailer OR clip OR review OR remake OR colorized OR compilation)",
+      "items": 80,
+      "filesPerItem": 1,
+      "minMinutes": 50,
+      "maxYear": 1975
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "10:00",
+      "durationMin": 60,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "The Lone Ranger",
+        "identifier": "theloneranger_201705",
+        "minMinutes": 15,
+        "maxYear": 1975
+      }
+    }
+  ]
+}

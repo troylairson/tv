@@ -1,0 +1,36 @@
+{
+  "id": "atomic-age-sci-fi",
+  "name": "Atomic Age Theater",
+  "description": "Black-and-white science fiction from the 1920s to the early 60s: Metropolis, Things to Come, Gojira, Rocketship X-M, Killers from Space, Red Planet Mars, Plan 9 from Outer Space and dozens more flying saucers, giant bugs and mad scientists. The 1936 Flash Gordon serial plays a chapter every Saturday at noon, in order.",
+  "curated": "2026-10-14: about 150 hours of hand-listed public-domain sci-fi titles (1965 and earlier) plus the complete 13-chapter Flash Gordon serial; trailers, clips, remakes and colorized versions excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Classic sci-fi films (to 1965)",
+      "query": "mediatype:movies AND title:(\"Plan 9 from Outer Space\" OR \"Robot Monster\" OR \"The Brain from Planet Arous\" OR \"Teenagers from Outer Space\" OR \"Killers from Space\" OR \"The Amazing Transparent Man\" OR \"Beyond the Time Barrier\" OR \"Phantom from Space\" OR \"Rocketship X-M\" OR \"Lost Continent\" OR \"Unknown World\" OR \"Cat-Women of the Moon\" OR \"King Dinosaur\" OR \"The Man from Planet X\" OR \"Things to Come\" OR \"Metropolis\" OR \"Aelita\" OR \"A Trip to the Moon\" OR \"Mesa of Lost Women\" OR \"The Atomic Brain\" OR \"The Killer Shrews\" OR \"Night of the Blood Beast\" OR \"Missile to the Moon\" OR \"Invasion of the Animal People\" OR \"The Astounding She-Monster\" OR \"The Giant Gila Monster\" OR \"Attack of the Giant Leeches\" OR \"Bride of the Monster\" OR \"The Beast of Yucca Flats\" OR \"Gojira\" OR \"Radar Men from the Moon\" OR \"Zombies of the Stratosphere\" OR \"Indestructible Man\" OR \"The Snow Creature\" OR \"Space Master X-7\" OR \"First Man into Space\" OR \"The Flying Saucer\" OR \"Red Planet Mars\" OR \"Invisible Invaders\" OR \"The Hideous Sun Demon\" OR \"The Brain That Wouldn't Die\" OR \"The Wasp Woman\") AND NOT year:[1966 TO 2030] AND NOT title:(trailer OR clip OR review OR remake OR colorized OR compilation) AND NOT title:(MST3K OR \"Mystery Science\")",
+      "items": 120,
+      "filesPerItem": 1,
+      "minMinutes": 45,
+      "maxYear": 1966
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "12:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "Flash Gordon (1936 serial)",
+        "identifier": "flash-gordon-the-complete-serial",
+        "minMinutes": 5,
+        "maxYear": 1966
+      }
+    }
+  ]
+}

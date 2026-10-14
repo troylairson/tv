@@ -1,0 +1,20 @@
+{
+  "id": "film-noir-after-dark",
+  "name": "Film Noir After Dark",
+  "description": "Shadows, fedoras and femmes fatales: 1940s and 50s crime dramas from the Internet Archive's film noir collection, around the clock. Best after midnight.",
+  "curated": "2026-10-14: about 165 hours from the Film_Noir collection (1965 and earlier).",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Film noir (to 1965)",
+      "query": "collection:(Film_Noir) AND NOT year:[1966 TO 2030] AND NOT title:(trailer OR clip OR review OR remake OR colorized OR compilation)",
+      "items": 140,
+      "filesPerItem": 1,
+      "minMinutes": 50,
+      "maxYear": 1966
+    }
+  ],
+  "slots": []
+}

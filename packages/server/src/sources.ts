@@ -38,10 +38,17 @@ async function iaSearchItems(query: string, items: number, filesPerItem: number,
   return perItem.flat();
 }
 
+/** True if the title names years and all of them are after `maxYear` (a 1920 film "restored 1994" stays). */
+export function tooRecent(title: string, maxYear: number): boolean {
+  const years = [...title.matchAll(/(?:^|\D)((?:19|20)\d{2})(?!\d)/g)].map((m) => Number(m[1]));
+  return years.length > 0 && Math.min(...years) > maxYear;
+}
+
 export async function resolveSource(source: SourceRef): Promise<ChannelItem[]> {
   const items = await resolveSourceItems(source);
   const min = 'minMinutes' in source && source.minMinutes ? source.minMinutes * 60 : 0;
-  return min ? items.filter((i) => i.durationSec >= min) : items;
+  const maxYear = 'maxYear' in source ? source.maxYear : undefined;
+  return items.filter((i) => i.durationSec >= min && !(maxYear && tooRecent(i.title, maxYear)));
 }
 
 async function resolveSourceItems(source: SourceRef): Promise<ChannelItem[]> {

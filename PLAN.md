@@ -447,9 +447,12 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   and committed as JSON packs (`packages/server/src/packs/`), installable in one tap
   from the manager. IA sources gained `minMinutes` (drop clips) and `sort`
   (archive order for "next episode" slots).
-- First pack: Retro Pro Wrestling (~690 h). Ideas for more: 70s/80s Saturday
-  morning cartoons, 50s sci-fi B-movies, classic sitcoms, game shows, old-time
-  news & PSAs, holiday specials.
+- Packs: Retro Pro Wrestling, Atomic Age Theater, Saturday Morning Cartoons, Classic
+  Sitcoms, Film Noir After Dark, Shock Theater, Saddle Up (westerns), Game Show
+  Classics. IA sources also gained `maxYear` (drop titles that only mention later
+  years). Every pack was installed against the live archive and every title scanned
+  for junk before shipping. More ideas: old-time news & PSAs, holiday specials,
+  70s/80s cartoons, kung fu theater, Mystery Science Theater-style B-movies.
 - Later, if an API key is ever available: an AI channel builder that screens
   search results the same way.
 
