@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fileStem, itemsFromMetadata, parseLength, pickPlayableFiles, type IaFile } from './ia';
+import { fileStem, identifierFromLink, itemsFromMetadata, parseLength, pickPlayableFiles, type IaFile } from './ia';
 
 // Trimmed from real archive.org metadata responses.
 const getSmart: IaFile[] = [
@@ -78,5 +78,18 @@ describe('itemsFromMetadata', () => {
   it('skips dark and non-video items', () => {
     expect(itemsFromMetadata('x', { is_dark: true, metadata: { mediatype: 'movies' }, files: cartoon })).toEqual([]);
     expect(itemsFromMetadata('x', { metadata: { mediatype: 'audio' }, files: cartoon })).toEqual([]);
+  });
+});
+
+describe('identifierFromLink', () => {
+  it('reads the item from pasted archive.org links', () => {
+    expect(identifierFromLink('https://archive.org/details/deathmatch-barbed-wire-wrestlin')).toBe('deathmatch-barbed-wire-wrestlin');
+    expect(identifierFromLink(' archive.org/details/his_girl_friday?tab=about ')).toBe('his_girl_friday');
+    expect(identifierFromLink('https://archive.org/download/commercials-clean/x.zip')).toBe('commercials-clean');
+  });
+
+  it('ignores ordinary searches', () => {
+    expect(identifierFromLink('barbed wire deathmatch')).toBeNull();
+    expect(identifierFromLink('archive.org')).toBeNull();
   });
 });

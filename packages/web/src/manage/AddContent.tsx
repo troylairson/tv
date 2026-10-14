@@ -152,7 +152,7 @@ const IA_COLLECTIONS = [
 function IaPicker({ onAdd, isAdded }: PickerProps) {
   const [q, setQ] = useState('');
   const [collection, setCollection] = useState('classic_tv');
-  const [result, setResult] = useState<{ query: string; total: number; results: IaResult[] } | null>(null);
+  const [result, setResult] = useState<{ query: string; total: number; link?: boolean; results: IaResult[] } | null>(null);
   const [searching, setSearching] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [items, setItems] = useState(20);
@@ -182,49 +182,50 @@ function IaPicker({ onAdd, isAdded }: PickerProps) {
             </option>
           ))}
         </select>
-        <input type="search" placeholder="Search, e.g. western, Popeye, 1950s" value={q} onInput={(e) => setQ((e.target as HTMLInputElement).value)} />
+        <input type="search" placeholder="Search, e.g. western, Popeye, 1950s, or paste an archive.org link" value={q} onInput={(e) => setQ((e.target as HTMLInputElement).value)} />
         <button class="mg-primary" type="submit" disabled={searching}>
           {searching ? 'Searching…' : 'Search'}
         </button>
       </form>
       {error && <p class="mg-error">{error}</p>}
+      {result?.link && !result.results.length && <p class="mg-error">No Internet Archive item found at that link.</p>}
+      {result && !result.link && (
+        <div class="mg-row mg-search-summary">
+          <span>
+            {result.total.toLocaleString()} results, most popular first.
+          </span>
+          <span class="mg-actions">
+            <label class="inline small">
+              Top
+              <input type="number" min={1} max={200} value={items} onInput={(e) => setItems(Number((e.target as HTMLInputElement).value) || 20)} />
+              items
+            </label>
+            <AddButton
+              source={{ kind: 'ia-search', query: result.query, items, filesPerItem: 10, title: label || result.query }}
+              label="Add this search (updates nightly)"
+              onAdd={onAdd}
+              isAdded={isAdded}
+            />
+          </span>
+        </div>
+      )}
       {result && (
-        <>
-          <div class="mg-row mg-search-summary">
-            <span>
-              {result.total.toLocaleString()} results, most popular first.
-            </span>
-            <span class="mg-actions">
-              <label class="inline small">
-                Top
-                <input type="number" min={1} max={200} value={items} onInput={(e) => setItems(Number((e.target as HTMLInputElement).value) || 20)} />
-                items
-              </label>
-              <AddButton
-                source={{ kind: 'ia-search', query: result.query, items, filesPerItem: 10, title: label || result.query }}
-                label="Add this search (updates nightly)"
-                onAdd={onAdd}
-                isAdded={isAdded}
-              />
-            </span>
-          </div>
-          <ul class="mg-list">
-            {result.results.map((r) => (
-              <li key={r.identifier}>
-                <img src={r.thumb} alt="" loading="lazy" />
-                <div class="mg-list-body">
-                  <a href={`https://archive.org/details/${encodeURIComponent(r.identifier)}`} target="_blank" rel="noreferrer">
-                    {r.title ?? r.identifier}
-                  </a>
-                  <div class="mg-dim small">
-                    {[r.year, r.downloads !== undefined && `${r.downloads.toLocaleString()} views`].filter(Boolean).join(' · ')}
-                  </div>
+        <ul class="mg-list">
+          {result.results.map((r) => (
+            <li key={r.identifier}>
+              <img src={r.thumb} alt="" loading="lazy" />
+              <div class="mg-list-body">
+                <a href={`https://archive.org/details/${encodeURIComponent(r.identifier)}`} target="_blank" rel="noreferrer">
+                  {r.title ?? r.identifier}
+                </a>
+                <div class="mg-dim small">
+                  {[r.year, r.downloads !== undefined && `${r.downloads.toLocaleString()} views`].filter(Boolean).join(' · ')}
                 </div>
-                <AddButton source={{ kind: 'ia-item', identifier: r.identifier, title: r.title ?? r.identifier }} onAdd={onAdd} isAdded={isAdded} />
-              </li>
-            ))}
-          </ul>
-        </>
+              </div>
+              <AddButton source={{ kind: 'ia-item', identifier: r.identifier, title: r.title ?? r.identifier }} onAdd={onAdd} isAdded={isAdded} />
+            </li>
+          ))}
+        </ul>
       )}
     </div>
   );

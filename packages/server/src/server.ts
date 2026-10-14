@@ -196,12 +196,15 @@ app.get('/api/manage/channels/:id/preview', (c) => {
 app.get('/api/ia/search', async (c) => {
   const q = (c.req.query('q') ?? '').trim();
   const collection = (c.req.query('collection') ?? '').trim();
-  const parts = [q, collection && `collection:${collection}`].filter(Boolean);
+  // A pasted archive.org link goes straight to that item, whatever collection is picked.
+  const linked = ia.identifierFromLink(q);
+  const parts = linked ? [`identifier:"${linked}"`] : [q, collection && `collection:${collection}`].filter(Boolean);
   if (!parts.length) return c.json({ error: 'Enter a search or pick a collection' }, 400);
   const query = parts.map((p) => `(${p})`).join(' AND ');
   const { numFound, docs } = await ia.search(query, { rows: 40, page: Number(c.req.query('page')) || 1 });
   return c.json({
     query,
+    link: Boolean(linked),
     total: numFound,
     results: docs.map((d) => ({ ...d, thumb: ia.thumbUrl(d.identifier) })),
   });

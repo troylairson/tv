@@ -81,7 +81,7 @@ export const api = {
   plexBrowse: (key: string, q: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/items?q=${encodeURIComponent(q)}`),
   plexCollections: (key: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/collections`),
   iaSearch: (q: string, collection: string) =>
-    call<{ query: string; total: number; results: IaResult[] }>(
+    call<{ query: string; total: number; link?: boolean; results: IaResult[] }>(
       `/api/ia/search?q=${encodeURIComponent(q)}&collection=${encodeURIComponent(collection)}`,
     ),
 };

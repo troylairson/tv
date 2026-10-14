@@ -90,6 +90,12 @@ export function downloadUrl(identifier: string, file: string): string {
   return `${IA}/download/${encodeURIComponent(identifier)}/${file.split('/').map(encodeURIComponent).join('/')}`;
 }
 
+/** The item identifier in a pasted archive.org link (details, download, embed…), if it is one. */
+export function identifierFromLink(text: string): string | null {
+  const m = /archive\.org\/(?:details|download|embed|metadata)\/([A-Za-z0-9._-]+)/.exec(text.trim());
+  return m?.[1] ? decodeURIComponent(m[1]) : null;
+}
+
 export function thumbUrl(identifier: string): string {
   return `${IA}/services/img/${encodeURIComponent(identifier)}`;
 }
