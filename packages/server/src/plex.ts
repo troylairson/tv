@@ -1,6 +1,7 @@
 import { randomUUID } from 'node:crypto';
 import { seededShuffle } from '@retro-tv/schedule';
 import { config } from './config';
+import { AUDIO_LANGUAGES, getSettings } from './settings';
 import { prettifyTitle } from './titles';
 import type { ChannelItem } from './types';
 
@@ -22,7 +23,16 @@ async function plexJson<T>(pathAndQuery: string, timeoutMs = 15_000): Promise<T>
   return (await res.json()) as T;
 }
 
-interface PlexPart { key: string; container?: string }
+interface PlexStream {
+  id: number;
+  /** 1 video, 2 audio, 3 subtitles. */
+  streamType: number;
+  languageCode?: string;
+  language?: string;
+  default?: boolean;
+  selected?: boolean;
+}
+interface PlexPart { id?: number; key: string; container?: string; Stream?: PlexStream[] }
 interface PlexMedia { container?: string; videoCodec?: string; audioCodec?: string; Part?: PlexPart[] }
 interface PlexMetadata {
   ratingKey: string;
@@ -189,12 +199,38 @@ export interface PlexPlayback {
   /** Seconds to seek after loading. Transcodes start at the offset server-side, so 0. */
   startAt: number;
   session?: string;
-  media?: { container?: string; videoCodec?: string; audioCodec?: string };
+  media?: { container?: string; videoCodec?: string; audioCodec?: string; audioLanguage?: string };
   /** How it's being played (auto picks one). */
   mode: 'transcode' | 'direct';
 }
 
 export type PlexPlayMode = 'auto' | 'transcode' | 'direct';
+
+/**
+ * Which audio track to play when a file has several. Returns null when there's
+ * nothing to choose (one track, no match, or the "file default" setting);
+ * `switched` means it isn't the track the file plays by default, so it can't be
+ * played directly: browsers always play the default track.
+ */
+export function pickAudio(streams: PlexStream[] | undefined, language: string): { stream: PlexStream; switched: boolean } | null {
+  const audio = (streams ?? []).filter((s) => s.streamType === 2);
+  const wanted = AUDIO_LANGUAGES[language]?.codes ?? [];
+  if (audio.length < 2 || !wanted.length) return null;
+  const matches = (s: PlexStream) => [s.languageCode, s.language].some((v) => v && wanted.includes(v.toLowerCase()));
+  const fileDefault = audio.find((s) => s.default) ?? audio[0]!;
+  if (matches(fileDefault)) return { stream: fileDefault, switched: false };
+  const stream = audio.find(matches);
+  return stream ? { stream, switched: true } : null;
+}
+
+/** Tell Plex which audio track to use for this file; transcodes follow it. */
+async function selectAudio(partId: number, streamId: number): Promise<void> {
+  await fetch(`${config.plexUrl}/library/parts/${partId}?audioStreamID=${streamId}&allParts=1`, {
+    method: 'PUT',
+    headers: plexHeaders(),
+    signal: AbortSignal.timeout(10_000),
+  }).catch(() => undefined);
+}
 
 /**
  * Files a browser (and the Chromecast WebView) plays natively: MP4/MOV with H.264
@@ -243,14 +279,22 @@ export async function playback(ratingKey: string, offsetSec: number, mode: PlexP
   const decision = mode === 'transcode' ? checkDecision(params) : null;
   decision?.catch(() => undefined);
   const media = (await metadata).MediaContainer.Metadata?.[0]?.Media?.[0];
-  const mediaInfo = { container: media?.container, videoCodec: media?.videoCodec, audioCodec: media?.audioCodec };
+  const part = media?.Part?.[0];
+  const audio = pickAudio(part?.Stream, getSettings().audioLanguage);
+  const mediaInfo = {
+    container: media?.container,
+    videoCodec: media?.videoCodec,
+    audioCodec: media?.audioCodec,
+    audioLanguage: audio?.stream.languageCode ?? audio?.stream.language,
+  };
 
-  if (mode === 'direct' || (mode === 'auto' && browserPlayable(mediaInfo))) {
-    const part = media?.Part?.[0];
+  // A file whose default audio is the wrong language has to convert to swap tracks.
+  if (mode === 'direct' || (mode === 'auto' && browserPlayable(mediaInfo) && !audio?.switched)) {
     if (!part) throw new Error(`Plex item ${ratingKey} has no media part`);
     return { url: `/plex${part.key}`, type: 'file', startAt: offsetSec, media: mediaInfo, mode: 'direct' };
   }
 
+  if (audio && !audio.stream.selected && part?.id !== undefined) await selectAudio(part.id, audio.stream.id);
   await (decision ?? checkDecision(params));
   return { url: `/plex/video/:/transcode/universal/start.m3u8?${params}`, type: 'hls', startAt: 0, session, media: mediaInfo, mode: 'transcode' };
 }

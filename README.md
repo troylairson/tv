@@ -60,7 +60,8 @@ to turn the TV on.
 **In the guide:** ▲▼ move between channels, ◀▶ move through programmes (the
 grid pages through time), OK watches the highlighted channel, Back closes. The
 live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
-commercial breaks on/off (applies to every TV in the house); CRT effect,
+commercial breaks on/off and **audio language** for Plex files with several audio
+tracks (both apply to every TV in the house); CRT effect,
 **theme** (six looks: *Prevue '89*, *VCR*, *Streaming*, *Broadcast*, *Station ID*
 and *Console*; see [docs/mockups](docs/mockups)), **static sound** on/off, **logo bug** (the
 channel's logo in the corner while a show plays) and Plex playback (*Auto*, the

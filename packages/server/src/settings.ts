@@ -8,10 +8,23 @@ export interface Settings {
   commercialBreaks: boolean;
   /** IANA zone that time slots are written in ("20:00" means 8 pm here). */
   timeZone: string;
+  /** Preferred audio track for Plex files with several (a key of AUDIO_LANGUAGES). */
+  audioLanguage: string;
 }
 
+/** Audio languages to pick from, with the codes and names Plex may tag a track with. "file" keeps the file's own default. */
+export const AUDIO_LANGUAGES: Record<string, { name: string; codes: string[] }> = {
+  eng: { name: 'English', codes: ['eng', 'en', 'english'] },
+  spa: { name: 'Spanish', codes: ['spa', 'es', 'spanish', 'español'] },
+  fra: { name: 'French', codes: ['fra', 'fre', 'fr', 'french', 'français'] },
+  deu: { name: 'German', codes: ['deu', 'ger', 'de', 'german', 'deutsch'] },
+  ita: { name: 'Italian', codes: ['ita', 'it', 'italian', 'italiano'] },
+  jpn: { name: 'Japanese', codes: ['jpn', 'ja', 'japanese', '日本語'] },
+  file: { name: 'File default', codes: [] },
+};
+
 const envZone = process.env.TZ && isValidTimeZone(process.env.TZ) ? process.env.TZ : 'UTC';
-const DEFAULTS: Settings = { commercialBreaks: true, timeZone: envZone };
+const DEFAULTS: Settings = { commercialBreaks: true, timeZone: envZone, audioLanguage: 'eng' };
 const file = () => path.join(config.dataDir, 'settings.json');
 
 let current: Settings = { ...DEFAULTS };
@@ -34,6 +47,10 @@ export async function updateSettings(patch: Partial<Settings>): Promise<Settings
   if (patch.timeZone !== undefined) {
     if (typeof patch.timeZone !== 'string' || !isValidTimeZone(patch.timeZone)) throw new SettingsError(`Unknown time zone "${String(patch.timeZone)}"`);
     next.timeZone = patch.timeZone;
+  }
+  if (patch.audioLanguage !== undefined) {
+    if (typeof patch.audioLanguage !== 'string' || !AUDIO_LANGUAGES[patch.audioLanguage]) throw new SettingsError(`Unknown audio language "${String(patch.audioLanguage)}"`);
+    next.audioLanguage = patch.audioLanguage;
   }
   current = next;
   await fs.mkdir(config.dataDir, { recursive: true });

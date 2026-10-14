@@ -34,7 +34,19 @@ const fmtTime = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: 'num
 
 interface HouseSettings {
   commercialBreaks: boolean;
+  audioLanguage?: string;
 }
+
+/** Matches the server's AUDIO_LANGUAGES. */
+const AUDIO_LANGUAGES: [string, string][] = [
+  ['eng', 'English'],
+  ['spa', 'Spanish'],
+  ['fra', 'French'],
+  ['deu', 'German'],
+  ['ita', 'Italian'],
+  ['jpn', 'Japanese'],
+  ['file', 'File default'],
+];
 interface PoolStatus {
   ready: number;
   target: number;
@@ -197,6 +209,23 @@ export function App() {
           body: JSON.stringify({ commercialBreaks: !house.commercialBreaks }),
         });
         setHouse((await res.json()) as HouseSettings);
+      },
+    },
+    {
+      label: 'Audio language',
+      value: house ? (AUDIO_LANGUAGES.find(([id]) => id === (house.audioLanguage ?? 'eng'))?.[1] ?? 'English') : '…',
+      note: 'For Plex files with more than one audio track. Applies to every TV',
+      activate: async () => {
+        if (!house) return;
+        const i = AUDIO_LANGUAGES.findIndex(([id]) => id === (house.audioLanguage ?? 'eng'));
+        const next = AUDIO_LANGUAGES[(i + 1) % AUDIO_LANGUAGES.length]![0];
+        const res = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ audioLanguage: next }),
+        });
+        setHouse((await res.json()) as HouseSettings);
+        if (tunerState.airing?.item.source === 'plex') tuner.current?.retune();
       },
     },
     {
