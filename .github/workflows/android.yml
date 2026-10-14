@@ -27,7 +27,7 @@ jobs:
       # A fixed download URL the TV can fetch directly (e.g. with the Downloader app):
       # https://github.com/<owner>/<repo>/releases/download/android-latest/retro-tv.apk
       - name: Publish to the android-latest release
-        if: github.ref_name == github.event.repository.default_branch
+        if: github.ref == 'refs/heads/main' || github.ref_name == github.event.repository.default_branch
         env:
           GH_TOKEN: ${{ github.token }}
         run: |

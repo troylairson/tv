@@ -1,5 +1,7 @@
 /* The channel manager: a normal phone/laptop page, not the 10-foot TV UI. */
 html.manage { overflow: auto; height: auto; }
+/* The TV view hides the cursor on html, body and #app; the manager is a normal page. */
+html.manage, body.manage, body.manage #app { cursor: auto; }
 body.manage {
   overflow: auto;
   cursor: auto;
