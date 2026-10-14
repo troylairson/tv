@@ -211,6 +211,17 @@ html, body, #app {
 }
 .osd-number { font-size: 9vh; font-weight: bold; line-height: 1; }
 .osd-name { font-size: 3vh; font-weight: bold; }
+.osd-logo { display: block; height: 11vh; width: 19vh; margin-top: 1vh; margin-left: auto; filter: drop-shadow(0 0 0.6vh rgba(0, 0, 0, 0.7)); }
+
+/* ── Channel logos ──────────────────────────────────────────────────────── */
+
+.logo { display: block; overflow: visible; }
+/* The watermark: small, see-through, bottom right, like a network bug. */
+.logo-bug {
+  position: absolute; right: var(--safe-x); bottom: var(--safe-y); width: 15vh; height: 8.75vh;
+  opacity: 0.55; pointer-events: none; filter: drop-shadow(0 0 0.4vh rgba(0, 0, 0, 0.6));
+}
+.guide-logo { flex: none; height: 5.2vh; width: 8.9vh; }
 
 /* ── Info banner ────────────────────────────────────────────────────────── */
 
@@ -224,6 +235,8 @@ html, body, #app {
   font-family: var(--font-display);
 }
 .banner-badge-number { font-size: 6vh; font-weight: bold; line-height: 1; }
+.banner-badge.has-logo { background: none; padding: 0; min-width: 0; gap: 0.4vh; color: var(--dim); }
+.banner-badge.has-logo .logo { width: 20vh; height: 11.7vh; }
 .banner-badge-name { font-size: 1.7vh; font-weight: bold; max-width: 14vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .banner-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .banner-row { display: flex; justify-content: space-between; gap: 2vw; }
@@ -256,6 +269,9 @@ html, body, #app {
 .tv[data-theme='seventies'] .ident-panel {
   background: var(--panel-soft); border: var(--border) solid var(--edge); border-radius: var(--radius); box-shadow: var(--shadow);
 }
+.ident-logo { display: flex; flex-direction: column; align-items: center; gap: 1vh; }
+.ident-logo .logo { width: 44vh; height: 25.7vh; }
+.ident-logo .ident-number { margin: 0; font-size: 4vh; font-family: var(--font-display); }
 .ident-channel { font-size: 3.4vh; font-weight: bold; color: var(--fg); letter-spacing: 0.1em; font-family: var(--font-display); }
 .ident-number { color: var(--accent); font-size: 6vh; vertical-align: middle; margin-right: 1vw; }
 .ident-label { font-size: 3vh; margin-top: 2vh; }
@@ -331,6 +347,7 @@ html, body, #app {
 }
 .tv.guide-open .static { z-index: 3; }
 .tv.guide-open .card,
+.tv.guide-open .logo-bug,
 .tv.guide-open .osd,
 .tv.guide-open .banner,
 .tv.guide-open .hint,
@@ -369,6 +386,10 @@ html, body, #app {
 .guide-row:nth-child(odd) .guide-channel { background: var(--guide-row-alt); }
 .guide-channel-number { font-size: 3vh; color: var(--accent); min-width: 2.2em; text-align: right; font-family: var(--font-display); }
 .guide-channel-name { font-size: 2.1vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Beside a logo the name gets two short lines. */
+.guide-logo + .guide-channel-name {
+  font-size: 1.7vh; line-height: 1.15; white-space: normal; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
 .guide-row.current .guide-channel { box-shadow: inset 0.5vw 0 0 var(--live-mark); }
 .guide-row.focused-row .guide-channel { background: var(--guide-row-focus); }
 

@@ -492,17 +492,17 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       per-channel on/off in the manager; optional short music bed; also show a
       bumper when tuning into a channel mid-break. Later: a full-screen
       "TV Guide channel" that scrolls every channel's next few hours.
-- [ ] **Channel logos** (mock-up: [docs/mockups/channel-logos.png](docs/mockups/channel-logos.png)):
-      hand-drawn SVG logos for the current channels and packs (parodies are nods with
-      their own names, never copies), plus a generator for user-made channels (keywords
-      → motif, name hash → layout/colours/font, follows the theme; regenerate, pick a
-      style or upload your own in the manager). **Final logos are transparent-background
-      SVGs** (the mock-up's coloured tiles are only for presentation); where a logo needs
-      a backing shape it's part of the logo itself. Fonts bundled, no network. Shown as
-      a see-through corner bug while watching (setting to turn it off), in the banner
-      badge, the guide's channel column, the "Coming up next" card / bumpers, and the
-      manager.
-- [ ] **Paste an Internet Archive link** into the manager's IA search box
+- [x] **Channel logos** (mock-up: [docs/mockups/channel-logos.png](docs/mockups/channel-logos.png)):
+      12 hand-drawn transparent SVG logos (`packages/web/src/logos/hand.ts`) for the
+      packs and default channels, picked automatically; a generator for every other
+      channel (keywords → motif, hash → layout/palette/font, follows the TV theme);
+      fonts bundled. Shown as the tune-in OSD, banner badge, guide channel column,
+      "Coming up next" card and an optional corner bug (Settings → *Logo bug*). The
+      manager shows them and has a picker (automatic / generated + *Try another* /
+      any hand-drawn / number only). New packs get a logo by adding it to
+      `AUTO_HAND_LOGO`.
+- [ ] **Upload your own channel logo** in the manager (stored in the data dir).
+- [x] **Paste an Internet Archive link** into the manager's IA search box
       (`archive.org/details/<id>`) to jump straight to that item and add it.
 
 ## 7. Prior art worth borrowing from

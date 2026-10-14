@@ -3,6 +3,8 @@ import { useEffect, useState } from 'preact/hooks';
 import { AddContent } from './AddContent';
 import { api, fmtDuration, sourceLabel, type ChannelFields, type ChannelStatus, type PackInfo, type PreviewBlock } from './api';
 import { Schedule, type DraftSlot } from './Schedule';
+import { Logo, logoSpec } from '../logos/Logo';
+import { HAND_LOGOS } from '../logos/hand';
 
 type Route = { page: 'list' } | { page: 'new' } | { page: 'edit'; id: string };
 
@@ -99,6 +101,9 @@ function ChannelList() {
         {channels?.map((c) => (
           <li key={c.id} class="mg-channel">
             <span class="mg-channel-number">{c.number}</span>
+            <div class="mg-logo-thumb">
+              <Logo channel={c} theme="retro" />
+            </div>
             <div class="mg-channel-body">
               <div class="mg-channel-name">{c.name}</div>
               <div class="mg-dim">
@@ -178,6 +183,48 @@ type Form = Omit<ChannelFields, 'slots'> & { slots: DraftSlot[] };
 
 const EMPTY: Form = { number: 0, name: '', mode: 'loop', breaks: true, sources: [], excluded: [], slots: [] };
 
+/** Pick the channel's logo: automatic, a generated one (try another), a hand-drawn one, or just the number. */
+function LogoPicker({ channel, onChange }: { channel: { id: string; name: string; logo?: string; packId?: string; sources: SourceRef[] }; onChange: (logo: string | undefined) => void }) {
+  const spec = logoSpec(channel);
+  const choice = !channel.logo ? 'auto' : channel.logo.startsWith('gen:') ? 'gen' : channel.logo;
+  const seed = spec.startsWith('gen:') ? Number(spec.slice(4)) || 0 : 0;
+  return (
+    <div class="mg-card mg-logo-picker">
+      <div class="mg-logo-previews">
+        {(['retro', 'modern', 'seventies'] as const).map((theme) => (
+          <div key={theme} class={`mg-logo-preview ${theme}`}>
+            {spec === 'none' ? <span class="mg-dim">Number only</span> : <Logo channel={channel} theme={theme} />}
+          </div>
+        ))}
+      </div>
+      <div class="mg-logo-controls">
+        <select
+          value={choice}
+          onChange={(e) => {
+            const v = (e.target as HTMLSelectElement).value;
+            onChange(v === 'auto' ? undefined : v === 'gen' ? `gen:${seed}` : v);
+          }}
+        >
+          <option value="auto">Automatic</option>
+          <option value="gen">Generated from the name</option>
+          <optgroup label="Hand-drawn">
+            {Object.entries(HAND_LOGOS).map(([key, logo]) => (
+              <option key={key} value={`hand:${key}`}>
+                {logo.name}
+              </option>
+            ))}
+          </optgroup>
+          <option value="none">None (number only)</option>
+        </select>
+        {spec.startsWith('gen:') && <button onClick={() => onChange(`gen:${(seed + 1) % 1000}`)}>Try another</button>}
+        <p class="mg-dim small">
+          Generated logos pick their look from the channel's name and content, and follow each TV's theme (Retro, Modern, 70s shown above).
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function Editor({ id }: { id: string | null }) {
   const [saved, setSaved] = useState<ChannelStatus | null>(null);
   const [form, setForm] = useState<Form>(EMPTY);
@@ -201,7 +248,7 @@ function Editor({ id }: { id: string | null }) {
     }
     const c = r.channels.find((ch) => ch.id === id) ?? null;
     setSaved(c);
-    if (c && !dirty) setForm({ number: c.number, name: c.name, mode: c.mode, breaks: c.breaks, sources: c.sources, excluded: c.excluded, slots: c.slots ?? [] });
+    if (c && !dirty) setForm({ number: c.number, name: c.name, mode: c.mode, breaks: c.breaks, sources: c.sources, excluded: c.excluded, slots: c.slots ?? [], logo: c.logo });
   };
 
   useEffect(() => {
@@ -240,7 +287,7 @@ function Editor({ id }: { id: string | null }) {
       setError(`Time slot ${unpicked + 1}: pick a show first`);
       return;
     }
-    const fields: ChannelFields = { ...form, slots: form.slots.map((s) => ({ ...s, source: s.source! })) };
+    const fields: ChannelFields = { ...form, logo: form.logo ?? 'auto', slots: form.slots.map((s) => ({ ...s, source: s.source! })) };
     setSaving(true);
     setError(null);
     try {
@@ -293,6 +340,9 @@ function Editor({ id }: { id: string | null }) {
           breaks between shows
         </label>
       </div>
+
+      <h2>Logo</h2>
+      <LogoPicker channel={{ id: id ?? 'new', name: form.name || 'New Channel', logo: form.logo, packId: saved?.packId, sources: form.sources }} onChange={(logo) => set({ logo })} />
 
       <h2>Regular programming</h2>
       <div class="mg-card">

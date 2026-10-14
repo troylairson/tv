@@ -60,6 +60,17 @@ body.manage #app { height: auto; overflow: visible; }
 .mg-channel-body { flex: 1; min-width: 0; }
 .mg-channel-name { font-weight: 700; font-size: 17px; }
 
+.mg-logo-thumb { width: 86px; height: 50px; flex: none; background: #101018; border-radius: 6px; padding: 3px; }
+.mg-logo-thumb .logo { width: 100%; height: 100%; }
+.mg-logo-picker { display: flex; flex-wrap: wrap; gap: 16px; align-items: center; }
+.mg-logo-previews { display: flex; gap: 8px; flex-wrap: wrap; }
+.mg-logo-preview { width: 170px; height: 100px; border-radius: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; }
+.mg-logo-preview.retro { background: #0c123c; }
+.mg-logo-preview.modern { background: #18181d; }
+.mg-logo-preview.seventies { background: #3b1f0e; }
+.mg-logo-preview .logo { width: 100%; height: 100%; }
+.mg-logo-controls { flex: 1; min-width: 220px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.mg-logo-controls p { width: 100%; margin: 0; }
 .mg-form { display: flex; flex-wrap: wrap; gap: 14px 20px; align-items: flex-end; }
 .mg-form fieldset { border: 0; padding: 0; margin: 0; display: flex; gap: 12px; }
 .mg-form legend { font-size: 13px; color: var(--mg-dim); margin-bottom: 4px; }

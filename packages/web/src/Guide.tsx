@@ -2,6 +2,9 @@ import type { MutableRef } from 'preact/hooks';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { now } from './clock';
 import type { Action } from './keys';
+import { Logo } from './logos/Logo';
+import type { LogoTheme } from './logos/generate';
+import type { ChannelInfo } from './tuner';
 
 interface GuideBlock {
   title: string;
@@ -34,6 +37,9 @@ const fmtDay = (ms: number) => new Date(ms).toLocaleDateString([], { weekday: 'l
 export interface GuideProps {
   /** Number of the channel playing now (its row is marked and focused on open). */
   currentNumber: number | undefined;
+  /** For the logos in the channel column. */
+  channels: ChannelInfo[];
+  theme: LogoTheme;
   /** The guide sets this each render; App routes remote keys to it while the guide is open. */
   actionRef: MutableRef<((action: Action) => boolean) | null>;
   onTune: (channelNumber: number) => void;
@@ -46,7 +52,7 @@ export interface GuideProps {
  * the video), details of the highlighted programme sit beside it, and the grid
  * of channels × half-hours fills the bottom.
  */
-export function Guide({ currentNumber, actionRef, onTune, onSettings, onClose }: GuideProps) {
+export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSettings, onClose }: GuideProps) {
   const [rows, setRows] = useState<GuideRow[]>([]);
   const [fetched, setFetched] = useState<{ from: number; to: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -213,6 +219,10 @@ export function Guide({ currentNumber, actionRef, onTune, onSettings, onClose }:
             <div key={r.id} class={`guide-row ${index === row ? 'focused-row' : ''} ${r.number === currentNumber ? 'current' : ''}`}>
               <div class="guide-channel">
                 <span class="guide-channel-number">{r.number}</span>
+                {(() => {
+                  const info = channels.find((c) => c.id === r.id);
+                  return info && <Logo channel={info} theme={theme} class="guide-logo" />;
+                })()}
                 <span class="guide-channel-name">{r.name}</span>
               </div>
               <div class="guide-cells">

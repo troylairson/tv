@@ -61,8 +61,9 @@ to turn the TV on.
 grid pages through time), OK watches the highlighted channel, Back closes. The
 live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
 commercial breaks on/off (applies to every TV in the house); CRT effect,
-**theme** (Retro, Modern or 70s), **static sound** on/off and Plex playback mode
-(this TV only); diagnostics.
+**theme** (Retro, Modern or 70s), **static sound** on/off, **logo bug** (the
+channel's logo in the corner while a show plays) and Plex playback mode (this TV
+only); diagnostics.
 
 ## Managing channels
 
@@ -77,7 +78,12 @@ guide → Settings → *Manage channels* shows the address and a QR code).
     whole library, or single movies. Browse by library, search by title.
   - **Internet Archive:** search a collection (Classic TV, cartoons, feature
     films, Prelinger, film noir…) and add single items, or add the search
-    itself, which picks up new results nightly.
+    itself, which picks up new results nightly. Or paste an `archive.org/details/…`
+    link into the search box to go straight to that item.
+- **Logo:** every channel has one. Channel ideas and the default channels come
+  with hand-drawn logos; others get one generated from the name and content (it
+  follows each TV's theme). Pick *Try another* for a different design, choose any
+  hand-drawn logo, or just the number.
 - **What plays:** the resolved episode list; ✕ removes an episode without
   removing its show.
 - **Next 24 hours:** the schedule as the guide will show it.

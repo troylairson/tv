@@ -7,6 +7,7 @@ import { lastKeyInfo, toAction, type Action, type KeyInfo } from './keys';
 import { Settings, type SettingRow } from './Settings';
 import { initStaticAudio, setStaticMuted, Static } from './Static';
 import { Tuner, type ChannelInfo, type PlexMode, type TunerState } from './tuner';
+import { Logo, logoSvg } from './logos/Logo';
 
 const params = new URLSearchParams(location.search);
 /** Set by the Android TV wrapper, which allows autoplay without a gesture. */
@@ -16,6 +17,7 @@ const CRT_KEY = 'retro-tv:crt';
 const PLEX_MODE_KEY = 'retro-tv:plex-mode';
 const THEME_KEY = 'retro-tv:theme';
 const STATIC_SOUND_KEY = 'retro-tv:static-sound';
+const LOGO_BUG_KEY = 'retro-tv:logo-bug';
 
 const THEMES = [
   { id: 'retro', name: 'Retro' },
@@ -70,6 +72,7 @@ export function App() {
   const [plexMode, setPlexMode] = useState<PlexMode>(store(PLEX_MODE_KEY) === 'direct' ? 'direct' : 'transcode');
   const [theme, setTheme] = useState<ThemeId>(() => THEMES.find((t) => t.id === store(THEME_KEY))?.id ?? 'retro');
   const [staticSound, setStaticSound] = useState(store(STATIC_SOUND_KEY) !== 'off');
+  const [logoBug, setLogoBug] = useState(store(LOGO_BUG_KEY) !== 'off');
   useEffect(() => setStaticMuted(!staticSound), [staticSound]);
   const [digits, setDigits] = useState('');
   const [lastKey, setLastKey] = useState<KeyInfo | null>(null);
@@ -227,6 +230,15 @@ export function App() {
       },
     },
     {
+      label: 'Logo bug',
+      value: logoBug ? 'On' : 'Off',
+      note: "The channel's logo in the corner while a show plays, like a network watermark. This TV only",
+      activate: () => {
+        store(LOGO_BUG_KEY, logoBug ? 'off' : 'on');
+        setLogoBug(!logoBug);
+      },
+    },
+    {
       label: 'Plex playback',
       value: plexMode === 'transcode' ? 'Convert' : 'Direct',
       note: 'Convert: Plex converts video for this TV. Direct: play files as-is. Falls back to the other if one fails',
@@ -353,6 +365,9 @@ export function App() {
   const nextShow = tunerState.upcoming.find((a) => a.kind === 'show');
   const progress = airing ? Math.min(1, Math.max(0, (now() - airing.startMs) / (airing.endMs - airing.startMs))) : 0;
   const isBreak = airing?.kind === 'commercial';
+  const hasLogo = channel ? logoSvg(channel, theme) !== null : false;
+  // A network-style watermark while a show plays (not over the banner, guide or menus).
+  const showBug = logoBug && hasLogo && channel && status === 'playing' && airing?.kind === 'show' && infoUntil <= t && !showGuide && !showSettings && !showDiag;
 
   return (
     <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''}`} data-theme={theme}>
@@ -361,9 +376,16 @@ export function App() {
       {status === 'interstitial' && airing?.kind === 'ident' && channel && (
         <div class="ident">
           <div class="ident-panel">
-            <div class="ident-channel">
-              <span class="ident-number">{channel.number}</span> {channel.name}
-            </div>
+            {hasLogo ? (
+              <div class="ident-logo">
+                <Logo channel={channel} theme={theme} />
+                <span class="ident-number">{channel.number}</span>
+              </div>
+            ) : (
+              <div class="ident-channel">
+                <span class="ident-number">{channel.number}</span> {channel.name}
+              </div>
+            )}
             {nextShow ? (
               <>
                 <div class="ident-label heading">Coming up next</div>
@@ -421,19 +443,30 @@ export function App() {
         </div>
       )}
 
+      {showBug && <Logo channel={channel} theme={theme} class="logo-bug" />}
+
       {(digits || (channel && osdUntil > t)) && (
         <div class="osd">
           <div class="osd-number">{digits || channel?.number}</div>
-          {!digits && <div class="osd-name">{channel?.name}</div>}
+          {!digits && channel && (hasLogo ? <Logo channel={channel} theme={theme} class="osd-logo" /> : <div class="osd-name">{channel.name}</div>)}
         </div>
       )}
 
       {channel && airing && infoUntil > t && (
         <div class="banner panel">
-          <div class="banner-badge">
-            <span class="banner-badge-number">{channel.number}</span>
-            <span class="banner-badge-name">{channel.name}</span>
-          </div>
+          {hasLogo ? (
+            <div class="banner-badge has-logo">
+              <Logo channel={channel} theme={theme} />
+              <span class="banner-badge-name">
+                {channel.number} · {channel.name}
+              </span>
+            </div>
+          ) : (
+            <div class="banner-badge">
+              <span class="banner-badge-number">{channel.number}</span>
+              <span class="banner-badge-name">{channel.name}</span>
+            </div>
+          )}
           <div class="banner-body">
             <div class="banner-row">
               <span class="banner-label">
@@ -459,6 +492,8 @@ export function App() {
       {showGuide && (
         <Guide
           currentNumber={channel?.number}
+          channels={channels}
+          theme={theme}
           actionRef={guideAction}
           onTune={tuneToNumber}
           onSettings={openSettings}

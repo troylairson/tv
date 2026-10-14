@@ -24,6 +24,12 @@ export interface Channel {
   items: ChannelItem[];
   /** Time slots with their resolved items. */
   slots?: TimeSlot<ChannelItem>[];
+  /** Logo choice: hand:<id>, gen:<seed>, none; unset = automatic. */
+  logo?: string;
+  /** The channel pack it was added from (picks its hand-drawn logo). */
+  packId?: string;
+  /** What the channel plays (source titles), for generated logos' motifs. */
+  logoHint?: string;
 }
 
 /** Where a channel's content comes from. A channel plays its sources' items in order (or shuffled). */
@@ -78,4 +84,6 @@ export interface ChannelConfig {
   slots?: SlotConfig[];
   /** Set when the channel was added from a channel pack. */
   packId?: string;
+  /** Logo choice: hand:<id>, gen:<seed>, none; unset = automatic. */
+  logo?: string;
 }

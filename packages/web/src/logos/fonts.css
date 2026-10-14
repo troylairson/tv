@@ -1,0 +1,73 @@
+/* Logo fonts (Google Fonts, SIL Open Font License), latin subset, bundled so the TV needs no internet. */
+@font-face {
+  font-family: 'Alfa Slab One';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/alfa-slab-one.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Bungee';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/bungee.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Bungee Shade';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/bungee-shade.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Creepster';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/creepster.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Fredoka';
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/fredoka.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Limelight';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/limelight.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Monoton';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/monoton.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Orbitron';
+  font-weight: 900;
+  font-display: swap;
+  src: url('./fonts/orbitron.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Oswald';
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/oswald.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Pacifico';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/pacifico.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Righteous';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/righteous.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Rye';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/rye.woff2') format('woff2');
+}

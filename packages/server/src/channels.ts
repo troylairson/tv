@@ -111,7 +111,20 @@ function toChannel(c: ChannelConfig): Channel | null {
   }));
   // A channel needs regular programming or at least one slot with something in it.
   if (!r.items.length && !slots.some((s) => s.items.length)) return null;
-  return { id: c.id, number: c.number, name: c.name, mode: c.mode, anchorMs: c.anchorMs, breaks: c.breaks, items: r.items, slots: slots.length ? slots : undefined };
+  const logoHint = [...c.sources.map((s) => s.title), ...(c.slots ?? []).map((s) => s.source.title)].join(' · ');
+  return {
+    id: c.id,
+    number: c.number,
+    name: c.name,
+    mode: c.mode,
+    anchorMs: c.anchorMs,
+    breaks: c.breaks,
+    items: r.items,
+    slots: slots.length ? slots : undefined,
+    logo: c.logo,
+    packId: c.packId,
+    logoHint,
+  };
 }
 
 /** Playable channels (those with resolved items), by number. */
@@ -222,6 +235,7 @@ export interface ChannelInput {
   sources?: unknown;
   excluded?: unknown;
   slots?: unknown;
+  logo?: unknown;
 }
 
 const SOURCE_KINDS = new Set(['plex-show', 'plex-collection', 'plex-library', 'plex-item', 'plex-sample', 'ia-search', 'ia-item']);
@@ -292,6 +306,12 @@ function applyInput(base: ChannelConfig, input: ChannelInput, selfId?: string): 
     const clash = configs.find((c) => c.number === n && c.id !== selfId);
     if (clash) throw new ValidationError(`Channel ${n} is already ${clash.name}`);
     next.number = n;
+  }
+  if (input.logo !== undefined) {
+    const logo = String(input.logo);
+    if (logo === 'auto' || logo === '') delete next.logo;
+    else if (/^(none|hand:[a-z0-9-]{1,40}|gen:\d{1,4})$/.test(logo)) next.logo = logo;
+    else throw new ValidationError(`not a valid logo: ${logo}`);
   }
   if (input.name !== undefined) {
     const name = String(input.name).trim();
