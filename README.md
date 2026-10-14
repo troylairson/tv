@@ -61,7 +61,8 @@ to turn the TV on.
 grid pages through time), OK watches the highlighted channel, Back closes. The
 live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
 commercial breaks on/off (applies to every TV in the house); CRT effect,
-**theme** (Retro, Modern or 70s), **static sound** on/off, **logo bug** (the
+**theme** (six looks: *Prevue '89*, *VCR*, *Streaming*, *Broadcast*, *Station ID*
+and *Console*; see [docs/mockups](docs/mockups)), **static sound** on/off, **logo bug** (the
 channel's logo in the corner while a show plays) and Plex playback mode (this TV
 only); diagnostics.
 

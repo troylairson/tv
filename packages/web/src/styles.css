@@ -1,7 +1,7 @@
 /*
- * The TV interface. Everything visual comes from the theme variables below, so a
- * theme is just a block of variables on .tv[data-theme=…]. Sizes are in vh/vw so
- * the layout scales from a laptop window to a 4K TV.
+ * The TV interface: layout shared by every theme. Colours, fonts and each
+ * theme's own arrangement of the banner, guide and cards are in themes.css.
+ * Sizes are in vh/vw so the layout scales from a laptop window to a 4K TV.
  */
 
 :root {
@@ -11,118 +11,17 @@
   --preview-h: 38vh;
   --preview-w: calc(var(--preview-h) * 16 / 9);
   --label-w: 18vw;
+  /* Where the live video sits while the guide is open. */
+  --preview-top: var(--safe-y);
+  --preview-left: var(--safe-x);
   color-scheme: dark;
 }
 
-/* ── Themes ─────────────────────────────────────────────────────────────── */
+/* Parts only some themes show. */
+.banner-chnum, .banner-play, .banner-art, .banner-upnext, .banner-endlogo, .banner-label-ch, .ticker,
+.ident-backdrop, .ident-flag, .ident-masthead, .ident-count, .ident-time-ch, .guide-masthead { display: none; }
 
-/* Retro (default): the 90s on-screen TV guide. */
-.tv {
-  --font: 'Courier New', ui-monospace, monospace;
-  --font-display: var(--font);
-  --fg: #f4f1e6;
-  --dim: #b9b39f;
-  --accent: #ffd23f;
-  --focus-bg: #ffd23f;
-  --focus-fg: #10063d;
-  --focus-edge: #fff;
-  --panel: #0c123c;
-  --panel-soft: rgba(12, 18, 60, 0.9);
-  --edge: #6d7dff;
-  --border: 0.4vh;
-  --radius: 0;
-  --shadow: none;
-  --heading-spacing: 0.25em;
-  --heading-case: uppercase;
-  --osd-fg: #6f6;
-  --osd-shadow: 0.3vh 0.3vh 0 #000, 0 0 1vh #3f3;
-  --progress-track: rgba(255, 255, 255, 0.15);
-  --bg: linear-gradient(180deg, #1c0a57 0%, #10063d 45%);
-  --ident-bg: radial-gradient(ellipse at center, #3446d6 0%, #1c0a57 60%, #0a0530 100%);
-  --guide-line: #0a0530;
-  --guide-row: #1d2a8c;
-  --guide-row-alt: #18237a;
-  --guide-row-focus: #3446d6;
-  --guide-cell: #2e3fc4;
-  --guide-break: #24308f;
-  --guide-offair: repeating-linear-gradient(45deg, #1a1a40 0 1vh, #22224d 1vh 2vh);
-  --guide-time-edge: #3a3a8a;
-  --now-line: #ff4040;
-  --live-mark: #6f6;
-  --power: #d33;
-}
-
-/* Modern: flat, quiet, streaming-app style. */
-.tv[data-theme='modern'] {
-  --font: Roboto, 'Helvetica Neue', 'Segoe UI', Arial, sans-serif;
-  --font-display: var(--font);
-  --fg: #f5f5f7;
-  --dim: rgba(245, 245, 247, 0.6);
-  --accent: #6cb4ff;
-  --focus-bg: #f5f5f7;
-  --focus-fg: #111114;
-  --focus-edge: #f5f5f7;
-  --panel: #18181d;
-  --panel-soft: rgba(18, 18, 22, 0.92);
-  --edge: transparent;
-  --border: 0;
-  --radius: 1.4vh;
-  --shadow: 0 1vh 4vh rgba(0, 0, 0, 0.55);
-  --heading-spacing: 0.02em;
-  --heading-case: none;
-  --osd-fg: #fff;
-  --osd-shadow: 0 0.3vh 1.2vh rgba(0, 0, 0, 0.8);
-  --progress-track: rgba(255, 255, 255, 0.18);
-  --bg: #0e0e11;
-  --ident-bg: radial-gradient(ellipse at center, #2a2a33 0%, #0e0e11 70%);
-  --guide-line: #0e0e11;
-  --guide-row: #1b1b21;
-  --guide-row-alt: #18181d;
-  --guide-row-focus: #2c2c35;
-  --guide-cell: #24242c;
-  --guide-break: #1d1d24;
-  --guide-offair: repeating-linear-gradient(45deg, #17171c 0 1vh, #1c1c22 1vh 2vh);
-  --guide-time-edge: #2c2c35;
-  --now-line: #6cb4ff;
-  --live-mark: #6cb4ff;
-  --power: #f5f5f7;
-}
-
-/* 70s: warm browns, harvest orange, rounded everything. */
-.tv[data-theme='seventies'] {
-  --font: 'Trebuchet MS', 'Gill Sans', 'Segoe UI', sans-serif;
-  --font-display: 'Cooper Black', 'Cooper Std', 'Rockwell Extra Bold', Georgia, serif;
-  --fg: #fbecd0;
-  --dim: #d6b98e;
-  --accent: #f6a623;
-  --focus-bg: #f6a623;
-  --focus-fg: #3b1f0e;
-  --focus-edge: #fbecd0;
-  --panel: #3b1f0e;
-  --panel-soft: rgba(59, 31, 14, 0.94);
-  --edge: #c9651b;
-  --border: 0.5vh;
-  --radius: 2.4vh;
-  --shadow: 0 0 0 0.5vh #7a3a12;
-  --heading-spacing: 0.08em;
-  --heading-case: none;
-  --osd-fg: #f6a623;
-  --osd-shadow: 0.3vh 0.3vh 0 #3b1f0e, 0 0 1.2vh #e8452c;
-  --progress-track: rgba(251, 236, 208, 0.18);
-  --bg: radial-gradient(ellipse at 50% 120%, #c9651b 0%, #6b3417 45%, #2b1508 100%);
-  --ident-bg: repeating-conic-gradient(from 0deg at 50% 110%, #e8452c 0 6deg, #f6a623 6deg 12deg, #c9651b 12deg 18deg, #6b3417 18deg 24deg);
-  --guide-line: #2b1508;
-  --guide-row: #6b3a18;
-  --guide-row-alt: #5e3214;
-  --guide-row-focus: #8a4b1f;
-  --guide-cell: #84461c;
-  --guide-break: #6e3c19;
-  --guide-offair: repeating-linear-gradient(45deg, #3b1f0e 0 1vh, #4a2711 1vh 2vh);
-  --guide-time-edge: #7a3a12;
-  --now-line: #e8452c;
-  --live-mark: #f6a623;
-  --power: #e8452c;
-}
+/* Theme variables and per-theme layouts live in themes.css. */
 
 /* ── Base ───────────────────────────────────────────────────────────────── */
 
@@ -235,8 +134,11 @@ html, body, #app {
   font-family: var(--font-display);
 }
 .banner-badge-number { font-size: 6vh; font-weight: bold; line-height: 1; }
-.banner-badge.has-logo { background: none; padding: 0; min-width: 0; gap: 0.4vh; color: var(--dim); }
-.banner-badge.has-logo .logo { width: 20vh; height: 11.7vh; }
+.banner-badge .logo { width: 20vh; height: 11.7vh; }
+.banner.has-logo .banner-badge { background: none; padding: 0; min-width: 0; gap: 0.4vh; color: var(--dim); }
+.banner.has-logo .banner-badge-number { display: none; }
+.banner-art { flex: none; background: center / cover no-repeat; }
+.banner-next { color: var(--dim); }
 .banner-badge-name { font-size: 1.7vh; font-weight: bold; max-width: 14vw; text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .banner-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .banner-row { display: flex; justify-content: space-between; gap: 2vw; }
@@ -261,22 +163,23 @@ html, body, #app {
 /* ── "Coming up next" card (pads the time before a slot) ────────────────── */
 
 .ident {
-  position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2vh;
-  background: var(--ident-bg); text-align: center;
+  position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+  background: var(--ident-bg); text-align: center; overflow: hidden;
 }
-.ident-panel { padding: 5vh 5vw; display: flex; flex-direction: column; align-items: center; gap: 2vh; max-width: 80vw; }
-/* The sunburst is too busy to read text on directly. */
-.tv[data-theme='seventies'] .ident-panel {
-  background: var(--panel-soft); border: var(--border) solid var(--edge); border-radius: var(--radius); box-shadow: var(--shadow);
-}
-.ident-logo { display: flex; flex-direction: column; align-items: center; gap: 1vh; }
-.ident-logo .logo { width: 44vh; height: 25.7vh; }
-.ident-logo .ident-number { margin: 0; font-size: 4vh; font-family: var(--font-display); }
+.ident-backdrop { position: absolute; inset: 0; background: center / cover no-repeat; }
+.ident-panel { position: relative; padding: 5vh 5vw; display: flex; flex-direction: column; gap: 2vh; max-width: 80vw; }
+.ident-main { display: flex; align-items: center; gap: 4vw; }
+.ident-art { flex: none; width: 40vh; height: 28vh; background: center / cover no-repeat; display: none; }
+.ident-text { display: flex; flex-direction: column; align-items: center; gap: 1.6vh; min-width: 0; }
+.ident-logo .logo { width: 36vh; height: 21vh; }
 .ident-channel { font-size: 3.4vh; font-weight: bold; color: var(--fg); letter-spacing: 0.1em; font-family: var(--font-display); }
 .ident-number { color: var(--accent); font-size: 6vh; vertical-align: middle; margin-right: 1vw; }
-.ident-label { font-size: 3vh; margin-top: 2vh; }
-.ident-title { font-size: 6vh; font-weight: bold; line-height: 1.15; font-family: var(--font-display); }
-.ident-time { font-size: 3.4vh; color: var(--dim); }
+.ident-label { font-size: 3.4vh; }
+.ident-title {
+  font-size: 8vh; font-weight: bold; line-height: 1.05; font-family: var(--font-display);
+  overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;
+}
+.ident-time { font-size: 3.6vh; color: var(--dim); }
 
 /* ── Settings ───────────────────────────────────────────────────────────── */
 
@@ -341,7 +244,7 @@ html, body, #app {
 .tv.guide-open .screen,
 .tv.guide-open .static,
 .tv.guide-open .bars {
-  top: var(--safe-y); left: var(--safe-x); right: auto; bottom: auto;
+  top: var(--preview-top); left: var(--preview-left); right: auto; bottom: auto;
   width: var(--preview-w); height: var(--preview-h); z-index: 2;
   border: max(var(--border), 0.2vh) solid var(--edge); border-radius: var(--radius); overflow: hidden;
 }
@@ -353,6 +256,7 @@ html, body, #app {
 .tv.guide-open .hint,
 .tv.guide-open .bug,
 .tv.guide-open .diag,
+.tv.guide-open .ticker,
 .tv.guide-open .ident { display: none; }
 
 .guide-top { display: flex; gap: 2vw; height: var(--preview-h); flex: none; }

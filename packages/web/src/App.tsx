@@ -8,6 +8,7 @@ import { Settings, type SettingRow } from './Settings';
 import { initStaticAudio, setStaticMuted, Static } from './Static';
 import { Tuner, type ChannelInfo, type PlexMode, type TunerState } from './tuner';
 import { Logo, logoSvg } from './logos/Logo';
+import { findTheme, THEMES } from './themes';
 
 const params = new URLSearchParams(location.search);
 /** Set by the Android TV wrapper, which allows autoplay without a gesture. */
@@ -18,13 +19,6 @@ const PLEX_MODE_KEY = 'retro-tv:plex-mode';
 const THEME_KEY = 'retro-tv:theme';
 const STATIC_SOUND_KEY = 'retro-tv:static-sound';
 const LOGO_BUG_KEY = 'retro-tv:logo-bug';
-
-const THEMES = [
-  { id: 'retro', name: 'Retro' },
-  { id: 'modern', name: 'Modern' },
-  { id: 'seventies', name: '70s' },
-] as const;
-type ThemeId = (typeof THEMES)[number]['id'];
 
 function store(key: string, value?: string): string | null {
   try {
@@ -70,7 +64,8 @@ export function App() {
   const [pool, setPool] = useState<PoolStatus | null>(null);
   const [crt, setCrt] = useState(store(CRT_KEY) !== 'off');
   const [plexMode, setPlexMode] = useState<PlexMode>(store(PLEX_MODE_KEY) === 'direct' ? 'direct' : 'transcode');
-  const [theme, setTheme] = useState<ThemeId>(() => THEMES.find((t) => t.id === store(THEME_KEY))?.id ?? 'retro');
+  const [themeId, setThemeId] = useState(() => findTheme(store(THEME_KEY)).id);
+  const theme = findTheme(themeId);
   const [staticSound, setStaticSound] = useState(store(STATIC_SOUND_KEY) !== 'off');
   const [logoBug, setLogoBug] = useState(store(LOGO_BUG_KEY) !== 'off');
   useEffect(() => setStaticMuted(!staticSound), [staticSound]);
@@ -212,12 +207,12 @@ export function App() {
     },
     {
       label: 'Theme',
-      value: THEMES.find((t) => t.id === theme)!.name,
-      note: 'Look of the guide, banners and menus: Retro, Modern or 70s. This TV only',
+      value: theme.name,
+      note: `The whole look of this TV: ${THEMES.map((t) => t.name).join(', ')}`,
       activate: () => {
-        const next = THEMES[(THEMES.findIndex((t) => t.id === theme) + 1) % THEMES.length]!.id;
+        const next = THEMES[(THEMES.indexOf(theme) + 1) % THEMES.length]!.id;
         store(THEME_KEY, next);
-        setTheme(next);
+        setThemeId(next);
       },
     },
     {
@@ -365,40 +360,54 @@ export function App() {
   const nextShow = tunerState.upcoming.find((a) => a.kind === 'show');
   const progress = airing ? Math.min(1, Math.max(0, (now() - airing.startMs) / (airing.endMs - airing.startMs))) : 0;
   const isBreak = airing?.kind === 'commercial';
-  const hasLogo = channel ? logoSvg(channel, theme) !== null : false;
+  const hasLogo = channel ? logoSvg(channel, theme.logo) !== null : false;
   // A network-style watermark while a show plays (not over the banner, guide or menus).
   const showBug = logoBug && hasLogo && channel && status === 'playing' && airing?.kind === 'show' && infoUntil <= t && !showGuide && !showSettings && !showDiag;
 
   return (
-    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''}`} data-theme={theme}>
+    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''} ${channel && airing && infoUntil > t && airing.kind !== 'ident' ? 'banner-open' : ''}`} data-theme={theme.id}>
       <video ref={video} class="screen" playsInline />
       {poweredOn && ((status === 'standby' && !filler) || (status === 'interstitial' && airing?.kind === 'offair')) && <div class="bars" />}
       {status === 'interstitial' && airing?.kind === 'ident' && channel && (
         <div class="ident">
+          {nextShow?.item.thumb && <div class="ident-backdrop" style={{ backgroundImage: `url(${nextShow.item.thumb})` }} />}
+          <div class="ident-flag">{theme.upNext}</div>
           <div class="ident-panel">
-            {hasLogo ? (
-              <div class="ident-logo">
-                <Logo channel={channel} theme={theme} />
-                <span class="ident-number">{channel.number}</span>
+            <div class="ident-masthead">
+              <span class="ident-masthead-badge">TV LOG</span>
+              <span>{nextShow ? theme.upNext : 'Thanks for watching'}</span>
+              <span class="ident-masthead-ch">
+                Channel {channel.number} · {channel.name}
+              </span>
+            </div>
+            <div class="ident-main">
+              {nextShow?.item.thumb && <div class="ident-art" style={{ backgroundImage: `url(${nextShow.item.thumb})` }} />}
+              <div class="ident-text">
+                {hasLogo ? (
+                  <div class="ident-logo">
+                    <Logo channel={channel} theme={theme.logo} />
+                  </div>
+                ) : (
+                  <div class="ident-channel">
+                    <span class="ident-number">{channel.number}</span> {channel.name}
+                  </div>
+                )}
+                <div class="ident-label heading">{nextShow ? theme.upNext : 'Thanks for watching'}</div>
+                <div class="ident-title">{nextShow ? nextShow.item.title : channel.name}</div>
+                {nextShow && (
+                  <div class="ident-time">
+                    at {fmtTime(nextShow.startMs)} <span class="ident-time-ch">on channel {channel.number}</span>
+                  </div>
+                )}
               </div>
-            ) : (
-              <div class="ident-channel">
-                <span class="ident-number">{channel.number}</span> {channel.name}
-              </div>
-            )}
-            {nextShow ? (
-              <>
-                <div class="ident-label heading">Coming up next</div>
-                <div class="ident-title">{nextShow.item.title}</div>
-                <div class="ident-time">at {fmtTime(nextShow.startMs)}</div>
-              </>
-            ) : (
-              <>
-                <div class="ident-label heading">Thanks for watching</div>
-                <div class="ident-title">{channel.name}</div>
-              </>
-            )}
+            </div>
           </div>
+          {nextShow && (
+            <div class="ident-count">
+              <b>{Math.max(1, Math.ceil((nextShow.startMs - now()) / 60_000))}</b>
+              <small>min</small>
+            </div>
+          )}
         </div>
       )}
       {status === 'interstitial' && airing?.kind === 'offair' && (
@@ -443,48 +452,71 @@ export function App() {
         </div>
       )}
 
-      {showBug && <Logo channel={channel} theme={theme} class="logo-bug" />}
+      {showBug && <Logo channel={channel} theme={theme.logo} class="logo-bug" />}
 
       {(digits || (channel && osdUntil > t)) && (
         <div class="osd">
           <div class="osd-number">{digits || channel?.number}</div>
-          {!digits && channel && (hasLogo ? <Logo channel={channel} theme={theme} class="osd-logo" /> : <div class="osd-name">{channel.name}</div>)}
+          {!digits && channel && (hasLogo ? <Logo channel={channel} theme={theme.logo} class="osd-logo" /> : <div class="osd-name">{channel.name}</div>)}
         </div>
       )}
 
-      {channel && airing && infoUntil > t && (
-        <div class="banner panel">
-          {hasLogo ? (
-            <div class="banner-badge has-logo">
-              <Logo channel={channel} theme={theme} />
-              <span class="banner-badge-name">
-                {channel.number} · {channel.name}
-              </span>
-            </div>
-          ) : (
-            <div class="banner-badge">
-              <span class="banner-badge-number">{channel.number}</span>
-              <span class="banner-badge-name">{channel.name}</span>
-            </div>
-          )}
+      {channel && airing && infoUntil > t && airing.kind !== 'ident' && (
+        <div class={`banner panel ${hasLogo ? 'has-logo' : ''}`}>
+          <div class="banner-badge">
+            {hasLogo && <Logo channel={channel} theme={theme.logo} />}
+            <span class="banner-badge-number">{channel.number}</span>
+            <span class="banner-badge-name">{channel.name}</span>
+          </div>
+          <div class="banner-chnum">CH {channel.number}</div>
+          <div class="banner-play">{airing.kind === 'show' ? '▶ PLAY' : isBreak ? '▶ COMMERCIAL' : '■ STOP'}</div>
+          {airing.kind === 'show' && airing.item.thumb && <div class="banner-art" style={{ backgroundImage: `url(${airing.item.thumb})` }} />}
           <div class="banner-body">
             <div class="banner-row">
               <span class="banner-label">
-                {isBreak ? 'Commercial break' : airing.kind === 'ident' ? 'Coming up next' : airing.kind === 'offair' ? 'Off the air' : 'Now playing'}
+                {isBreak ? 'Commercial break' : airing.kind === 'offair' ? 'Off the air' : 'Now playing'}
+                <span class="banner-label-ch"> on {channel.name}</span>
               </span>
-              <span class="dim">{fmtTime(now())}</span>
+              <span class="banner-clock">{fmtTime(now())}</span>
             </div>
             <div class="banner-title">{airing.kind === 'show' || isBreak ? airing.item.title : (nextShow?.item.title ?? channel.name)}</div>
-            <div class="banner-row dim">
+            <div class="banner-row banner-meta">
               <span>
                 {airing.kind === 'show' ? `${fmtTime(airing.startMs)} – ${fmtTime(airing.endMs)}` : `until ${fmtTime(airing.endMs)}`}
               </span>
-              {nextShow && airing.kind === 'show' && <span>Next: {nextShow.item.title}</span>}
-              {nextShow && isBreak && <span>Up next: {nextShow.item.title}</span>}
+              {nextShow && airing.kind === 'show' && <span class="banner-next">Next: {nextShow.item.title}</span>}
+              {nextShow && isBreak && <span class="banner-next">Up next: {nextShow.item.title}</span>}
             </div>
             <div class="progress">
               <div class="progress-fill" style={{ width: `${progress * 100}%` }} />
             </div>
+          </div>
+          {nextShow && (
+            <div class="banner-upnext">
+              Up next · {fmtTime(nextShow.startMs)}
+              <b>{nextShow.item.title}</b>
+            </div>
+          )}
+          {hasLogo && (
+            <div class="banner-endlogo">
+              <Logo channel={channel} theme={theme.logo} />
+            </div>
+          )}
+        </div>
+      )}
+
+      {channel && airing && infoUntil > t && airing.kind !== 'ident' && tunerState.upcoming.some((a) => a.kind === 'show') && (
+        <div class="ticker">
+          <b>Up next</b>
+          <div class="ticker-track">
+            {tunerState.upcoming
+              .filter((a) => a.kind === 'show')
+              .slice(0, 5)
+              .map((a) => (
+                <span key={a.startMs}>
+                  {a.item.title} <i>{fmtTime(a.startMs)}</i>
+                </span>
+              ))}
           </div>
         </div>
       )}

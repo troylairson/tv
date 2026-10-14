@@ -474,11 +474,15 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 
 ## TODO (requested)
 
-- [x] **Clean up the UI and add themes**: Settings → *Theme* switches the TV
-      interface (guide, banner, cards, settings, fonts, colours) between *Retro*
-      (blue cable-guide, monospace), *Modern* (dark, clean) and *70s* (warm browns,
-      serif, sunburst). Per TV. Shared panel/heading styles across all screens.
-      More eras (80s, 90s) can be added as another `data-theme` block in `styles.css`.
+- [x] **Clean up the UI and add themes**: Settings → *Theme* picks one of six looks
+      from the design board (`docs/mockups/design-board-*.png`): *Prevue '89* (beveled
+      cable guide), *VCR* (pixel on-screen display, blue menu guide), *Streaming*
+      (artwork, scrims, rounded cards, countdown), *Broadcast* (angled lower third,
+      ticker), *Station ID* (cream cards, rainbow stripes, sunburst) and *Console*
+      (walnut and brass, TV-listings-page guide). Shared markup in App/Guide, each
+      look a block in `packages/web/src/themes.css`; names and theme-specific text in
+      `themes.ts`. Artwork comes from item thumbnails (IA / Plex). Old settings map
+      Retro → Prevue, Modern → Streaming, 70s → Station ID.
 - [x] **Setting to mute the static sound when tuning**: Settings → *Static sound*
       (per TV). The snow still shows; it's just silent.
 

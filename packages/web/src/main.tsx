@@ -2,6 +2,7 @@ import { render } from 'preact';
 import { App } from './App';
 import { Manager } from './manage/Manager';
 import './styles.css';
+import './themes.css';
 import './manage/manage.css';
 
 const isManager = location.pathname === '/manage' || location.pathname.startsWith('/manage/');

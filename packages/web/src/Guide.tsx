@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { now } from './clock';
 import type { Action } from './keys';
 import { Logo } from './logos/Logo';
-import type { LogoTheme } from './logos/generate';
+import type { Theme } from './themes';
 import type { ChannelInfo } from './tuner';
 
 interface GuideBlock {
@@ -39,7 +39,7 @@ export interface GuideProps {
   currentNumber: number | undefined;
   /** For the logos in the channel column. */
   channels: ChannelInfo[];
-  theme: LogoTheme;
+  theme: Theme;
   /** The guide sets this each render; App routes remote keys to it while the guide is open. */
   actionRef: MutableRef<((action: Action) => boolean) | null>;
   onTune: (channelNumber: number) => void;
@@ -171,6 +171,16 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
 
   return (
     <div class="guide">
+      {theme.guideMasthead && (
+        <div class="guide-masthead">
+          {theme.guideMasthead.badge && <span class="guide-masthead-badge">{theme.guideMasthead.badge}</span>}
+          <span class="guide-masthead-title">{theme.guideMasthead.title(windowStart)}</span>
+          <span class="guide-masthead-rule" />
+          <span class="guide-masthead-clock">
+            {fmtDay(t)} · {fmtTime(t)}
+          </span>
+        </div>
+      )}
       <div class="guide-top">
         {/* The live video sits in this space (positioned by App's .guide-open styles). */}
         <div class="guide-preview" />
@@ -221,7 +231,7 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
                 <span class="guide-channel-number">{r.number}</span>
                 {(() => {
                   const info = channels.find((c) => c.id === r.id);
-                  return info && <Logo channel={info} theme={theme} class="guide-logo" />;
+                  return info && <Logo channel={info} theme={theme.logo} class="guide-logo" />;
                 })()}
                 <span class="guide-channel-name">{r.name}</span>
               </div>
