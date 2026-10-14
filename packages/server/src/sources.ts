@@ -77,16 +77,32 @@ export interface Resolution {
   errors: string[];
 }
 
+/**
+ * The Internet Archive often has the same film uploaded several times (an "ipod"
+ * copy, an .avi rip…): same title, same length, different identifier.
+ */
+export function uploadKey(item: Pick<ChannelItem, 'title' | 'durationSec'>): string {
+  const title = item.title.toLowerCase().replace(/^the\s+|,\s*the$/g, '').replace(/[^a-z0-9]/g, '');
+  return `${title}:${Math.round(item.durationSec / 120)}`;
+}
+
 /** All sources in order, minus excluded items and duplicates. */
 export async function resolveSources(sources: SourceRef[], excluded: string[]): Promise<Resolution> {
   const skip = new Set(excluded);
   const seen = new Set<string>();
+  const uploads = new Set<string>();
   const items: ChannelItem[] = [];
   const errors: string[] = [];
   for (const source of sources) {
     try {
       for (const item of await resolveSource(source)) {
         if (skip.has(item.id) || seen.has(item.id) || item.durationSec <= 0) continue;
+        // Only searches: a Plex show or a hand-picked item may legitimately repeat a title.
+        if (source.kind === 'ia-search') {
+          const key = uploadKey(item);
+          if (uploads.has(key)) continue;
+          uploads.add(key);
+        }
         seen.add(item.id);
         items.push(item);
       }

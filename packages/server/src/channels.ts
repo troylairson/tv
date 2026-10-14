@@ -16,14 +16,56 @@ const LEGACY_ANCHOR_MS = Date.UTC(2026, 0, 1);
 const CACHE_VERSION = 3;
 const REFRESH_EVERY_MS = 24 * 3600_000;
 
+/** Commercials, PSAs and promos up to the 80s; no 2000s kids'-channel tapes or full shows "with commercials". */
+const COMMERCIALS_SOURCE: SourceRef = {
+  kind: 'ia-search',
+  title: 'Vintage TV commercials (Internet Archive)',
+  query:
+    'collection:classic_tv_commercials ' +
+    'AND mediatype:movies ' +
+    'AND (year:[1940 TO 1989] OR (*:* -year:[* TO *])) ' +
+    'AND title:(commercial OR commercials OR ad OR ads OR advert OR adverts OR advertising OR PSA OR "public service" OR promo) ' +
+    'AND NOT title:(2000s OR 2000 OR 90s OR 1990s OR banned OR toonami OR "cartoon network" OR nickelodeon OR nick OR noggin OR disney OR sprout OR "nostalgia critic" OR stimpy OR "with commercials" OR "air cut" OR elvis OR "commercial breaks" OR parody OR top OR election OR campaign OR political)',
+  items: 80,
+  filesPerItem: 5,
+  maxYear: 1989,
+};
+
+/** Feature-length films 1920–1975, minus exploitation, nudie and propaganda reels. */
+const FEATURE_FILMS_SOURCE: SourceRef = {
+  kind: 'ia-search',
+  title: 'Classic feature films (Internet Archive)',
+  query:
+    'collection:feature_films ' +
+    'AND mediatype:movies ' +
+    'AND year:[1920 TO 1975] ' +
+    'AND NOT collection:german_cinema ' +
+    'AND NOT title:(sex OR sexual OR porn OR nudist OR nudity OR madness OR nazi OR concentration OR hitler OR marihuana OR marijuana OR reefer OR cocaine OR "white slavery" OR prostitution OR burlesque OR striptease OR teaserama OR "child bride") ' +
+    'AND NOT subject:(exploitation OR sexploitation OR nudity OR erotic OR burlesque OR propaganda OR holocaust OR documentary)',
+  items: 60,
+  filesPerItem: 1,
+  minMinutes: 60,
+  maxYear: 1975,
+};
+
 /** The first-run lineup: popular items from a few Internet Archive collections. */
 const DEFAULT_CHANNELS: Omit<ChannelConfig, 'anchorMs' | 'excluded'>[] = [
   { id: 'ia-2', number: 2, name: 'Classic TV', mode: 'shuffle', breaks: true, sources: [{ kind: 'ia-search', title: 'Classic TV (Internet Archive)', query: 'collection:classic_tv', items: 8, filesPerItem: 10 }] },
   { id: 'ia-3', number: 3, name: 'Cartoons', mode: 'shuffle', breaks: true, sources: [{ kind: 'ia-search', title: 'Classic cartoons (Internet Archive)', query: 'collection:classic_cartoons', items: 40, filesPerItem: 3 }] },
   { id: 'ia-4', number: 4, name: 'Prelinger', mode: 'shuffle', breaks: true, sources: [{ kind: 'ia-search', title: 'Prelinger Archives', query: 'collection:prelinger', items: 40, filesPerItem: 1 }] },
-  { id: 'ia-5', number: 5, name: 'Commercials', mode: 'shuffle', breaks: false, sources: [{ kind: 'ia-search', title: 'Classic TV commercials (Internet Archive)', query: 'collection:classic_tv_commercials', items: 60, filesPerItem: 5 }] },
-  { id: 'ia-6', number: 6, name: 'Feature Films', mode: 'shuffle', breaks: true, sources: [{ kind: 'ia-search', title: 'Feature films (Internet Archive)', query: 'collection:feature_films', items: 16, filesPerItem: 1 }] },
+  { id: 'ia-5', number: 5, name: 'Commercials', mode: 'shuffle', breaks: false, sources: [COMMERCIALS_SOURCE] },
+  { id: 'ia-6', number: 6, name: 'Feature Films', mode: 'shuffle', breaks: true, sources: [FEATURE_FILMS_SOURCE] },
 ];
+
+/**
+ * The first lineup's bare collection searches, replaced on existing installs if
+ * still untouched: they pulled in modern uploads, kids'-channel recordings,
+ * exploitation films and documentaries.
+ */
+const OLD_DEFAULT_SOURCES: Record<string, { old: SourceRef; now: SourceRef }> = {
+  'ia-5': { old: { kind: 'ia-search', title: 'Classic TV commercials (Internet Archive)', query: 'collection:classic_tv_commercials', items: 60, filesPerItem: 5 }, now: COMMERCIALS_SOURCE },
+  'ia-6': { old: { kind: 'ia-search', title: 'Feature films (Internet Archive)', query: 'collection:feature_films', items: 16, filesPerItem: 1 }, now: FEATURE_FILMS_SOURCE },
+};
 
 interface Resolved {
   configHash: string;
@@ -346,6 +388,17 @@ export async function initChannels(): Promise<void> {
     await saveConfigs();
     console.log(`created ${configs.length} channels from the default lineup`);
   }
+
+  let migrated = false;
+  for (const c of configs) {
+    const swap = OLD_DEFAULT_SOURCES[c.id];
+    if (swap && c.sources.length === 1 && JSON.stringify(c.sources[0]) === JSON.stringify(swap.old)) {
+      c.sources = [swap.now];
+      migrated = true;
+      console.log(`${c.name}: replaced the original search with a cleaner one`);
+    }
+  }
+  if (migrated) await saveConfigs();
 
   if (cache.version === CACHE_VERSION && cache.resolved) {
     for (const [id, r] of Object.entries(cache.resolved)) resolved.set(id, r);

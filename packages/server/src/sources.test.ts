@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { tooRecent } from './sources';
+import { tooRecent, uploadKey } from './sources';
 
 describe('tooRecent', () => {
   it('drops titles that only mention years after the cutoff', () => {
@@ -18,5 +18,17 @@ describe('tooRecent', () => {
   it('ignores digits that are not years', () => {
     expect(tooRecent('865 The Giant Gila Monster', 1966)).toBe(false);
     expect(tooRecent('Episode 20190', 1966)).toBe(false);
+  });
+});
+
+describe('uploadKey', () => {
+  it('matches re-uploads of the same film', () => {
+    expect(uploadKey({ title: 'McLintock!', durationSec: 7620 })).toBe(uploadKey({ title: 'Mclintock', durationSec: 7650 }));
+    expect(uploadKey({ title: 'House on Haunted Hill', durationSec: 4500 })).toBe(uploadKey({ title: 'The House On Haunted Hill', durationSec: 4510 }));
+  });
+
+  it('keeps different cuts and different films apart', () => {
+    expect(uploadKey({ title: 'Nosferatu', durationSec: 5580 })).not.toBe(uploadKey({ title: 'Nosferatu', durationSec: 3900 }));
+    expect(uploadKey({ title: 'Scarlet Street', durationSec: 6060 })).not.toBe(uploadKey({ title: 'Detour', durationSec: 6060 }));
   });
 });
