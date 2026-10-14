@@ -65,7 +65,7 @@ const json = (method: string, data: unknown): RequestInit => ({
   body: JSON.stringify(data),
 });
 
-export type ChannelFields = Pick<ChannelConfig, 'number' | 'name' | 'mode' | 'breaks' | 'sources' | 'excluded' | 'slots' | 'logo'>;
+export type ChannelFields = Pick<ChannelConfig, 'number' | 'name' | 'mode' | 'breaks' | 'sources' | 'excluded' | 'slots' | 'logo' | 'bumpers'>;
 
 export const api = {
   channels: () => call<{ channels: ChannelStatus[]; plexConfigured: boolean }>('/api/manage/channels'),

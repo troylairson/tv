@@ -122,6 +122,7 @@ function toChannel(c: ChannelConfig): Channel | null {
     items: r.items,
     slots: slots.length ? slots : undefined,
     logo: c.logo,
+    bumpers: c.bumpers,
     packId: c.packId,
     logoHint,
   };
@@ -236,6 +237,7 @@ export interface ChannelInput {
   excluded?: unknown;
   slots?: unknown;
   logo?: unknown;
+  bumpers?: unknown;
 }
 
 const SOURCE_KINDS = new Set(['plex-show', 'plex-collection', 'plex-library', 'plex-item', 'plex-sample', 'ia-search', 'ia-item']);
@@ -323,6 +325,10 @@ function applyInput(base: ChannelConfig, input: ChannelInput, selfId?: string): 
     next.mode = input.mode as ChannelMode;
   }
   if (input.breaks !== undefined) next.breaks = Boolean(input.breaks);
+  if (input.bumpers !== undefined) {
+    if (input.bumpers === false) next.bumpers = false;
+    else delete next.bumpers;
+  }
   if (input.sources !== undefined) next.sources = validSources(input.sources);
   if (input.slots !== undefined) next.slots = validSlots(input.slots);
   if (input.excluded !== undefined) {

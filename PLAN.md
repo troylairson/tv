@@ -486,16 +486,12 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 - [x] **Setting to mute the static sound when tuning**: Settings → *Static sound*
       (per TV). The snow still shows; it's just silent.
 
-- [ ] **Channel bumpers ("Coming up on …")**: a 5–10 s card at the end of a
-      commercial break listing what's next on this channel (the next 3–4 shows with
-      start times), styled per theme with the channel name/number, like a
-      90s cable "Up next" screen. The schedule already knows the upcoming airings
-      (the guide uses them), so this is a new `bumper` airing kind the scheduler
-      places at the end of each break (time taken from the break, so shows stay on
-      schedule), rendered like the existing "Coming up next" ident card. Options:
-      per-channel on/off in the manager; optional short music bed; also show a
-      bumper when tuning into a channel mid-break. Later: a full-screen
-      "TV Guide channel" that scrolls every channel's next few hours.
+- [x] **Channel bumpers ("Coming up on …")** (mock-up: `docs/mockups/bumpers.png`): the
+      channel's logo and next four shows over the last 8 s of each commercial break, and
+      straight away when tuning in mid-break. Drawn by the TV (no schedule change: the
+      commercial keeps running underneath, muted, so shows stay on time). One markup
+      (`Bumper.tsx`), styled per theme in `themes.css`. Per-channel on/off in the
+      manager (default on). Later: a full-screen Prevue-style guide channel.
 - [x] **Channel logos** (mock-up: [docs/mockups/channel-logos.png](docs/mockups/channel-logos.png)):
       12 hand-drawn transparent SVG logos (`packages/web/src/logos/hand.ts`) for the
       packs and default channels, picked automatically; a generator for every other

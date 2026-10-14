@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'preact/hooks';
 import { clockStats, now, syncClock } from './clock';
 import qrcode from 'qrcode-generator';
 import { capabilities, report } from './diag';
+import { Bumper } from './Bumper';
 import { Guide } from './Guide';
 import { lastKeyInfo, toAction, type Action, type KeyInfo } from './keys';
 import { Settings, type SettingRow } from './Settings';
@@ -19,6 +20,8 @@ const PLEX_MODE_KEY = 'retro-tv:plex-mode';
 const THEME_KEY = 'retro-tv:theme';
 const STATIC_SOUND_KEY = 'retro-tv:static-sound';
 const LOGO_BUG_KEY = 'retro-tv:logo-bug';
+/** How long the "Coming up on…" card shows. */
+const BUMPER_MS = 8000;
 
 function store(key: string, value?: string): string | null {
   try {
@@ -63,6 +66,7 @@ export function App() {
   const [index, setIndex] = useState(0);
   const [tunerState, setTunerState] = useState<TunerState>({ status: 'idle', upcoming: [], latencies: [], stalls: 0 });
   const [osdUntil, setOsdUntil] = useState(0);
+  const [tunedAt, setTunedAt] = useState(0);
   const [infoUntil, setInfoUntil] = useState(0);
   const [showDiag, setShowDiag] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
@@ -163,6 +167,7 @@ export function App() {
     store(LAST_CHANNEL_KEY, String(channel.number));
     const t = Date.now();
     setOsdUntil(t + 3000);
+    setTunedAt(t);
     setInfoUntil(t + 5000);
     void tuner.current.tune(channel);
   }
@@ -393,11 +398,24 @@ export function App() {
   const progress = airing ? Math.min(1, Math.max(0, (now() - airing.startMs) / (airing.endMs - airing.startMs))) : 0;
   const isBreak = airing?.kind === 'commercial';
   const hasLogo = channel ? logoSvg(channel, theme.logo) !== null : false;
+  // "Coming up on…": the last seconds of a commercial break, or right away when tuning in mid-break.
+  const breakEnd = isBreak ? tunerState.upcoming.find((a) => a.kind !== 'commercial') : undefined;
+  const bumperShows = breakEnd?.kind === 'show' ? tunerState.upcoming.filter((a) => a.kind === 'show').slice(0, 4) : [];
+  const showBumper =
+    channel?.bumpers !== false &&
+    status === 'playing' &&
+    bumperShows.length > 0 &&
+    !showGuide &&
+    (breakEnd!.startMs - t <= BUMPER_MS || t - tunedAt <= BUMPER_MS);
+  // The commercial keeps rolling under the card, silently, like a real station cutting away.
+  useEffect(() => {
+    if (video.current) video.current.muted = showBumper;
+  }, [showBumper]);
   // A network-style watermark while a show plays (not over the banner, guide or menus).
   const showBug = logoBug && hasLogo && channel && status === 'playing' && airing?.kind === 'show' && infoUntil <= t && !showGuide && !showSettings && !showDiag;
 
   return (
-    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''} ${channel && airing && infoUntil > t && airing.kind !== 'ident' ? 'banner-open' : ''}`} data-theme={theme.id}>
+    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''} ${channel && airing && infoUntil > t && airing.kind !== 'ident' && !showBumper ? 'banner-open' : ''}`} data-theme={theme.id}>
       <video ref={video} class="screen" playsInline />
       {poweredOn && ((status === 'standby' && !filler) || (status === 'interstitial' && airing?.kind === 'offair')) && <div class="bars" />}
       {status === 'interstitial' && airing?.kind === 'ident' && channel && (
@@ -484,16 +502,18 @@ export function App() {
         </div>
       )}
 
+      {showBumper && channel && <Bumper channel={channel} shows={bumperShows} theme={theme} nowMs={t} />}
+
       {showBug && <Logo channel={channel} theme={theme.logo} class="logo-bug" />}
 
-      {(digits || (channel && osdUntil > t)) && (
+      {(digits || (channel && osdUntil > t && !showBumper)) && (
         <div class="osd">
           <div class="osd-number">{digits || channel?.number}</div>
           {!digits && channel && (hasLogo ? <Logo channel={channel} theme={theme.logo} class="osd-logo" /> : <div class="osd-name">{channel.name}</div>)}
         </div>
       )}
 
-      {channel && airing && infoUntil > t && airing.kind !== 'ident' && (
+      {channel && airing && infoUntil > t && airing.kind !== 'ident' && !showBumper && (
         <div class={`banner panel ${hasLogo ? 'has-logo' : ''}`}>
           <div class="banner-badge">
             {hasLogo && <Logo channel={channel} theme={theme.logo} />}
@@ -537,7 +557,7 @@ export function App() {
         </div>
       )}
 
-      {channel && airing && infoUntil > t && airing.kind !== 'ident' && tunerState.upcoming.some((a) => a.kind === 'show') && (
+      {channel && airing && infoUntil > t && airing.kind !== 'ident' && !showBumper && tunerState.upcoming.some((a) => a.kind === 'show') && (
         <div class="ticker">
           <b>Up next</b>
           <div class="ticker-track">
@@ -573,7 +593,7 @@ export function App() {
         <Diagnostics state={tunerState} caps={caps} lastKey={lastKey} plexMode={plexMode} video={video.current} />
       )}
 
-      {poweredOn && !showDiag && !showSettings && infoUntil > t && (
+      {poweredOn && !showDiag && !showSettings && !showBumper && infoUntil > t && (
         <div class="hint">▲▼ channel · OK guide</div>
       )}
     </div>

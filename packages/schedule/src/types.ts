@@ -26,6 +26,8 @@ export interface Channel {
   slots?: TimeSlot<ChannelItem>[];
   /** Logo choice: hand:<id>, gen:<seed>, none; unset = automatic. */
   logo?: string;
+  /** false: no "Coming up on…" card at the end of commercial breaks. */
+  bumpers?: boolean;
   /** The channel pack it was added from (picks its hand-drawn logo). */
   packId?: string;
   /** What the channel plays (source titles), for generated logos' motifs. */
@@ -86,4 +88,6 @@ export interface ChannelConfig {
   packId?: string;
   /** Logo choice: hand:<id>, gen:<seed>, none; unset = automatic. */
   logo?: string;
+  /** false: no "Coming up on…" card at the end of commercial breaks (default on). */
+  bumpers?: boolean;
 }

@@ -19,7 +19,22 @@
 
 /* Parts only some themes show. */
 .banner-chnum, .banner-play, .banner-art, .banner-upnext, .banner-endlogo, .banner-label-ch, .ticker,
-.ident-backdrop, .ident-flag, .ident-masthead, .ident-count, .ident-time-ch, .guide-masthead { display: none; }
+.ident-backdrop, .ident-flag, .ident-masthead, .ident-count, .ident-time-ch, .guide-masthead,
+.bumper-backdrop, .bumper-badge, .bumper-clock, .bumper-photo-wrap, .bumper-tag, .bumper-chip, .bumper-dots, .bumper-ticker,
+.bumper-logo-number, .bumper-art { display: none; }
+
+/* ── "Coming up on…" bumper (end of a commercial break) ─────────────────── */
+
+.bumper { position: absolute; inset: 0; overflow: hidden; background: var(--ident-bg); color: var(--fg); font-family: var(--font); }
+.bumper-head, .bumper-list, .bumper-photo-wrap { position: absolute; z-index: 1; }
+.bumper-backdrop { position: absolute; inset: 0; background: center / cover no-repeat; }
+.bumper-list { margin: 0; padding: 0; list-style: none; }
+.bumper-list li { position: relative; display: flex; align-items: stretch; }
+.bumper-title { min-width: 0; display: flex; flex-direction: column; justify-content: center; }
+.bumper-title b { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bumper-art { background: center / cover no-repeat; }
+.bumper-time small { display: block; }
+.tv.guide-open .bumper { display: none; }
 
 /* Theme variables and per-theme layouts live in themes.css. */
 

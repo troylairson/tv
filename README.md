@@ -84,6 +84,9 @@ guide → Settings → *Manage channels* shows the address and a QR code).
     films, Prelinger, film noir…) and add single items, or add the search
     itself, which picks up new results nightly. Or paste an `archive.org/details/…`
     link into the search box to go straight to that item.
+- **Bumpers:** at the end of each commercial break a "Coming up on…" card shows the
+  channel's next four shows (styled to the TV's theme). On by default; turn it off
+  per channel.
 - **Logo:** every channel has one. Channel ideas and the default channels come
   with hand-drawn logos; others get one generated from the name and content (it
   follows each TV's theme). Pick *Try another* for a different design, choose any

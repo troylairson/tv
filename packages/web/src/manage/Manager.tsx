@@ -248,7 +248,7 @@ function Editor({ id }: { id: string | null }) {
     }
     const c = r.channels.find((ch) => ch.id === id) ?? null;
     setSaved(c);
-    if (c && !dirty) setForm({ number: c.number, name: c.name, mode: c.mode, breaks: c.breaks, sources: c.sources, excluded: c.excluded, slots: c.slots ?? [], logo: c.logo });
+    if (c && !dirty) setForm({ number: c.number, name: c.name, mode: c.mode, breaks: c.breaks, sources: c.sources, excluded: c.excluded, slots: c.slots ?? [], logo: c.logo, bumpers: c.bumpers });
   };
 
   useEffect(() => {
@@ -287,7 +287,7 @@ function Editor({ id }: { id: string | null }) {
       setError(`Time slot ${unpicked + 1}: pick a show first`);
       return;
     }
-    const fields: ChannelFields = { ...form, logo: form.logo ?? 'auto', slots: form.slots.map((s) => ({ ...s, source: s.source! })) };
+    const fields: ChannelFields = { ...form, logo: form.logo ?? 'auto', bumpers: form.bumpers !== false, slots: form.slots.map((s) => ({ ...s, source: s.source! })) };
     setSaving(true);
     setError(null);
     try {
@@ -338,6 +338,15 @@ function Editor({ id }: { id: string | null }) {
         <label class="inline">
           <input type="checkbox" checked={form.breaks} onChange={(e) => set({ breaks: (e.target as HTMLInputElement).checked })} /> Commercial
           breaks between shows
+        </label>
+        <label class="inline">
+          <input
+            type="checkbox"
+            checked={form.bumpers !== false}
+            disabled={!form.breaks}
+            onChange={(e) => set({ bumpers: (e.target as HTMLInputElement).checked ? undefined : false })}
+          />{' '}
+          “Coming up on…” card at the end of each break
         </label>
       </div>
 
