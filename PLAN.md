@@ -482,6 +482,19 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 - [x] **Setting to mute the static sound when tuning**: Settings → *Static sound*
       (per TV). The snow still shows; it's just silent.
 
+- [ ] **Channel bumpers ("Coming up on …")**: a 5–10 s card at the end of a
+      commercial break listing what's next on this channel (the next 3–4 shows with
+      start times), styled per theme with the channel name/number, like a
+      90s cable "Up next" screen. The schedule already knows the upcoming airings
+      (the guide uses them), so this is a new `bumper` airing kind the scheduler
+      places at the end of each break (time taken from the break, so shows stay on
+      schedule), rendered like the existing "Coming up next" ident card. Options:
+      per-channel on/off in the manager; optional short music bed; also show a
+      bumper when tuning into a channel mid-break. Later: a full-screen
+      "TV Guide channel" that scrolls every channel's next few hours.
+- [ ] **Paste an Internet Archive link** into the manager's IA search box
+      (`archive.org/details/<id>`) to jump straight to that item and add it.
+
 ## 7. Prior art worth borrowing from
 - **ErsatzTV**, **Tunarr** (successor to dizqueTV): Plex-backed custom channels
   exported as IPTV. Good reference for scheduling rules and filler; they restream
