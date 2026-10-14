@@ -48,7 +48,7 @@ app.get('/api/time', (c) => {
 
 app.get('/api/info', (c) => {
   const { channels, builtAt, building } = getChannels();
-  return c.json({ plexConfigured: plexConfigured(), channels: channels.length, builtAt, building, commercials: poolStatus() });
+  return c.json({ version: config.version, plexConfigured: plexConfigured(), channels: channels.length, builtAt, building, commercials: poolStatus() });
 });
 
 /** Channel list without the (large) item lists; what's on comes from /airings. */
@@ -266,6 +266,11 @@ app.get('/api/diag', (c) => c.json(diag.slice().reverse()));
 // ── Web app ──────────────────────────────────────────────────────────────────
 
 const webRoot = path.relative(process.cwd(), config.webDir) || '.';
+// The page itself must always be re-checked so an update shows up; its assets have hashed names.
+app.use('/*', async (c, next) => {
+  await next();
+  if (c.res.headers.get('content-type')?.startsWith('text/html')) c.res.headers.set('cache-control', 'no-cache');
+});
 app.use('/*', serveStatic({ root: webRoot }));
 app.get('*', serveStatic({ root: webRoot, path: 'index.html' }));
 
@@ -281,5 +286,5 @@ setInterval(() => {
   for (const channel of getChannels().channels) ensureLineup(channel);
 }, 10 * 60_000);
 serve({ fetch: app.fetch, port: config.port, hostname: '0.0.0.0' }, ({ port }) => {
-  console.log(`retro-tv listening on http://0.0.0.0:${port} (web: ${config.webDir}, data: ${config.dataDir}, plex: ${plexConfigured() ? config.plexUrl : 'off'})`);
+  console.log(`retro-tv ${config.version} listening on http://0.0.0.0:${port} (web: ${config.webDir}, data: ${config.dataDir}, plex: ${plexConfigured() ? config.plexUrl : 'off'})`);
 });

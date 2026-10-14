@@ -21,6 +21,13 @@ function go(path: string) {
 /** The channel manager: a regular phone/laptop page at /manage. */
 export function Manager() {
   const [route, setRoute] = useState<Route>(parseRoute);
+  const [version, setVersion] = useState<string | null>(null);
+  useEffect(() => {
+    void fetch('/api/info')
+      .then((r) => r.json())
+      .then((info: { version?: string }) => setVersion(info.version ?? null))
+      .catch(() => undefined);
+  }, []);
   useEffect(() => {
     const onPop = () => setRoute(parseRoute());
     addEventListener('popstate', onPop);
@@ -40,9 +47,12 @@ export function Manager() {
         >
           RETRO TV <span>Channel manager</span>
         </a>
-        <a class="mg-link" href="/">
-          Open the TV ↗
-        </a>
+        <span class="mg-header-right">
+          {version && <span class="mg-version" title="Server version (git commit)">v{version}</span>}
+          <a class="mg-link" href="/">
+            Open the TV ↗
+          </a>
+        </span>
       </header>
       <main class="mg-main">
         {route.page === 'list' && <ChannelList />}
