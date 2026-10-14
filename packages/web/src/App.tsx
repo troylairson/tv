@@ -63,7 +63,10 @@ export function App() {
   const [house, setHouse] = useState<HouseSettings | null>(null);
   const [pool, setPool] = useState<PoolStatus | null>(null);
   const [crt, setCrt] = useState(store(CRT_KEY) !== 'off');
-  const [plexMode, setPlexMode] = useState<PlexMode>(store(PLEX_MODE_KEY) === 'direct' ? 'direct' : 'transcode');
+  const [plexMode, setPlexMode] = useState<PlexMode>(() => {
+    const saved = store(PLEX_MODE_KEY);
+    return saved === 'direct' || saved === 'transcode' ? saved : 'auto';
+  });
   const [themeId, setThemeId] = useState(() => findTheme(store(THEME_KEY)).id);
   const theme = findTheme(themeId);
   const [staticSound, setStaticSound] = useState(store(STATIC_SOUND_KEY) !== 'off');
@@ -235,10 +238,10 @@ export function App() {
     },
     {
       label: 'Plex playback',
-      value: plexMode === 'transcode' ? 'Convert' : 'Direct',
-      note: 'Convert: Plex converts video for this TV. Direct: play files as-is. Falls back to the other if one fails',
+      value: plexMode === 'auto' ? 'Auto' : plexMode === 'transcode' ? 'Convert' : 'Direct',
+      note: 'Auto: files the TV can play start straight away, others are converted by Plex. Falls back to the other way if one fails',
       activate: () => {
-        const next: PlexMode = plexMode === 'transcode' ? 'direct' : 'transcode';
+        const next: PlexMode = plexMode === 'auto' ? 'transcode' : plexMode === 'transcode' ? 'direct' : 'auto';
         store(PLEX_MODE_KEY, next);
         setPlexMode(next);
         if (tuner.current) {

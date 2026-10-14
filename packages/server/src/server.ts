@@ -235,7 +235,8 @@ app.get('/api/plex/test/:ratingKey?', async (c) => {
 
 app.get('/api/plex/play/:ratingKey', async (c) => {
   const offset = Number(c.req.query('offset') ?? 0) || 0;
-  const mode = c.req.query('mode') === 'direct' ? 'direct' : 'transcode';
+  const asked = c.req.query('mode');
+  const mode = asked === 'direct' || asked === 'transcode' ? asked : 'auto';
   return c.json(await plex.playback(c.req.param('ratingKey'), offset, mode));
 });
 

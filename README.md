@@ -63,7 +63,9 @@ live channel keeps playing in the corner. ▲ from the top row reaches **Setting
 commercial breaks on/off (applies to every TV in the house); CRT effect,
 **theme** (six looks: *Prevue '89*, *VCR*, *Streaming*, *Broadcast*, *Station ID*
 and *Console*; see [docs/mockups](docs/mockups)), **static sound** on/off, **logo bug** (the
-channel's logo in the corner while a show plays) and Plex playback mode (this TV
+channel's logo in the corner while a show plays) and Plex playback (*Auto*, the
+default, plays MP4/H.264 files straight from Plex and converts the rest; or force
+*Convert* / *Direct*) (this TV
 only); diagnostics.
 
 ## Managing channels

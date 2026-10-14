@@ -3,7 +3,8 @@ import { airingAt, type Channel, type ChannelItem, type LineupAiring } from '@re
 import { now } from './clock';
 import { report } from './diag';
 
-export type PlexMode = 'transcode' | 'direct';
+/** auto: play files the TV handles natively straight from Plex, convert the rest. */
+export type PlexMode = 'auto' | 'transcode' | 'direct';
 export type Airing = LineupAiring<ChannelItem>;
 export type ChannelInfo = Omit<Channel, 'items'> & { itemCount: number };
 
@@ -14,7 +15,8 @@ interface Playback {
   baseOffsetSec: number;
   session?: string;
   media?: { container?: string; videoCodec?: string; audioCodec?: string };
-  plexMode?: PlexMode;
+  /** The mode actually used (auto resolves to one of the others). */
+  plexMode?: 'transcode' | 'direct';
 }
 
 export interface TunerState {
@@ -51,7 +53,7 @@ class Blocked extends Error {}
  */
 export class Tuner {
   state: TunerState = { status: 'idle', upcoming: [], latencies: [], stalls: 0 };
-  plexMode: PlexMode = 'transcode';
+  plexMode: PlexMode = 'auto';
 
   private token = 0;
   private hls: Hls | null = null;
@@ -117,16 +119,25 @@ export class Tuner {
     }
 
     const errors: string[] = [];
-    for (const mode of this.attemptModes(airing.item)) {
+    const modes = this.attemptModes(airing.item);
+    const tried = new Set<string>();
+    while (modes.length) {
+      const mode = modes.shift();
+      let used: string | undefined = mode;
       try {
+        const resolveStarted = performance.now();
         const playback = await this.resolve(airing.item, (now() - airing.startMs) / 1000, mode);
+        used = playback.plexMode ?? mode;
+        const resolveMs = Math.round(performance.now() - resolveStarted);
         if (token !== this.token) {
           if (playback.session) void stopPlexSession(playback.session);
           return;
         }
         this.set({ playback });
+        const loadStarted = performance.now();
         await this.load(playback, airing, token);
         if (token !== this.token) return;
+        const loadMs = Math.round(performance.now() - loadStarted);
 
         const latencyMs = Math.round(performance.now() - started);
         this.set({ status: 'playing', latencies: [...this.state.latencies, latencyMs].slice(-20) });
@@ -140,6 +151,8 @@ export class Tuner {
           plexMode: playback.plexMode,
           media: playback.media,
           latencyMs,
+          resolveMs,
+          loadMs,
           videoSize: `${this.video.videoWidth}x${this.video.videoHeight}`,
           earlierErrors: errors.length ? errors : undefined,
         });
@@ -150,8 +163,14 @@ export class Tuner {
           this.set({ status: 'blocked' });
           return;
         }
-        errors.push(`${mode ?? 'default'}: ${(err as Error).message}`);
+        errors.push(`${used ?? 'default'}: ${(err as Error).message}`);
         this.unload();
+        // Plex gets a second try in whichever mode hasn't failed yet.
+        if (used) tried.add(used);
+        if (airing.item.source === 'plex' && !modes.length) {
+          const other = (['direct', 'transcode'] as const).find((m) => !tried.has(m));
+          if (other && tried.size < 2) modes.push(other);
+        }
       }
     }
     await this.standby(token, errors.join(' · '));
@@ -162,10 +181,9 @@ export class Tuner {
     if (this.state.channel) void this.tune(this.state.channel);
   }
 
-  /** Plex gets two tries: the preferred mode, then the other one. */
+  /** Plex starts in the preferred mode; a failure falls back to the other one (see tune). */
   private attemptModes(item: ChannelItem): (PlexMode | undefined)[] {
-    if (item.source !== 'plex') return [undefined];
-    return this.plexMode === 'transcode' ? ['transcode', 'direct'] : ['direct', 'transcode'];
+    return item.source === 'plex' ? [this.plexMode] : [undefined];
   }
 
   /**
@@ -221,7 +239,7 @@ export class Tuner {
       baseOffsetSec: body.type === 'hls' ? offsetSec : 0,
       session: body.session,
       media: body.media,
-      plexMode: mode,
+      plexMode: body.mode ?? (mode === 'direct' ? 'direct' : 'transcode'),
     };
   }
 

@@ -190,6 +190,23 @@ export interface PlexPlayback {
   startAt: number;
   session?: string;
   media?: { container?: string; videoCodec?: string; audioCodec?: string };
+  /** How it's being played (auto picks one). */
+  mode: 'transcode' | 'direct';
+}
+
+export type PlexPlayMode = 'auto' | 'transcode' | 'direct';
+
+/**
+ * Files a browser (and the Chromecast WebView) plays natively: MP4/MOV with H.264
+ * video and AAC or MP3 audio. These skip Plex's transcoder, which on a small
+ * server takes seconds to start; everything else (MKV, AVI, HEVC, AC3…) converts.
+ */
+export function browserPlayable(media: { container?: string; videoCodec?: string; audioCodec?: string } | undefined): boolean {
+  if (!media) return false;
+  const container = (media.container ?? '').toLowerCase();
+  const video = (media.videoCodec ?? '').toLowerCase();
+  const audio = (media.audioCodec ?? '').toLowerCase();
+  return ['mp4', 'm4v', 'mov'].includes(container) && video === 'h264' && ['aac', 'mp3'].includes(audio);
 }
 
 function transcodeParams(ratingKey: string, offsetSec: number, session: string): URLSearchParams {
@@ -218,21 +235,24 @@ function transcodeParams(ratingKey: string, offsetSec: number, session: string):
   });
 }
 
-export async function playback(ratingKey: string, offsetSec: number, mode: 'transcode' | 'direct'): Promise<PlexPlayback> {
-  const data = await plexJson<PlexContainer<{ Metadata?: PlexMetadata[] }>>(`/library/metadata/${encodeURIComponent(ratingKey)}`);
-  const media = data.MediaContainer.Metadata?.[0]?.Media?.[0];
-  const mediaInfo = { container: media?.container, videoCodec: media?.videoCodec, audioCodec: media?.audioCodec };
-
-  if (mode === 'direct') {
-    const part = media?.Part?.[0];
-    if (!part) throw new Error(`Plex item ${ratingKey} has no media part`);
-    return { url: `/plex${part.key}`, type: 'file', startAt: offsetSec, media: mediaInfo };
-  }
-
+export async function playback(ratingKey: string, offsetSec: number, mode: PlexPlayMode): Promise<PlexPlayback> {
   const session = randomUUID();
   const params = transcodeParams(ratingKey, offsetSec, session);
-  await checkDecision(params);
-  return { url: `/plex/video/:/transcode/universal/start.m3u8?${params}`, type: 'hls', startAt: 0, session, media: mediaInfo };
+  const metadata = plexJson<PlexContainer<{ Metadata?: PlexMetadata[] }>>(`/library/metadata/${encodeURIComponent(ratingKey)}`);
+  // A forced transcode doesn't need the metadata first: ask for the decision at the same time.
+  const decision = mode === 'transcode' ? checkDecision(params) : null;
+  decision?.catch(() => undefined);
+  const media = (await metadata).MediaContainer.Metadata?.[0]?.Media?.[0];
+  const mediaInfo = { container: media?.container, videoCodec: media?.videoCodec, audioCodec: media?.audioCodec };
+
+  if (mode === 'direct' || (mode === 'auto' && browserPlayable(mediaInfo))) {
+    const part = media?.Part?.[0];
+    if (!part) throw new Error(`Plex item ${ratingKey} has no media part`);
+    return { url: `/plex${part.key}`, type: 'file', startAt: offsetSec, media: mediaInfo, mode: 'direct' };
+  }
+
+  await (decision ?? checkDecision(params));
+  return { url: `/plex/video/:/transcode/universal/start.m3u8?${params}`, type: 'hls', startAt: 0, session, media: mediaInfo, mode: 'transcode' };
 }
 
 async function probeStep(url: string, init: RequestInit = {}) {
