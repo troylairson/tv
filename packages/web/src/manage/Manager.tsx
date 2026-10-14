@@ -119,7 +119,58 @@ function ChannelList() {
           </li>
         ))}
       </ul>
+      <ChannelIdeas />
     </section>
+  );
+}
+
+/** Ready-made channels: hand-curated content, order and time slots, added in one tap. */
+function ChannelIdeas() {
+  const [packs, setPacks] = useState<PackInfo[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState<string | null>(null);
+
+  useEffect(() => {
+    api
+      .packs()
+      .then((r) => setPacks(r.packs))
+      .catch((e: Error) => setError(e.message));
+  }, []);
+
+  async function install(pack: PackInfo) {
+    setBusy(pack.id);
+    try {
+      const created = await api.installPack(pack.id);
+      go(`/manage/${encodeURIComponent(created.id)}`);
+    } catch (e) {
+      alert((e as Error).message);
+      setBusy(null);
+    }
+  }
+
+  return (
+    <>
+      <h2>Channel ideas</h2>
+      {error && <p class="mg-error">Couldn't load channel ideas: {error}</p>}
+      {!packs && !error && <p class="mg-dim">Loading…</p>}
+      <ul class="mg-ideas">
+        {packs?.map((p) => (
+          <li key={p.id} class="mg-card mg-idea">
+            <div class="mg-channel-name">{p.name}</div>
+            <p>{p.description}</p>
+            <div class="mg-dim small">
+              {p.sourceCount} sources · {p.slotCount} time slots · curated {p.curated.split(':')[0]}
+            </div>
+            <div class="mg-row">
+              <span class="mg-dim small">{p.installed.length > 0 && `On channel ${p.installed.map((c) => c.number).join(', ')}`}</span>
+              <button class={p.installed.length ? '' : 'mg-primary'} disabled={busy === p.id} onClick={() => void install(p)}>
+                {busy === p.id ? 'Adding…' : p.installed.length ? 'Add another copy' : 'Add this channel'}
+              </button>
+            </div>
+          </li>
+        ))}
+      </ul>
+    </>
   );
 }
 

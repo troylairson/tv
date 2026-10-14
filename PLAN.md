@@ -469,6 +469,14 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 
 ---
 
+## TODO (requested)
+
+- [ ] **Clean up the UI and add themes** (e.g. *Modern*, *Retro*): a theme picker for
+      the TV interface (guide, banner, cards, fonts, colours) and a consistent pass
+      over spacing and layout. Possibly per-era retro looks (70s, 80s, 90s).
+- [ ] **Setting to mute the static sound when tuning**: a toggle in TV Settings
+      (per TV, like the CRT effect) that silences the static noise between channels.
+
 ## 7. Prior art worth borrowing from
 - **ErsatzTV**, **Tunarr** (successor to dizqueTV): Plex-backed custom channels
   exported as IPTV. Good reference for scheduling rules and filler; they restream
