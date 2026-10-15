@@ -1,4 +1,4 @@
-import { prettifyTitle } from './titles';
+import { prettifyTitle, shortDescription } from './titles';
 import type { ChannelItem } from './types';
 
 const IA = 'https://archive.org';
@@ -13,7 +13,7 @@ export interface IaFile {
 
 export interface IaMetadata {
   is_dark?: boolean;
-  metadata?: { identifier?: string; title?: string | string[]; mediatype?: string };
+  metadata?: { identifier?: string; title?: string | string[]; mediatype?: string; description?: string | string[] };
   files?: IaFile[];
 }
 
@@ -118,6 +118,7 @@ export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles
   const rawTitle = meta.metadata?.title;
   const title = (Array.isArray(rawTitle) ? rawTitle[0] : rawTitle) ?? identifier;
   const files = pickPlayableFiles(meta.files).slice(0, maxFiles);
+  const description = shortDescription(meta.metadata?.description, title);
   let part = 0;
   const fileTitle = (f: (typeof files)[number]) => {
     if (files.length === 1) return prettifyTitle(isGenericName(title) ? fallbackName(identifier, title, f.name) : title);
@@ -133,6 +134,7 @@ export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles
     durationSec: Math.round(f.durationSec * 100) / 100,
     url: downloadUrl(identifier, f.name),
     thumb: thumbUrl(identifier),
+    ...(description && { description }),
   }));
 }
 

@@ -74,3 +74,52 @@ export function commercialTitle(path: string): { title: string; year?: number } 
     .trim();
   return { title: prettifyTitle(t || base, { filename: looksLikeFilename(t) }), year };
 }
+
+const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', mdash: '—', ndash: '–', hellip: '…', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“' };
+/** Sentences about the file rather than the show: uploads, rips, links, licences, appeals. */
+const NOT_ABOUT_THE_SHOW = /https?:|www\.|\.com\b|upload|ripped|\brip\b|digiti[sz]|transferred|subscribe|donat|patreon|paypal|copyright|public domain|licen[cs]e|creative commons|torrent|download|\bvhs\b.*\b(quality|tracking)|please (note|enjoy)|enjoy!?$/i;
+
+/**
+ * A short plain-text description for the guide: HTML stripped, entities decoded,
+ * housekeeping sentences dropped, cut at a sentence end near `max` characters.
+ * Undefined when nothing worth showing is left.
+ */
+export function shortDescription(raw: unknown, title = '', max = 240): string | undefined {
+  const DOT = '․'; // stands in for full stops that don't end a sentence
+  const text = (Array.isArray(raw) ? raw.join(' ') : typeof raw === 'string' ? raw : '')
+    .replace(/<(br|\/p|\/div|\/li|\/h\d)[^>]*>/gi, ' ¶ ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&(#x[0-9a-f]+|#\d+|[a-z]+);/gi, (m, e: string) =>
+      e[0] === '#' ? String.fromCodePoint(e[1]?.toLowerCase() === 'x' ? parseInt(e.slice(2), 16) : Number(e.slice(1))) : (ENTITIES[e.toLowerCase()] ?? m),
+    )
+    .replace(/(https?:\/\/|www\.)\S+|\b[\w.-]+\.(com|org|net|edu|tv)\b\S*/gi, ' LINK ')
+    .replace(/\.\.\.+/g, '…')
+    .replace(/\b(Mr|Mrs|Ms|Dr|St|Jr|Sr|vs|Lt|Sgt|Capt|Col|Gen|Prof|Rev|No|Vol|Ep|Pt|[A-Z])\./g, `$1${DOT}`)
+    .replace(/\s+/g, ' ');
+  // Paragraph breaks end sentences too (headings and credit lines rarely have a full stop).
+  const sentences = text
+    .split('¶')
+    .flatMap((para) => para.match(/[^.!?]+(?:[.!?]+["')\]]*|$)/g) ?? [])
+    .map((s) => s.trim().replace(/^(from )?(imdb|wikipedia)\s*:\s*/i, ''))
+    .filter(
+      (s) =>
+        s.split(' ').length >= 3 &&
+        /[a-z]/i.test(s) &&
+        !/\bLINK\b/.test(s) &&
+        !NOT_ABOUT_THE_SHOW.test(s) &&
+        // The uploader talking ("episodes I have", "let me know", "thanks to…").
+        !/\b(I|I'm|I've|my|me|we|our|thanks?|thank you)\b/i.test(s),
+    )
+    .map((s) => (/[.!?…]["')\]]*$/.test(s) ? s : `${s}.`));
+  let out = sentences.join(' ').split(DOT).join('.');
+  if (out.length > max) {
+    // End at the last full sentence that fits, unless that leaves too little.
+    const cut = out.slice(0, max + 1);
+    const end = Math.max(cut.lastIndexOf('. '), cut.lastIndexOf('! '), cut.lastIndexOf('? '));
+    out = end >= max * 0.4 ? cut.slice(0, end + 1) : `${out.slice(0, max).replace(/[\s,;:–-]+\S*$/, '')}…`;
+  }
+  const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+  // Just the title again, or a few words of it ("Flash Gordon Complete Serial"), isn't a description.
+  if (out.split(' ').length < 6 || norm(out).includes(norm(title)) && out.length < title.length + 20) return undefined;
+  return out;
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { commercialTitle, looksLikeFilename, prettifyTitle } from './titles';
+import { commercialTitle, looksLikeFilename, prettifyTitle, shortDescription } from './titles';
 
 describe('prettifyTitle', () => {
   it('cleans dotted file names', () => {
@@ -55,5 +55,28 @@ describe('commercialTitle', () => {
       'Mario vs. Donkey Kong for Nintendo DS',
     );
     expect(commercialTitle('Commercials/Holiday Commercials/Santa.mp4')).toEqual({ title: 'Santa', year: undefined });
+  });
+});
+
+describe('shortDescription', () => {
+  it('strips HTML and the uploader talking', () => {
+    expect(
+      shortDescription('<div>Joe Friday and Bill Gannon investigate a string of burglaries.</div><div>Uploaded by me from my VHS collection. Visit http://example.com</div>'),
+    ).toBe('Joe Friday and Bill Gannon investigate a string of burglaries.');
+  });
+  it('decodes entities and keeps initials inside a sentence', () => {
+    expect(shortDescription('Directed by B. Reeves Eason &amp; Otto Brower, starring Gene Autry as himself.')).toBe(
+      'Directed by B. Reeves Eason & Otto Brower, starring Gene Autry as himself.',
+    );
+  });
+  it('drops descriptions that only repeat the title', () => {
+    expect(shortDescription('Flash Gordon Complete Serial', 'Flash Gordon: The Complete Serial')).toBeUndefined();
+    expect(shortDescription('These are episodes from a serial in the Public Domain.')).toBeUndefined();
+  });
+  it('cuts long text at a sentence end', () => {
+    const text = `${'A fine opening sentence about the show and its cast. '.repeat(3)}${'More words '.repeat(40)}`;
+    const out = shortDescription(text)!;
+    expect(out.length).toBeLessThanOrEqual(240);
+    expect(out.endsWith('cast.')).toBe(true);
   });
 });

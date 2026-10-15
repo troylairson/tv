@@ -99,9 +99,30 @@ export function ensureLineup(channel: Channel, untilMs = Date.now() + HORIZON_MS
   return lineup;
 }
 
+/** Each channel's items by id, rebuilt whenever its item list is replaced. */
+const itemIndex = new WeakMap<object, Map<string, ChannelItem>>();
+function currentItem(channel: Channel, item: ChannelItem): ChannelItem {
+  let index = itemIndex.get(channel.items);
+  if (!index) {
+    index = new Map();
+    for (const list of [channel.items, ...(channel.slots ?? []).map((s) => s.items ?? [])]) for (const i of list) index.set(i.id, i);
+    itemIndex.set(channel.items, index);
+  }
+  return index.get(item.id) ?? item;
+}
+
 export function airingsFor(channel: Channel, fromMs: number, toMs: number): LineupAiring<ChannelItem>[] {
   const lineup = ensureLineup(channel, toMs);
-  return lineup ? lineup.airings.filter((a) => a.endMs > fromMs && a.startMs < toMs) : [];
+  if (!lineup) return [];
+  // Stored airings carry a copy of the item from when they were scheduled; show the latest
+  // details (a description added by a refresh) without reshuffling what's on.
+  return lineup.airings
+    .filter((a) => a.endMs > fromMs && a.startMs < toMs)
+    .map((a) => {
+      if (a.kind !== 'show') return a;
+      const latest = currentItem(channel, a.item);
+      return latest === a.item || latest.description === a.item.description ? a : { ...a, item: { ...a.item, description: latest.description } };
+    });
 }
 
 /** Settings or the commercial pool changed: keep what's on now, regenerate everything after it. */
@@ -133,6 +154,8 @@ export interface GuideBlock {
   kind: 'show' | 'break' | 'offair';
   /** Part of a time slot. */
   slot?: boolean;
+  description?: string;
+  thumb?: string;
 }
 
 /** The channel's programmes for a guide row: shows only, each spanning up to the next show. */
@@ -143,7 +166,15 @@ export function guideBlocks(channel: Channel, fromMs: number, toMs: number): Gui
   for (const a of airings) {
     const last = blocks[blocks.length - 1];
     if (a.kind === 'show') {
-      blocks.push({ title: a.item.title, startMs: a.startMs, endMs: a.endMs, kind: 'show', slot: Boolean(a.slotId) || undefined });
+      blocks.push({
+        title: a.item.title,
+        startMs: a.startMs,
+        endMs: a.endMs,
+        kind: 'show',
+        slot: Boolean(a.slotId) || undefined,
+        description: a.item.description,
+        thumb: a.item.thumb,
+      });
     } else if (a.kind === 'offair') {
       if (last?.kind === 'offair' && last.endMs === a.startMs) last.endMs = a.endMs;
       else blocks.push({ title: 'Off the Air', startMs: a.startMs, endMs: a.endMs, kind: 'offair' });

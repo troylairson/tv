@@ -95,7 +95,8 @@ async function writeJson(file: string, data: unknown) {
 }
 
 const saveConfigs = () => writeJson(configFile(), { channels: configs });
-const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, resolved: Object.fromEntries(resolved) });
+// `described`: items carry descriptions (older caches get one full refresh to pick them up).
+const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, described: true, resolved: Object.fromEntries(resolved) });
 
 function toChannel(c: ChannelConfig): Channel | null {
   const r = resolved.get(c.id);
@@ -390,6 +391,7 @@ export async function deleteChannel(id: string): Promise<boolean> {
 
 interface LegacyCache {
   version?: number;
+  described?: boolean;
   channels?: Channel[];
   resolved?: Record<string, Resolved>;
 }
@@ -439,6 +441,8 @@ export async function initChannels(): Promise<void> {
 
   const stale = configs.filter((c) => resolved.get(c.id)?.configHash !== contentHash(c)).length;
   console.log(`${configs.length} channels configured, ${configs.length - stale} ready${stale ? `, resolving ${stale}…` : ''}`);
-  void refreshAll(true);
+  // Caches from before show descriptions: re-resolve everything once (what's cached keeps playing meanwhile).
+  if (!cache.described && resolved.size) console.log('fetching show descriptions for every channel in the background…');
+  void refreshAll(cache.described === true || !resolved.size);
   setInterval(() => void refreshAll(), REFRESH_EVERY_MS);
 }

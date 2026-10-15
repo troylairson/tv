@@ -50,6 +50,7 @@ export function Bumper({ channel, shows, theme, nowMs }: { channel: ChannelInfo;
             <span class="bumper-title">
               {i === 0 && <span class="bumper-chip">In {mins} min</span>}
               <b>{a.item.title}</b>
+              {i === 0 && a.item.description && <span class="bumper-desc">{a.item.description}</span>}
             </span>
             <span class="bumper-dots" />
           </li>

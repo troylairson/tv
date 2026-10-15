@@ -731,3 +731,7 @@
 .tv[data-theme='console'] .bumper-title { flex: 0 1 auto; }
 .tv[data-theme='console'] .bumper-title b { font: 400 4vh var(--font-display); }
 .tv[data-theme='console'] .bumper-dots { display: block; flex: 1; min-width: 2vw; border-bottom: 0.3vh dotted rgba(42, 26, 12, 0.55); }
+
+/* Show descriptions where space is tight. */
+.tv[data-theme='broadcast'] .bumper-desc { -webkit-line-clamp: 1; }
+.tv[data-theme='vcr'] .guide-details-desc, .tv[data-theme='vcr'] .ident-desc, .tv[data-theme='vcr'] .bumper-desc { font-size: 2.6vh; }

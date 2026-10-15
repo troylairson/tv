@@ -10,6 +10,8 @@ export interface ChannelItem extends ScheduleItem {
   /** Direct URL when the client can play it as-is (IA). Plex items resolve via /api/plex/play. */
   url?: string;
   thumb?: string;
+  /** A sentence or two about it (IA description, Plex summary), for the guide and "up next" cards. */
+  description?: string;
 }
 
 export interface Channel {

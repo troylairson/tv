@@ -59,6 +59,9 @@ to turn the TV on.
 
 **In the guide:** ▲▼ move between channels, ◀▶ move through programmes (the
 grid pages through time), OK watches the highlighted channel, Back closes. The
+panel at the top describes the highlighted show (from the Internet Archive item's
+description or Plex's summary, when there is one); so do the "Up next" card and
+the "Coming up" bumper. The
 live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
 commercial breaks on/off and **audio language** for Plex files with several audio
 tracks (both apply to every TV in the house); CRT effect,

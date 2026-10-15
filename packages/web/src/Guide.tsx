@@ -12,6 +12,7 @@ interface GuideBlock {
   endMs: number;
   kind: 'show' | 'break' | 'offair';
   slot?: boolean;
+  description?: string;
 }
 
 interface GuideRow {
@@ -196,12 +197,13 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
               <div class="guide-details-ch heading">
                 {focusedRow.number} {focusedRow.name}
               </div>
-              <div class="guide-details-title">{focused.title}</div>
+              <div class={`guide-details-title ${focused.description ? 'one-line' : ''}`}>{focused.title}</div>
               <div class="guide-details-meta">
                 {fmtTime(focused.startMs)} – {fmtTime(focused.endMs)}
                 {focused.startMs <= t && t < focused.endMs ? ' · ON NOW' : ` · starts in ${Math.round((focused.startMs - t) / 60_000)} min`}
               </div>
-              {nextAfterFocused && nextAfterFocused !== focused && <div class="guide-details-next">Then: {nextAfterFocused.title}</div>}
+              {focused.description && <div class="guide-details-desc">{focused.description}</div>}
+              {!focused.description && nextAfterFocused && nextAfterFocused !== focused && <div class="guide-details-next">Then: {nextAfterFocused.title}</div>}
               <div class="guide-details-hint">OK watch channel {focusedRow.number}</div>
             </>
           ) : (

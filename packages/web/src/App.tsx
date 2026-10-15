@@ -457,6 +457,7 @@ export function App() {
                 )}
                 <div class="ident-label heading">{nextShow ? theme.upNext : 'Thanks for watching'}</div>
                 <div class="ident-title">{nextShow ? nextShow.item.title : channel.name}</div>
+                {nextShow?.item.description && <div class="ident-desc">{nextShow.item.description}</div>}
                 {nextShow && (
                   <div class="ident-time">
                     at {fmtTime(nextShow.startMs)} <span class="ident-time-ch">on channel {channel.number}</span>

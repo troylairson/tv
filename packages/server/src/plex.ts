@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { seededShuffle } from '@retro-tv/schedule';
 import { config } from './config';
 import { AUDIO_LANGUAGES, getSettings } from './settings';
-import { prettifyTitle } from './titles';
+import { prettifyTitle, shortDescription } from './titles';
 import type { ChannelItem } from './types';
 
 function plexHeaders(): Record<string, string> {
@@ -82,6 +82,7 @@ function toItem(m: PlexMetadata): ChannelItem {
     title: displayTitle(m),
     durationSec: (m.duration ?? 0) / 1000,
     thumb: m.thumb ? `/plex${m.thumb}` : undefined,
+    description: shortDescription(m.summary, m.title),
   };
 }
 

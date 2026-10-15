@@ -510,6 +510,11 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       stores it as `<data dir>/logos/<channel id>.<ext>` (type sniffed from the bytes,
       2 MB max) and sets the logo to `upload:<timestamp>`; served at `/logos/:id` with a
       no-script CSP so an SVG can't run anything. Deleted with the channel.
+- [x] **Show descriptions** in the guide, the "Up next" card and the bumper:
+      `ChannelItem.description` from IA `metadata.description` / Plex `summary`, cleaned
+      by `shortDescription` (HTML and entities, links, uploader chatter, licences dropped;
+      cut at a sentence near 240 chars). Already-scheduled airings pick it up from the
+      channel's current items; caches from before it get one background refresh.
 - [x] **Paste an Internet Archive link** into the manager's IA search box
       (`archive.org/details/<id>`) to jump straight to that item and add it.
 
