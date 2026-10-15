@@ -502,7 +502,17 @@ export function App() {
         <div class="card panel">
           <h1 class="heading">Please Stand By</h1>
           <p>We're experiencing technical difficulties.</p>
-          {nextShow && <p class="dim">Back at {fmtTime(airing?.endMs ?? nextShow.startMs)} with {nextShow.item.title}</p>}
+          {tunerState.retryAt && tunerState.retryAt > t ? (
+            <p class="dim">
+              Trying {airing?.kind === 'show' ? `${airing.item.title} ` : ''}again in {Math.max(1, Math.ceil((tunerState.retryAt - t) / 1000))} s…
+            </p>
+          ) : (
+            nextShow && (
+              <p class="dim">
+                Back at {fmtTime(airing?.endMs ?? nextShow.startMs)} with {nextShow.item.title}
+              </p>
+            )
+          )}
         </div>
       )}
 

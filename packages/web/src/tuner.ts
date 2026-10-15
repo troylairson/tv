@@ -32,6 +32,8 @@ export interface TunerState {
   playback?: Playback;
   /** What's filling time during standby, if anything. */
   filler?: ChannelItem;
+  /** When standby will try the show again (ms), if it will. */
+  retryAt?: number;
   error?: string;
   latencies: number[];
   driftSec?: number;
@@ -95,7 +97,7 @@ export class Tuner {
     const token = ++this.token;
     const started = performance.now();
     this.teardown();
-    this.set({ status: 'tuning', channel, airing: undefined, upcoming: [], playback: undefined, filler: undefined, error: undefined, driftSec: undefined });
+    this.set({ status: 'tuning', channel, airing: undefined, upcoming: [], playback: undefined, filler: undefined, error: undefined, driftSec: undefined, retryAt: undefined });
 
     let airings: Airing[];
     try {
@@ -214,7 +216,10 @@ export class Tuner {
     const retry = () => {
       if (token === this.token && channel) void this.tune(channel);
     };
-    if (airing && channel && airing.endMs - retryAt > 60_000) this.timers.push(setTimeout(retry, retryAt - Date.now()));
+    if (airing && channel && airing.endMs - retryAt > 60_000) {
+      this.timers.push(setTimeout(retry, retryAt - Date.now()));
+      this.set({ retryAt });
+    }
 
     let fillers: ChannelItem[] = [];
     try {
