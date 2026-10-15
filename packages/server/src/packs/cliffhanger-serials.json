@@ -1,0 +1,172 @@
+{
+  "id": "cliffhanger-serials",
+  "name": "Cliffhanger Serials",
+  "description": "Saturday-matinee chapter plays from the 1930s to the 50s, every chapter in order: John Wayne in The Hurricane Express, Gene Autry in The Phantom Empire, Undersea Kingdom, Zorro's Fighting Legion, The Lone Ranger, Bela Lugosi in The Phantom Creeps, Captain Marvel, Spy Smasher, Captain America, Superman and Radar Men from the Moon. Buster Crabbe's Buck Rogers blasts off every Saturday at 9:00 am, one chapter a week, and The Phantom Creeps lurks weekdays after school at 4:00 pm.",
+  "curated": "2026-10-15: 18 complete Republic, Universal, Columbia and Mascot serials (1932-1952), each from a single upload holding every chapter in order and played back to back in release order; colorized versions, feature-length condensations, single-file 'complete serial' rips, MST3K/riff and 'breakfast serial show' re-hosts, and the 1936 Flash Gordon (already on Atomic Age Theater) excluded.",
+  "mode": "loop",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-item",
+      "title": "The Hurricane Express (1932)",
+      "identifier": "the-hurricane-express",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "The Phantom Empire (1935)",
+      "identifier": "PhantomEmpire1",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "The New Adventures of Tarzan (1935)",
+      "identifier": "the-new-adventures-of-tarzan-complete-serial",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Undersea Kingdom (1936)",
+      "identifier": "undersea-kingdom-mp4",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Zorro Rides Again (1937)",
+      "identifier": "zorro-rides-again",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "The Lone Ranger (1938)",
+      "identifier": "the-lone-ranger",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Flash Gordon's Trip to Mars (1938)",
+      "identifier": "flash-gordon-s-trip-to-mars-serial",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Buck Rogers (1939)",
+      "identifier": "buck-rogers-1939-e-12-war-of-the-planets",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "The Phantom Creeps (1939)",
+      "identifier": "the-phantom-creeps-pnm",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Zorro's Fighting Legion (1939)",
+      "identifier": "zorros-fighting-legion",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "The Green Hornet Strikes Again! (1941)",
+      "identifier": "the-green-hornet-strikes-again-serial",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Adventures of Captain Marvel (1941)",
+      "identifier": "AdventuresOfCaptainMarvelChapters112",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Spy Smasher (1942)",
+      "identifier": "spy.-smasher.-chap.-01",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Captain America (1944)",
+      "identifier": "CaptainAmerica1944Serial1",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "The Crimson Ghost (1946)",
+      "identifier": "TheCrimsonGhost12Eps",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Superman (1948)",
+      "identifier": "superman-1948_202205",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Batman and Robin (1949)",
+      "identifier": "batman-and-robin-movie-serial-1949_202205",
+      "minMinutes": 10,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-item",
+      "title": "Radar Men from the Moon (1952)",
+      "identifier": "radar-men-from-the-moon-movie-serial",
+      "minMinutes": 10,
+      "maxYear": 1960
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "09:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "Buck Rogers (1939)",
+        "identifier": "buck-rogers-1939-e-12-war-of-the-planets",
+        "minMinutes": 10,
+        "maxYear": 1960
+      }
+    },
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "16:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "The Phantom Creeps (1939)",
+        "identifier": "the-phantom-creeps-pnm",
+        "minMinutes": 10,
+        "maxYear": 1960
+      }
+    }
+  ]
+}
