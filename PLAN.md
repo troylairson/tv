@@ -506,7 +506,7 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       (`Bumper.tsx`), styled per theme in `themes.css`. Per-channel on/off in the
       manager (default on). Later: a full-screen Prevue-style guide channel.
 - [x] **Channel logos** (mock-up: [docs/mockups/channel-logos.png](docs/mockups/channel-logos.png)):
-      12 hand-drawn transparent SVG logos (`packages/web/src/logos/hand.ts`) for the
+      27 hand-drawn transparent SVG logos (every pack but Variety Hour has one; sheet: docs/mockups/channel-logos-2.png) (`packages/web/src/logos/hand.ts`) for the
       packs and default channels, picked automatically; a generator for every other
       channel (keywords → motif, hash → layout/palette/font, follows the TV theme);
       fonts bundled. Shown as the tune-in OSD, banner badge, guide channel column,
