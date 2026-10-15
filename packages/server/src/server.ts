@@ -20,7 +20,7 @@ import {
 } from './channels';
 import { mediaPath, poolStatus, readyCommercials, startCommercialPool } from './commercials';
 import { config, plexConfigured } from './config';
-import { serveFile } from './media';
+import { relayVideo, serveFile } from './media';
 import * as ia from './ia';
 import { getPack, PACKS } from './packs';
 import * as plex from './plex';
@@ -117,6 +117,14 @@ app.get('/media/commercials/:file', (c) => {
   const file = mediaPath(c.req.param('file'));
   if (!file) return c.text('Not found', 404);
   return serveFile(file, c.req.header('range'));
+});
+
+/** Internet Archive videos, relayed so the TV only ever talks to this server. */
+app.get('/media/ia/:id/:file{.+}', (c) => {
+  const id = c.req.param('id');
+  const file = c.req.param('file');
+  if (!/^[A-Za-z0-9._-]{1,200}$/.test(id) || !file || file.split('/').some((part) => part === '..' || part === '')) return c.text('Not found', 404);
+  return relayVideo(ia.downloadUrl(id, file), c.req.header('range'), c.req.raw.signal);
 });
 
 /** Uploaded channel logos. SVGs can carry scripts, so they get a policy that forbids them. */

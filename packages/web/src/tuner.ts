@@ -252,6 +252,10 @@ export class Tuner {
   }
 
   private async resolve(item: ChannelItem, offsetSec: number, mode: PlexMode | undefined): Promise<Playback> {
+    if (item.source === 'ia' && item.ref.includes('/')) {
+      // Through the server: some TV web views won't play archive.org links directly.
+      return { url: `/media/ia/${item.ref.split('/').map(encodeURIComponent).join('/')}`, type: 'file', baseOffsetSec: 0 };
+    }
     if (item.source !== 'plex') {
       if (!item.url) throw new Error('Item has no URL');
       return { url: item.url, type: 'file', baseOffsetSec: 0 };
