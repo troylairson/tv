@@ -109,8 +109,26 @@ export function App() {
     report('caps', { ...caps });
   }, []);
 
+  // No "turn on the TV" screen: start on the last channel watched (or the first).
   useEffect(() => {
-    if (IN_TV_APP) void powerOn();
+    void powerOn();
+  }, []);
+
+  // Browsers allow sound only after a button press or tap; the first one turns it on.
+  useEffect(() => {
+    const unlock = (e: Event) => {
+      initStaticAudio();
+      // The press that turns the sound on does only that (OK shouldn't also open the guide).
+      if (tuner.current?.unlockSound() && e.type === 'keydown') {
+        e.stopImmediatePropagation();
+        e.preventDefault();
+      }
+    };
+    const events = ['keydown', 'pointerdown', 'touchend'] as const;
+    for (const e of events) window.addEventListener(e, unlock, { capture: true });
+    return () => {
+      for (const e of events) window.removeEventListener(e, unlock, { capture: true });
+    };
   }, []);
 
   async function loadChannels() {
@@ -318,10 +336,6 @@ export function App() {
   // Key handling reads the latest state through a ref so the listener is attached once.
   const handlerRef = useRef<(action: Action) => boolean>(() => false);
   handlerRef.current = (action) => {
-    if (!poweredOn) {
-      if (action.type === 'ok') void powerOn();
-      return true;
-    }
     if (tunerState.status === 'blocked' && action.type === 'ok') {
       tuner.current?.retune();
       return true;
@@ -422,8 +436,8 @@ export function App() {
     (breakEnd!.startMs - t <= BUMPER_MS || t - tunedAt <= BUMPER_MS);
   // The commercial keeps rolling under the card, silently, like a real station cutting away.
   useEffect(() => {
-    if (video.current) video.current.muted = showBumper;
-  }, [showBumper]);
+    if (video.current) video.current.muted = showBumper || !!tunerState.soundLocked;
+  }, [showBumper, tunerState.soundLocked]);
   // A network-style watermark while a show plays (not over the banner, guide or menus).
   const showBug = logoBug && hasLogo && channel && status === 'playing' && airing?.kind === 'show' && infoUntil <= t && !showGuide && !showSettings && !showDiag;
 
@@ -485,12 +499,7 @@ export function App() {
       )}
       <Static visible={poweredOn && (status === 'tuning' || status === 'idle')} />
 
-      {!poweredOn && (
-        <button class="power" onClick={() => void powerOn()} autoFocus>
-          <span class="power-icon">⏻</span>
-          <span>Press OK to turn on the TV</span>
-        </button>
-      )}
+      {tunerState.soundLocked && <div class="sound-hint panel">🔇 Press OK or tap for sound</div>}
 
       {poweredOn && !channels.length && (
         <div class="card panel">

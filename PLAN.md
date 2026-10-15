@@ -246,9 +246,11 @@ playback quality disappoints. **E** is a nice stretch goal because the schedule
 engine already produces exactly what XMLTV needs.
 
 ### Web-on-TV gotchas to design for up front
-- **Autoplay with sound** needs a user gesture → a "power on" screen (press OK to
-  turn the TV on) is both required *and* on-theme. The WebView wrapper can disable
-  this restriction (`setMediaPlaybackRequiresUserGesture(false)`).
+- **Autoplay with sound** needs a user gesture. The TV starts straight away on the
+  last channel watched; if the browser refuses sound it plays muted with a "Press OK
+  or tap for sound" note, and the first press only unmutes. The WebView wrapper
+  disables the restriction (`setMediaPlaybackRequiresUserGesture(false)`), so the
+  Android TV app always starts with sound.
 - **Low-power hardware** (Chromecast w/ Google TV is weak): no heavy WebGL CRT
   shader on top of video by default; CSS scanlines + vignette are cheap, WebGL
   is an opt-in.

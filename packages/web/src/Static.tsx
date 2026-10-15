@@ -19,9 +19,13 @@ export function setStaticMuted(value: boolean) {
   applyVolume();
 }
 
-/** Must be called from a user gesture (the power button) so the browser allows audio. */
+/** Set up the static hiss. Browsers keep it silent until a button press or tap, so call this again then. */
 export function initStaticAudio() {
-  if (audio || typeof AudioContext === 'undefined') return;
+  if (audio) {
+    if (audio.ctx.state === 'suspended') void audio.ctx.resume().catch(() => undefined);
+    return;
+  }
+  if (typeof AudioContext === 'undefined') return;
   const ctx = new AudioContext();
   const buffer = ctx.createBuffer(1, ctx.sampleRate * 2, ctx.sampleRate);
   const data = buffer.getChannelData(0);

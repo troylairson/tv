@@ -100,13 +100,11 @@ html, body, #app {
 
 /* ── Power ──────────────────────────────────────────────────────────────── */
 
-.power {
-  position: absolute; inset: 0; display: flex; flex-direction: column; gap: 2vh;
-  align-items: center; justify-content: center; border: 0; background: #000;
-  color: var(--dim); font: inherit; font-size: 4.1vh; cursor: pointer;
+.sound-hint {
+  position: absolute; left: 50%; top: var(--safe-y); transform: translateX(-50%); z-index: 6;
+  padding: 1.2vh 2vw; font-size: 3vh; font-weight: bold; white-space: nowrap; animation: sound-hint 1.6s ease-in-out infinite alternate;
 }
-.power:focus { outline: none; color: var(--fg); }
-.power-icon { font-size: 12vh; color: var(--power); text-shadow: 0 0 2vh var(--power); }
+@keyframes sound-hint { from { opacity: 1; } to { opacity: 0.55; } }
 
 /* ── Cards (stand by, off the air, press OK) ────────────────────────────── */
 

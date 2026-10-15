@@ -38,6 +38,8 @@ export interface TunerState {
   latencies: number[];
   driftSec?: number;
   stalls: number;
+  /** The browser only allowed silent autoplay: sound waits for the first button press or tap. */
+  soundLocked?: boolean;
 }
 
 const DRIFT_CHECK_MS = 15_000;
@@ -189,6 +191,14 @@ export class Tuner {
     if (this.state.channel) void this.tune(this.state.channel);
   }
 
+  /** A button press or tap happened, so sound is allowed now. True if that press was what was needed. */
+  unlockSound(): boolean {
+    const wasLocked = Boolean(this.state.soundLocked) || this.state.status === 'blocked';
+    if (this.state.soundLocked) this.set({ soundLocked: false });
+    if (this.state.status === 'blocked') this.retune();
+    return wasLocked;
+  }
+
   /** Plex starts in the preferred mode; a failure falls back to the other one (see tune). */
   private attemptModes(item: ChannelItem): (PlexMode | undefined)[] {
     return item.source === 'plex' ? [this.plexMode] : [undefined];
@@ -302,7 +312,13 @@ export class Tuner {
           const target = (now() - airing.startMs) / 1000;
           video.currentTime = Math.max(0, Math.min(target, (video.duration || Infinity) - 1));
         }
-        video.play().catch((err: Error) => fail(err.name === 'NotAllowedError' ? new Blocked() : err));
+        video.play().catch((err: Error) => {
+          if (err.name !== 'NotAllowedError' || video.muted) return fail(err.name === 'NotAllowedError' ? new Blocked() : err);
+          // No button pressed yet, so the browser won't play sound: start silently instead.
+          video.muted = true;
+          this.set({ soundLocked: true });
+          video.play().catch((again: Error) => fail(again.name === 'NotAllowedError' ? new Blocked() : again));
+        });
       };
       video.addEventListener('playing', onPlaying);
       video.addEventListener('error', onError);
