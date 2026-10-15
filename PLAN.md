@@ -451,7 +451,12 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
   Sitcoms, Film Noir After Dark, Shock Theater, Saddle Up (westerns), Game Show
   Classics. IA sources also gained `maxYear` (drop titles that only mention later
   years). Every pack was installed against the live archive and every title scanned
-  for junk before shipping. More ideas: old-time news & PSAs, holiday specials,
+  for junk before shipping.
+- 16 more packs (2026-10-15): Taped Off TV (off-air VHS with original commercials),
+  80s Cartoon Rewind, Variety Hour, Gumshoe TV, Strange Tales, Cliffhanger Serials,
+  Kiddie Matinee, Drive-In Double Feature, Kung Fu Theater, Silent Laughs, Comedy Teams,
+  Jukebox Soundies, Newsreel Theater, Space Race, Fight Night, Holiday Hearth. Each was
+  screened with `scripts/check-pack.ts`, which resolves a pack exactly as the server does. More ideas: old-time news & PSAs, holiday specials,
   70s/80s cartoons, kung fu theater, Mystery Science Theater-style B-movies.
 - Later, if an API key is ever available: an AI channel builder that screens
   search results the same way.

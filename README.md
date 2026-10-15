@@ -119,7 +119,39 @@ guide → Settings → *Manage channels* shows the address and a QR code).
   - **Shock Theater**: classic horror to 1970 (~160 h); Creature Double Feature Fri & Sat 11 pm.
   - **Saddle Up**: western TV and B-westerns (~205 h); *The Lone Ranger* Saturdays 10 am.
   - **Game Show Classics**: *What's My Line?*, *You Bet Your Life* and friends (~120 h);
-    *What's My Line?* weeknights 7:30 pm. Packs live in
+    *What's My Line?* weeknights 7:30 pm.
+  - **Taped Off TV**: whole evenings recorded off the air, 1975–1999, original
+    commercials and all (~340 h, in order); network cartoon blocks Saturdays 7 am.
+  - **80s Cartoon Rewind**: He-Man, ThunderCats, G.I. Joe, Transformers, Jem and more
+    (~210 h); He-Man weekdays 3:30 pm, Muppet Babies Saturdays 8 am.
+  - **Variety Hour**: Hollywood Palace, Steve Allen, Carson, Jack Benny, Gleason
+    (~400 h); Ed Sullivan / Colgate Comedy Hour Sundays 8 pm.
+  - **Gumshoe TV**: 50s–60s detective series (~150 h); *Peter Gunn* weeknights 9 pm.
+  - **Strange Tales**: anthology and suspense TV (~90 h); *One Step Beyond* weeknights
+    10 pm, Karloff's *Thriller* Saturdays 11 pm.
+  - **Cliffhanger Serials**: 18 complete serials, 1932–1952, chapter by chapter;
+    *Buck Rogers* Saturdays 9 am, *The Phantom Creeps* weekdays 4 pm.
+  - **Kiddie Matinee**: Howdy Doody, Kukla Fran and Ollie, Space Patrol (~85 h);
+    *Rocky Jones* weekdays 5 pm, *Fireball XL5* Saturdays 9 am.
+  - **Drive-In Double Feature**: hot rods, delinquents, bikers, beach and jungle B-movies
+    (~65 h); sword-and-sandal Saturdays 9 pm.
+  - **Kung Fu Theater**: 70s–early 80s martial arts (~55 h); Bruceploitation double
+    feature Fridays 10 pm.
+  - **Silent Laughs**: Chaplin, Keaton, Lloyd, Langdon (~80 h); Laurel & Hardy silents
+    weeknights 6 pm, Our Gang Saturdays 9 am.
+  - **Comedy Teams**: Laurel & Hardy, the Stooges, Abbott & Costello, the Marx Brothers
+    (~65 h); *The Abbott and Costello Show* weeknights 7 pm.
+  - **Jukebox Soundies**: Soundies, jazz shorts and 50s TV music shows (~60 h);
+    *Your Hit Parade* Saturdays 10:30 pm, *Dinah Shore* Sundays 9 pm.
+  - **Newsreel Theater**: 1929–1967 American newsreels (~65 h); *The March of Time*
+    Sundays 8 pm.
+  - **Space Race**: NASA films 1957–1975 (~25 h); the Apollo 7–17 mission films in order,
+    Saturdays 10 am.
+  - **Fight Night**: classic boxing, 1908–1990 (~110 h); Muhammad Ali Saturdays 9 pm.
+  - **Holiday Hearth**: Christmas films, cartoons, TV episodes and specials (~40 h);
+    A Christmas Carol adaptations Sundays 7 pm, Rankin/Bass Saturdays 6 pm.
+
+  Packs live in
   `packages/server/src/packs/`; new ones are curated by researching the Internet
   Archive (ask Claude for a theme).
 

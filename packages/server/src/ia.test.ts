@@ -108,3 +108,19 @@ describe('generic file names', () => {
     expect(untitled[0]!.title).toBe('ABC 11-16-80 WOC (part 1)');
   });
 });
+
+describe('episode order', () => {
+  it('ignores leading symbols when ordering files', () => {
+    const files = ['▶ One Step Beyond S01E22 The Riddle', 'One Step Beyond S01E01 The Bride Possessed', 'One Step Beyond S01E02 Night of April 14th'].map((stem) => ({
+      name: `${stem}.mp4`,
+      format: 'h.264',
+      length: '1500',
+      size: '1000',
+    }));
+    expect(pickPlayableFiles(files).map((f) => f.stem)).toEqual([
+      'One Step Beyond S01E01 The Bride Possessed',
+      'One Step Beyond S01E02 Night of April 14th',
+      '▶ One Step Beyond S01E22 The Riddle',
+    ]);
+  });
+});

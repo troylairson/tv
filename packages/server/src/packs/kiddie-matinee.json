@@ -1,7 +1,7 @@
 {
   "id": "kiddie-matinee",
   "name": "Kiddie Matinee",
-  "description": "It's Howdy Doody time! Afternoon TV for kids from the 1940s to the early 60s: Howdy Doody, Kukla, Fran and Ollie, Ding Dong School, Rootie Kazootie, Winky Dink, Pinky Lee, Super Circus, Watch Mr. Wizard, Captain Video, Space Patrol, Tom Corbett, Flash Gordon, Ramar of the Jungle and Supercar. Rocky Jones, Space Ranger blasts off weekdays at 5:00 pm, and Fireball XL5 flies Saturday mornings at 9:00, both in episode order.",
+  "description": "It's Howdy Doody time! Afternoon TV for kids from the 1940s to the early 60s: Howdy Doody, Kukla, Fran and Ollie, Ding Dong School, Rootie Kazootie, Winky Dink, Pinky Lee, Super Circus, Watch Mr. Wizard, Captain Video, Space Patrol, Tom Corbett, Flash Gordon, Supercar. Rocky Jones, Space Ranger blasts off weekdays at 5:00 pm, and Fireball XL5 flies Saturday mornings at 9:00, both in episode order.",
   "curated": "2026-10-15: about 85 hours of 1948-62 children's TV episodes from the Classic TV collection and whole-series items; Rocky Jones and Fireball XL5 slots from complete-series items. Excluded westerns already on Saddle Up, the 1987 Howdy Doody anniversary special, colorized Commando Cody and Fireball XL5 uploads, a three-hour Rootie Tootie party broadcast, Diver Dan (seven-minute fragments), commercials and older duplicate uploads of the same Howdy Doody, Super Circus, Pinky Lee, Mr. Wizard, Winky Dink and Captain Video episodes.",
   "mode": "shuffle",
   "breaks": true,
@@ -18,7 +18,7 @@
     {
       "kind": "ia-search",
       "title": "Kids' TV classics",
-      "query": "collection:(classic_tv) AND title:(\"Pinky Lee\" OR \"Ding Dong School\" OR \"Rootie Kazootie\" OR \"Winky Dink\" OR \"Mr. Wizard\" OR \"Captain Video\" OR \"Captain Midnight\" OR \"Tom Corbett\" OR \"Time for Beany\" OR \"Super Circus\" OR \"Paul Winchell\" OR \"Mr. I. Magination\" OR \"Lassie\" OR \"Ramar of the Jungle\" OR \"z-ro\") AND NOT identifier:(Mr-Wizard-1-1-1 OR IfYouWannaBeHappy OR Yugi-Moto_likes-to_Fart OR Super-Circus_1956 OR Circus_3 OR Circus_4 OR Super_Circus_Unknown_Date OR Super_Circus_6 OR Pinky_Lee_Show OR Pinky_Lee_Show2 OR WinkyDinkAndYou1 OR captain-video-and-his-video-rangers-v01e01 OR captain-video-and-his-video-rangers-episode-2-of-4-mkv OR captain-video-and-his-video-rangers-episode-3-of-4-mkv OR captain-video-and-his-video-rangers-episode-4-of-4-mkv) AND NOT title:(commercial OR commercials OR colorized OR promo OR Lucy OR party)",
+      "query": "collection:(classic_tv) AND title:(\"Pinky Lee\" OR \"Ding Dong School\" OR \"Rootie Kazootie\" OR \"Winky Dink\" OR \"Mr. Wizard\" OR \"Captain Video\" OR \"Captain Midnight\" OR \"Tom Corbett\" OR \"Time for Beany\" OR \"Super Circus\" OR \"Paul Winchell\" OR \"Mr. I. Magination\" OR \"Lassie\" OR \"z-ro\") AND NOT identifier:(Mr-Wizard-1-1-1 OR IfYouWannaBeHappy OR Yugi-Moto_likes-to_Fart OR Super-Circus_1956 OR Circus_3 OR Circus_4 OR Super_Circus_Unknown_Date OR Super_Circus_6 OR Pinky_Lee_Show OR Pinky_Lee_Show2 OR WinkyDinkAndYou1 OR captain-video-and-his-video-rangers-v01e01 OR captain-video-and-his-video-rangers-episode-2-of-4-mkv OR captain-video-and-his-video-rangers-episode-3-of-4-mkv OR captain-video-and-his-video-rangers-episode-4-of-4-mkv) AND NOT title:(commercial OR commercials OR colorized OR promo OR Lucy OR party)",
       "items": 100,
       "filesPerItem": 1,
       "minMinutes": 12,

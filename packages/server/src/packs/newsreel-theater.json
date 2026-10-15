@@ -9,7 +9,7 @@
     {
       "kind": "ia-search",
       "title": "Universal Newsreels",
-      "query": "mediatype:movies AND collection:(universal_newsreels) AND NOT title:(trailer OR \"State Theatre\" OR Wetback)",
+      "query": "mediatype:movies AND collection:(universal_newsreels) AND NOT title:(trailer OR \"State Theatre\" OR Wetback) AND NOT identifier:1946-08-05_Jap_Films_of_Hiroshima",
       "items": 650,
       "filesPerItem": 1,
       "minMinutes": 1,
@@ -18,7 +18,7 @@
     {
       "kind": "ia-search",
       "title": "Complete Universal Newsreel releases",
-      "query": "mediatype:movies AND title:(\"Universal Newsreel Volume\") AND collection:(FedFlix OR opensource_movies) AND NOT year:[1991 TO 2030] AND NOT identifier:(un-un-v36-r96 OR 200-UN-30-82 OR GagarinInSpaceNewsreel200un3521)",
+      "query": "mediatype:movies AND title:(\"Universal Newsreel Volume\") AND collection:(FedFlix OR opensource_movies) AND NOT year:[1991 TO 2030] AND NOT identifier:(un-un-v36-r96 OR 200-UN-30-82 OR GagarinInSpaceNewsreel200un3521) AND NOT identifier:1946-08-05_Jap_Films_of_Hiroshima",
       "items": 150,
       "filesPerItem": 1,
       "minMinutes": 3,
@@ -27,7 +27,7 @@
     {
       "kind": "ia-search",
       "title": "Pathé News, Fox Movietone and News of the Day",
-      "query": "mediatype:movies AND identifier:(PatheNew1937 OR PatheNew1936 OR 0056_Pathe_News_Digest_1938_No_4_08_44_04_01 OR 6114_Pathe_News_00_01_01_08 OR 6130_Pathe_News_00_41_33_11 OR NET356_R-2 OR NET356_R-4 OR AFP-74BD OR 1942NewsOfTheDay OR gov.archives.arc.44250 OR gov.archives.arc.44249 OR LC-45044 OR fc-fc-4456 OR fc-fc-4679 OR PatheNew1950 OR 1953_Movietone_News_Monster_Victory_Parade_Cheered_by_2_500_000 OR TheInaugurationOfJFK1961 OR tmp_05001 OR 0384_Universal-International_Newsreel_Vol_36_No_75_1963_15_18_26_00)",
+      "query": "mediatype:movies AND identifier:(PatheNew1937 OR PatheNew1936 OR 0056_Pathe_News_Digest_1938_No_4_08_44_04_01 OR 6114_Pathe_News_00_01_01_08 OR 6130_Pathe_News_00_41_33_11 OR NET356_R-2 OR NET356_R-4 OR AFP-74BD OR 1942NewsOfTheDay OR gov.archives.arc.44250 OR gov.archives.arc.44249 OR LC-45044 OR fc-fc-4456 OR fc-fc-4679 OR PatheNew1950 OR 1953_Movietone_News_Monster_Victory_Parade_Cheered_by_2_500_000 OR TheInaugurationOfJFK1961 OR tmp_05001 OR 0384_Universal-International_Newsreel_Vol_36_No_75_1963_15_18_26_00) AND NOT identifier:1946-08-05_Jap_Films_of_Hiroshima",
       "items": 40,
       "filesPerItem": 1,
       "minMinutes": 3
@@ -35,7 +35,7 @@
     {
       "kind": "ia-search",
       "title": "Castle Films News Parade",
-      "query": "mediatype:movies AND identifier:(gov.fdr.4 OR gov.fdr.292 OR gov.fdr.245 OR gov.fdr.232 OR gov.fdr.227 OR gov.fdr.237 OR gov.fdr.267 OR gov.fdr.233 OR gov.fdr.225 OR gov.fdr.244 OR gov.fdr.249 OR gov.fdr.228 OR gov.fdr.259 OR gov.fdr.230 OR gov.fdr.234 OR gov.fdr.300 OR gov.fdr.291 OR gov.fdr.240 OR gov.fdr.211 OR news_parade_of_1945 OR NewsParadeOfTheYear1942 OR 42444-castle-films-news-parade-of-the-year-1938 OR 42434castlefilmsnewsparadeoftheyear1939vwr OR FFz4Iy0c0PkvsqdRYRawuNY15RpBoD OR 49564NewsParadeOfTheYear1941 OR 70374a-castle-films-news-parade-of-the-year-1946-vwr OR 70374b-castle-films-news-parade-of-the-year-1947-vwr OR 70374c-castle-films-news-parade-of-the-year-1948-vwr OR PW17jDTPxMnJ24KfjOfVnvdYuBrvpd OR 70374e-castle-films-news-parade-of-the-year-1950-vwr OR xd-10264-castle-film-news-parade-of-1952-vwr OR xd-10254-castle-film-news-parade-of-1953-vwr OR xd-10274-castle-film-news-parade-of-1954-vwr-1 OR xd-10284-castle-film-news-parade-of-1957-vwr OR GPE4BrMFuJaxJwrO04EJe9H4vf8N1A OR 42424-europes-powder-keg-vwr OR 42734CastleFilmsNewsParadeOfTheYear1943 OR 70792GermanyInvadesAustria OR 23664CastleFilmsBattleForFranceVwr)",
+      "query": "mediatype:movies AND identifier:(gov.fdr.4 OR gov.fdr.292 OR gov.fdr.245 OR gov.fdr.232 OR gov.fdr.227 OR gov.fdr.237 OR gov.fdr.267 OR gov.fdr.233 OR gov.fdr.225 OR gov.fdr.244 OR gov.fdr.249 OR gov.fdr.228 OR gov.fdr.259 OR gov.fdr.230 OR gov.fdr.234 OR gov.fdr.300 OR gov.fdr.291 OR gov.fdr.240 OR gov.fdr.211 OR news_parade_of_1945 OR NewsParadeOfTheYear1942 OR 42444-castle-films-news-parade-of-the-year-1938 OR 42434castlefilmsnewsparadeoftheyear1939vwr OR FFz4Iy0c0PkvsqdRYRawuNY15RpBoD OR 49564NewsParadeOfTheYear1941 OR 70374a-castle-films-news-parade-of-the-year-1946-vwr OR 70374b-castle-films-news-parade-of-the-year-1947-vwr OR 70374c-castle-films-news-parade-of-the-year-1948-vwr OR PW17jDTPxMnJ24KfjOfVnvdYuBrvpd OR 70374e-castle-films-news-parade-of-the-year-1950-vwr OR xd-10264-castle-film-news-parade-of-1952-vwr OR xd-10254-castle-film-news-parade-of-1953-vwr OR xd-10274-castle-film-news-parade-of-1954-vwr-1 OR xd-10284-castle-film-news-parade-of-1957-vwr OR GPE4BrMFuJaxJwrO04EJe9H4vf8N1A OR 42424-europes-powder-keg-vwr OR 42734CastleFilmsNewsParadeOfTheYear1943 OR 70792GermanyInvadesAustria OR 23664CastleFilmsBattleForFranceVwr) AND NOT identifier:1946-08-05_Jap_Films_of_Hiroshima",
       "items": 60,
       "filesPerItem": 1,
       "minMinutes": 3
@@ -43,7 +43,7 @@
     {
       "kind": "ia-search",
       "title": "Wartime American newsreels",
-      "query": "mediatype:movies AND collection:wwIIarchive AND title:(newsreel OR \"united news\" OR \"news of the day\") AND NOT title:(german OR japanese OR japan OR jap OR italian OR french OR luce OR soviet OR russian OR nazi OR NZ OR compilation OR captured) AND NOT identifier:(NewsOfTheDay1942-12 OR DDay1944)",
+      "query": "mediatype:movies AND collection:wwIIarchive AND title:(newsreel OR \"united news\" OR \"news of the day\") AND NOT title:(german OR japanese OR japan OR jap OR italian OR french OR luce OR soviet OR russian OR nazi OR NZ OR compilation OR captured) AND NOT identifier:(NewsOfTheDay1942-12 OR DDay1944) AND NOT identifier:1946-08-05_Jap_Films_of_Hiroshima",
       "items": 150,
       "filesPerItem": 1,
       "minMinutes": 3,
@@ -61,7 +61,7 @@
       "source": {
         "kind": "ia-search",
         "title": "The March of Time",
-        "query": "mediatype:movies AND identifier:(EF-257 OR EF-105 OR TheFrenchCampaign OR EF-221 OR MarchOfTime-ThroughTheYearsjuly61951 OR GermanyHandleWithCare OR EF-101 OR AirwaysOfTheFuture OR LowTreason OR fv-0053-irn-1001104 OR inside-nazi-germany-march-of-time-1938 OR the-march-of-time-sweden-wwii-aftermath OR MarchOfTimeN OR 26052TheMarchOfTime OR 15035-the-march-of-time-americas-busiest-river-vwr OR tLeMoXfBzC9X8tjFlCG3EaoxvvGIiG OR MarchofTimeNightClubBoom OR 65194-march-of-time-the-fbi-vwr OR 18844marchoftimeourstakeintroublemoroccovwr OR 14484marchoftimethemenaroundeisenhowservwr OR xd-30194-marchof-time-las-vegas-frontier-town-vwr OR 75392MarchOfTimeAtHisSide OR xd-43364-the-march-of-time-nobodys-children-vwr OR 97524-march-of-time-the-two-worlds-of-france-paris-and-the-france-beyond-vwr OR 95494-show-business-at-war-vwr OR 71674z-march-of-time-atomic-power-print-2-vwr)",
+        "query": "mediatype:movies AND identifier:(EF-257 OR EF-105 OR TheFrenchCampaign OR EF-221 OR MarchOfTime-ThroughTheYearsjuly61951 OR GermanyHandleWithCare OR EF-101 OR AirwaysOfTheFuture OR LowTreason OR fv-0053-irn-1001104 OR inside-nazi-germany-march-of-time-1938 OR the-march-of-time-sweden-wwii-aftermath OR MarchOfTimeN OR 26052TheMarchOfTime OR 15035-the-march-of-time-americas-busiest-river-vwr OR tLeMoXfBzC9X8tjFlCG3EaoxvvGIiG OR MarchofTimeNightClubBoom OR 65194-march-of-time-the-fbi-vwr OR 18844marchoftimeourstakeintroublemoroccovwr OR 14484marchoftimethemenaroundeisenhowservwr OR xd-30194-marchof-time-las-vegas-frontier-town-vwr OR 75392MarchOfTimeAtHisSide OR xd-43364-the-march-of-time-nobodys-children-vwr OR 97524-march-of-time-the-two-worlds-of-france-paris-and-the-france-beyond-vwr OR 95494-show-business-at-war-vwr OR 71674z-march-of-time-atomic-power-print-2-vwr) AND NOT identifier:1946-08-05_Jap_Films_of_Hiroshima",
         "items": 40,
         "filesPerItem": 1,
         "minMinutes": 5

@@ -83,7 +83,9 @@ export function pickPlayableFiles(files: IaFile[]): PlayableFile[] {
     );
     if (!dupe) out.push(p);
   }
-  return out.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+  // Leading symbols ("▶ S01E22…") would otherwise sort a file ahead of episode 1.
+  const sortKey = (name: string) => name.replace(/(^|\/)[^\p{L}\p{N}]+/gu, '$1');
+  return out.sort((a, b) => sortKey(a.name).localeCompare(sortKey(b.name), undefined, { numeric: true }));
 }
 
 export function downloadUrl(identifier: string, file: string): string {
