@@ -40,7 +40,11 @@ export interface TunerState {
 
 const DRIFT_CHECK_MS = 15_000;
 const MAX_DRIFT_SEC = 4;
-const LOAD_TIMEOUT_MS = 30_000;
+/** Big Internet Archive files can take a while to start, especially far into a 2-hour show. */
+const LOAD_TIMEOUT_MS = 45_000;
+/** While covering for a show that won't play, try it again after this long (growing with each failure). */
+const RETRY_FIRST_MS = 60_000;
+const RETRY_MAX_MS = 5 * 60_000;
 const STALL_TIMEOUT_MS = 20_000;
 
 class Blocked extends Error {}
@@ -58,6 +62,8 @@ export class Tuner {
   private token = 0;
   private hls: Hls | null = null;
   private timers: ReturnType<typeof setTimeout>[] = [];
+  /** Failed attempts per airing ("channel:start"), so retries back off and errors aren't reported every time. */
+  private failures = new Map<string, number>();
   private driftTimer: ReturnType<typeof setInterval> | null = null;
   private stallTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -194,7 +200,21 @@ export class Tuner {
     const { channel, airing } = this.state;
     this.unload();
     this.set({ status: 'standby', error, filler: undefined });
-    report('error', { channel: channel?.number, title: airing?.item.title, source: airing?.item.source, error });
+    const key = `${channel?.id}:${airing?.startMs}`;
+    const attempts = (this.failures.get(key) ?? 0) + 1;
+    this.failures.set(key, attempts);
+    if (this.failures.size > 50) this.failures.delete(this.failures.keys().next().value!);
+    if (attempts === 1 || attempts % 5 === 0) {
+      report('error', { channel: channel?.number, title: airing?.item.title, source: airing?.item.source, error, attempts });
+    }
+
+    // Archive hiccups are usually brief: keep trying the show (picking up where it should be by now)
+    // instead of covering the whole of a 2-hour slot with commercials.
+    const retryAt = Date.now() + Math.min(RETRY_FIRST_MS * attempts, RETRY_MAX_MS);
+    const retry = () => {
+      if (token === this.token && channel) void this.tune(channel);
+    };
+    if (airing && channel && airing.endMs - retryAt > 60_000) this.timers.push(setTimeout(retry, retryAt - Date.now()));
 
     let fillers: ChannelItem[] = [];
     try {
@@ -205,6 +225,7 @@ export class Tuner {
     }
     for (const filler of fillers) {
       if (token !== this.token) return;
+      if (Date.now() >= retryAt) break; // the retry timer takes it from here
       try {
         this.set({ filler });
         await this.load({ url: filler.url!, type: 'file', baseOffsetSec: 0 }, null, token);
