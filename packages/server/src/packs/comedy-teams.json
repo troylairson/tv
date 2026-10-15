@@ -1,0 +1,103 @@
+{
+  "id": "comedy-teams",
+  "name": "Comedy Teams",
+  "description": "Two (or three, or four) heads are funnier than one: Laurel & Hardy's talkie shorts and The Flying Deuces, the Marx Brothers from The Cocoanuts to Duck Soup, the Three Stooges in Disorder in the Court and Brideless Groom, Abbott & Costello in Africa Screams and Jack and the Beanstalk, Martin & Lewis and Abbott & Costello hosting the Colgate Comedy Hour, plus Wheeler & Woolsey, Olsen & Johnson and the Ritz Brothers. The Abbott and Costello Show airs weeknights at 7:00 pm.",
+  "curated": "2026-10-15: about 73 hours of hand-listed team comedies 1929-1959: 39 Laurel & Hardy talkie shorts (1929-35) and two features, the first seven Columbia Stooges shorts plus the public-domain ones, Marx Brothers features, ten Wheeler & Woolsey films, and Colgate Comedy Hour episodes hosted by Abbott & Costello or Martin & Lewis; the complete Abbott and Costello Show in the weeknight slot. Excluded: colorized versions, foreign dubs, clip compilations and tributes, A Day at the Races (blackface number), Uncivil Warriors and later wartime Stooges shorts with racial caricature, the final Martin & Lewis Colgate show (yellowface parody), solo vehicles (Rock-a-Bye Baby, Copacabana) and the 142-minute Atoll K/Utopia print.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Laurel & Hardy talkie shorts (1929-30)",
+      "query": "identifier:(\"unaccustomed-as-we-are_1929\" OR \"berth-marks_1929\" OR \"perfect-day_1929\" OR \"they-go-boom_1929\" OR \"the-hoosegow_1929\" OR \"night-owls_1930\" OR \"blotto_1930\" OR \"brats_1930\" OR \"below-zero_1930\" OR \"hog-wild_1930\" OR \"the-laurelhardy-murder-case_1930\" OR \"another-fine-mess_1930\")",
+      "items": 12,
+      "filesPerItem": 1,
+      "minMinutes": 8,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-search",
+      "title": "Laurel & Hardy shorts (1931-35)",
+      "query": "identifier:(\"laurel-hardy-shorts-from-1931\" OR \"laurel-hardy-shorts-from-1932\" OR \"laurel-hardy-shorts-from-1933\" OR \"laurel-hardy-shorts-from-1934\" OR \"laurel-hardy-shorts-from-1935\")",
+      "items": 5,
+      "filesPerItem": 10,
+      "minMinutes": 8,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-search",
+      "title": "Teams on film and on the Colgate Comedy Hour",
+      "query": "identifier:(\"TheFlyingDeuces\" OR \"LaurelHardyAChumpAtOxford1940Movie\" OR \"AfricaScreams\" OR \"AbbottAndCostelloInJackAndTheBeanstalk\" OR \"abbott-and-costello-meet-frankenstein\" OR \"abbott-and-costello-meet-the-invisible-man\" OR \"ColgateComedyHour_AbbottCostello\" OR \"ColgateComedyHourWithAbbottAndCostelloAndGuestsGeorgeRaftAndLouie\" OR \"ColgateComedyHourWithAbbottAndCostelloAndErrolFlynn\" OR \"TheColgateComedyHour11March1951\" OR \"Colgate-Comedy-Hour-S6E1\" OR \"ColgateComedyHour-September17th1950\" OR \"TheColgateComedyHour-February4th1951\" OR \"ColgateComedyHour-April29th1951\" OR \"TheColgateComedyHour1041953\" OR \"TheColgateComedyHourNovember121950\" OR \"AtWarWithTheArmy\" OR \"youre-never-too-young-1955-comedy-jerry-lewis-dean-martin\" OR \"disorder_in_the_court\" OR \"sing_a_song_of_six_pants\" OR \"brideless_groom\" OR \"malice_in_the_palace\" OR \"TheThreeStoogesInThreeLittleBeers\" OR \"3StoogesPilot\" OR \"have-rocket-will-travel\" OR \"a-night-in-casablanca\" OR \"1949.-love-happy\" OR \"country-gentlemen-full-movie\" OR \"pack-up-your-troubles-1939-the-ritz-brothers\")",
+      "items": 29,
+      "filesPerItem": 1,
+      "minMinutes": 8,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-search",
+      "title": "More Abbott & Costello on Colgate",
+      "query": "identifier:(\"TheColgateComedyHourAbbottandCostello\")",
+      "items": 1,
+      "filesPerItem": 3,
+      "minMinutes": 30,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-search",
+      "title": "Three Stooges: the first Columbia shorts",
+      "query": "identifier:(\"the-three-stooges-720p\")",
+      "items": 1,
+      "filesPerItem": 7,
+      "minMinutes": 8,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-search",
+      "title": "Ted Healy and His Stooges at MGM",
+      "query": "identifier:(\"beer-and-pretzels-1933\")",
+      "items": 1,
+      "filesPerItem": 2,
+      "minMinutes": 8,
+      "maxYear": 1960
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Marx Brothers",
+      "query": "identifier:(\"marx_brothers_202101\")",
+      "items": 1,
+      "filesPerItem": 6,
+      "minMinutes": 30,
+      "maxYear": 1950
+    },
+    {
+      "kind": "ia-search",
+      "title": "Wheeler & Woolsey",
+      "query": "identifier:(\"wheeler-and-woolsey-10-movies-1930s\")",
+      "items": 1,
+      "filesPerItem": 10,
+      "minMinutes": 30,
+      "maxYear": 1960
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "19:00",
+      "durationMin": 30,
+      "order": "random",
+      "source": {
+        "kind": "ia-item",
+        "title": "The Abbott and Costello Show",
+        "identifier": "abbott_costello_the_vacation",
+        "minMinutes": 15,
+        "maxYear": 1960
+      }
+    }
+  ]
+}

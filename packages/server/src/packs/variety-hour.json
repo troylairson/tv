@@ -1,0 +1,101 @@
+{
+  "id": "variety-hour",
+  "name": "Variety Hour",
+  "description": "The golden age of TV variety, 1949 to the 70s: The Hollywood Palace, Steve Allen, Milton Berle's Texaco Star Theater, Your Show of Shows, Jack Benny, Red Skelton, Jackie Gleason, Dinah Shore, Perry Como and The Tonight Show from Steve Allen through Johnny Carson's 70s heyday. Sunday nights at 8 it's Ed Sullivan (the Beatles' four shows included) alternating with The Colgate Comedy Hour, the show NBC ran against him.",
+  "curated": "2026-10-15: about 400 hours of complete 1949-1979 episodes: The Hollywood Palace, The Tonight Show (Steve Allen 1954-56, Carson 1962-79), The Steve Allen Plymouth Show, 150-odd Jack Benny Programs, Jackie Gleason Show 1966-70, Your Show of Shows/Caesar's Hour, Red Skelton, and Texaco Star Theater, Berle, Dinah Shore, Perry Como, Kraft Music Hall, Your Hit Parade and All Star Revue episodes; plus about 27 hours of Ed Sullivan and Colgate Comedy Hour for the Sunday slot. Excluded: single-performance clips (Beatles, Elvis), best-of and tribute compilations, roasts, promos, radio shows, colorized versions, a Red Skelton archive padded with interviews and documentaries, Conan/Leno/Fallon-era Tonight Shows and anything after 1990.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "The Hollywood Palace (1964-1970)",
+      "query": "mediatype:movies AND identifier:(e-hoood-palace-1-02-15)",
+      "items": 1,
+      "filesPerItem": 71,
+      "minMinutes": 30,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Tonight Show (Steve Allen and Johnny Carson)",
+      "query": "mediatype:movies AND identifier:(the-tonight-show-starring-johnny-carson)",
+      "items": 1,
+      "filesPerItem": 90,
+      "minMinutes": 40,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Steve Allen Plymouth Show",
+      "query": "mediatype:movies AND identifier:(e-se-an-ph-sw-21-7)",
+      "items": 1,
+      "filesPerItem": 64,
+      "minMinutes": 30,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Jack Benny Program",
+      "query": "mediatype:movies AND uploader:\"glowingdial@wowway.com\" AND title:(\"Jack Benny Program\")",
+      "items": 150,
+      "filesPerItem": 1,
+      "minMinutes": 20,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "Your Show of Shows & Caesar's Hour",
+      "query": "mediatype:movies AND identifier:(your-show-of-shows-s-5-e-16-airdate-february-6-1954-guest-host-margaret-truman)",
+      "items": 1,
+      "filesPerItem": 10,
+      "minMinutes": 30,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Red Skelton Show",
+      "query": "mediatype:movies AND identifier:(\"the-red-skelton-show\" OR \"unknownWonderwowmanpilot\" OR \"red_NBC_No_Guest\" OR \"dvd-6906-the-red-skelton-hour-1962-12-11\" OR \"RedSkeltonHourSomebodyUpThereShouldStayUpThere\" OR \"redskeltonrevue\")",
+      "items": 10,
+      "filesPerItem": 15,
+      "minMinutes": 20,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Jackie Gleason Show (1966-1970)",
+      "query": "mediatype:movies AND identifier:(\"series-09-the-jackie-gleason-show-season-5-1966-1967\" OR \"the-jackie-gleason-show-season-6-1967-1968\" OR \"jackie-gleason-show-season-7-1968-1969\" OR \"jackie-gleason-show-season-8-1969-1970\")",
+      "items": 4,
+      "filesPerItem": 25,
+      "minMinutes": 30,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "Texaco Star Theater, Berle, Kraft Music Hall, Dean Martin & friends",
+      "query": "mediatype:movies AND collection:(classic_tv) AND title:(\"Texaco Star Theater\" OR \"Texaco Star Theatre\" OR \"Milton Berle Show\" OR \"Buick Berle\" OR \"Buick-Berle\" OR \"Kraft Music Hall\" OR \"Steve Allen Show\" OR \"Dean Martin Show\" OR \"Your Hit Parade\" OR \"Liberace Show\" OR \"Perry Como\" OR \"Dinah Shore\" OR \"Garry Moore\" OR \"Ernie Kovacs\" OR \"Cavalcade of Stars\" OR \"Four Star Revue\" OR \"All Star Revue\") AND NOT title:(clip OR clips OR roast OR trailer OR promo OR promos OR colorized OR radio OR commercial OR commercials OR \"Make Room\" OR Elvis OR Beatles OR bloopers OR \"best of\" OR tribute OR highlights) AND NOT year:[1976 TO 2030] AND NOT identifier:(\"cavalcadeOfStars-Fragments\" OR \"Jack_Benny_-_Ernie_Kovacs_Guests\")",
+      "items": 100,
+      "filesPerItem": 1,
+      "minMinutes": 20,
+      "maxYear": 1975
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        0
+      ],
+      "start": "20:00",
+      "durationMin": 60,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "Sunday night: Ed Sullivan & The Colgate Comedy Hour",
+        "query": "mediatype:movies AND identifier:(\"ToastOfTheTown12181949\" OR \"1956edsullivanshow30thepisode\" OR \"toast-of-the-town-s-02-e-21-divx\" OR \"the-ed-sullivan-show-harpo-marx-mrs.-harpo-marx-dick-haymes-and-fran-jeffries-al\" OR \"the-beatles-the-4-ed-sullivan-shows\" OR \"the-cte-cdy-hr-s-01--16-ht-bb-h\")",
+        "items": 10,
+        "filesPerItem": 30,
+        "minMinutes": 40,
+        "maxYear": 1975
+      }
+    }
+  ]
+}

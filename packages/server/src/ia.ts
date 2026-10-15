@@ -100,16 +100,34 @@ export function thumbUrl(identifier: string): string {
   return `${IA}/services/img/${encodeURIComponent(identifier)}`;
 }
 
+/** File and folder names that say nothing about what's on them: DVD rips' VTS_01_1, "video", "tape 2"… */
+const GENERIC_NAME = /^(vts[\s_-]*\d+([\s_-]*\d+)?|video_ts|video|movie|tape[\s_-]*\d*|disc[\s_-]*\d*|title[\s_-]*\d*|track[\s_-]*\d+|part[\s_-]*\d+|\d+)$/i;
+export const isGenericName = (name: string) => GENERIC_NAME.test(name.trim());
+
+/** For a file with a generic name: the item's title, or failing that the nearest folder with a real name. */
+function fallbackName(identifier: string, itemTitle: string, path: string): string {
+  if (!isGenericName(itemTitle) && !isGenericName(itemTitle.replace(/[_-]\d{8}.*$/, ''))) return itemTitle;
+  const folder = path.split('/').slice(0, -1).reverse().find((d) => !isGenericName(d));
+  return folder ?? identifier;
+}
+
 export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles = Infinity): ChannelItem[] {
   if (meta.is_dark || !meta.files || meta.metadata?.mediatype !== 'movies') return [];
   const rawTitle = meta.metadata?.title;
   const title = (Array.isArray(rawTitle) ? rawTitle[0] : rawTitle) ?? identifier;
   const files = pickPlayableFiles(meta.files).slice(0, maxFiles);
+  let part = 0;
+  const fileTitle = (f: (typeof files)[number]) => {
+    if (files.length === 1) return prettifyTitle(isGenericName(title) ? fallbackName(identifier, title, f.name) : title);
+    if (!isGenericName(f.stem)) return prettifyTitle(f.stem, { filename: true });
+    // DVD rips of off-air tapes: "ABC Primetime 11-30-80 (part 2)" rather than "VTS 01 2".
+    return `${prettifyTitle(fallbackName(identifier, title, f.name))} (part ${++part})`;
+  };
   return files.map((f) => ({
     id: `ia:${identifier}/${f.name}`,
     source: 'ia' as const,
     ref: `${identifier}/${f.name}`,
-    title: files.length > 1 ? prettifyTitle(f.stem, { filename: true }) : prettifyTitle(title),
+    title: fileTitle(f),
     durationSec: Math.round(f.durationSec * 100) / 100,
     url: downloadUrl(identifier, f.name),
     thumb: thumbUrl(identifier),

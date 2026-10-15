@@ -1,0 +1,44 @@
+{
+  "id": "taped-off-tv",
+  "name": "Taped Off TV",
+  "description": "Whole evenings recorded off the air between 1975 and 1999, exactly as they aired: the shows, the network promos, the station IDs and every original commercial. ABC prime time nights, the CBS Late Movie, TGIF, USA's Up All Night, TV-movie premieres and the 1994 USA airing of Teenage Mutant Ninja Turtles. Saturday mornings at 7 play real network cartoon blocks, cereal ads and all.",
+  "curated": "2026-10-15: VHS and Betamax off-air recordings tagged WOC / with commercials, 1975–1999; music-video channels and partial clips left out; the tapes carry their own commercials, so no extra breaks.",
+  "mode": "loop",
+  "breaks": false,
+  "sources": [
+    {
+      "kind": "ia-item",
+      "title": "Teenage Mutant Ninja Turtles on USA (1994)",
+      "identifier": "teenage-mutant-ninja-turtles-1990-usa-movie-woc",
+      "maxYear": 1999
+    },
+    {
+      "kind": "ia-search",
+      "title": "Prime time, movies and specials as aired (1975–1999)",
+      "query": "mediatype:movies AND (title:WOC OR subject:WOC OR title:\"with commercials\" OR subject:\"with commercials\" OR title:\"w/ commercials\" OR title:\"W/C\" OR subject:\"original commercials\") AND year:[1975 TO 1999] AND NOT title:(\"Saturday Morning\" OR \"Fox Kids\" OR \"cartoon block\" OR \"Cartoon Network\" OR Toonami OR \"Kids WB\" OR Nickelodeon OR \"Disney Afternoon\" OR \"One Saturday Morning\") AND NOT title:(MTV OR VH1 OR Headbangers OR \"music video\" OR \"music videos\" OR compilation OR \"commercials only\" OR \"commercial collection\" OR \"commercial breaks\" OR bumpers OR promos OR MST3K OR \"Mystery Science\" OR Japanese OR Japan OR Sliver OR Teletoon OR Headbanger) AND NOT identifier:(lionking0898 OR japanese-tv OR duet-open-house OR ThePowersThatBe1992 OR vts-00-4_20220902 OR vts-01-1_20201011 OR classic-creatures-return-of-the-jedi-woc)",
+      "items": 160,
+      "filesPerItem": 8,
+      "minMinutes": 20,
+      "maxYear": 1999
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "07:00",
+      "durationMin": 300,
+      "order": "next",
+      "source": {
+        "kind": "ia-search",
+        "title": "Saturday morning cartoon blocks as aired",
+        "query": "mediatype:movies AND (title:WOC OR subject:WOC OR title:\"with commercials\" OR subject:\"with commercials\" OR title:\"w/ commercials\" OR title:\"W/C\" OR subject:\"original commercials\") AND year:[1975 TO 1999] AND title:(\"Saturday Morning\" OR \"Fox Kids\" OR \"cartoon block\" OR \"Cartoon Network\" OR Toonami OR \"Kids WB\" OR Nickelodeon OR \"Disney Afternoon\" OR \"One Saturday Morning\") AND NOT title:(compilation OR \"commercials only\" OR \"commercial breaks\" OR bumpers OR promos)",
+        "items": 60,
+        "filesPerItem": 8,
+        "minMinutes": 20,
+        "maxYear": 1999
+      }
+    }
+  ]
+}

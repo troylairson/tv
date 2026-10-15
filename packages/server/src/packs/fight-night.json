@@ -2,7 +2,7 @@
   "id": "fight-night",
   "name": "Fight Night",
   "description": "Ringside from the silent era to the 80s: Jack Johnson, Dempsey and Tunney, Joe Louis and Schmeling, Patterson and Liston, then full TV broadcasts of Holmes, Duran, Leonard, Hearns, Hagler, Chavez and the young Mike Tyson. Saturday nights at 9 pm belong to The Greatest, with Muhammad Ali's fights against Liston, Frazier, Foreman, Norton and more.",
-  "curated": "2026-10-15: about 115 hours of complete fights and fight films from 1908 to 1990, mostly from two careful uploaders (a historic fight-film archive and a collection of dated TV broadcasts) plus a 1980s fight collection and hand-picked broadcasts. Excluded: duplicate uploads of the same bout, newsreel snippets under 8 minutes, wrestling and MMA, colorized and modern 'HD production' re-edits, knockout compilations, documentaries, and anything after 1990.",
+  "curated": "2026-10-15: about 108 hours (plus 11 hours of Ali for the Saturday slot) of complete fights and fight films from 1908 to 1990, mostly from two careful uploaders (a historic fight-film archive and a collection of dated TV broadcasts) plus a 1980s fight collection and hand-picked broadcasts. Excluded: duplicate uploads of the same bout, newsreel snippets under 8 minutes, wrestling and MMA, colorized and modern 'HD production' re-edits, knockout compilations, documentaries, and anything after 1990.",
   "mode": "shuffle",
   "breaks": true,
   "sources": [

@@ -1,0 +1,103 @@
+{
+  "id": "jukebox-soundies",
+  "name": "Jukebox Soundies",
+  "description": "Three-minute jukebox films from the 1940s Panoram machines, Cab Calloway, Louis Armstrong, Fats Waller, Louis Jordan, the Andrews Sisters and Glenn Miller, Duke Ellington's Black and Tan and Bessie Smith's St. Louis Blues, plus 1950s TV music hours with Perry Como, Patti Page, Rosemary Clooney, Liberace, Frankie Laine and The Sound of Jazz. Your Hit Parade counts down the week's top tunes Saturday nights at 10:30, and The Dinah Shore Chevy Show airs Sundays at 9:00 pm.",
+  "curated": "2026-10-15: about 60 hours: 1940s Soundies from the Prelinger Archives, 16mm prints and Mills Panoram reels, 1928-1956 jazz, swing and blues film clips, Black and Tan, St. Louis Blues and Cab Calloway's Hi-De-Ho, The Sound of Jazz and Art Ford's Jazz Party, and 1950s TV music shows (Perry Como, Patti Page, Rosemary Clooney, Liberace, Frankie Laine, Coke Time, The Big Record), plus Your Hit Parade and Dinah Shore Chevy Show slots; burlesque soundies, comedy and novelty-act soundies, untitled and duplicate prints, a full-length feature, colorized/AI-restored clips, audio-only record uploads, modern mashups and retrospectives excluded. No commercial breaks: the clips are too short and the TV shows keep their original sponsor spots.",
+  "mode": "shuffle",
+  "breaks": false,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Soundies (Prelinger Archives)",
+      "query": "mediatype:movies AND collection:prelinger AND title:(soundie OR soundies OR \"Juvenile Jubilee\") AND NOT title:(burlesque OR \"Variety Girls\" OR Roxie OR Yvonne OR Scarlett OR Unid OR Juggling OR Canine OR Skates OR \"Black Music\") AND NOT identifier:(0733* OR 0810*)",
+      "items": 120,
+      "filesPerItem": 1,
+      "minMinutes": 1
+    },
+    {
+      "kind": "ia-search",
+      "title": "Soundies (16mm prints)",
+      "query": "mediatype:movies AND collection:demolitionkitchenvideo AND title:soundie AND NOT title:(comedy OR \"Willie Howard\" OR \"2nd copy\" OR 2ndCopy) AND NOT identifier:(soundie-rovin-cowboy_202202 OR soundie-texas-home OR soundie-3-suns-blue-horizon OR soundie-ginger-harmon-tica-ti-tica-ta_202402 OR soundie-del-casino-same-old-story-1941 OR soundie-icant-give-you-anything)",
+      "items": 120,
+      "filesPerItem": 1,
+      "minMinutes": 1
+    },
+    {
+      "kind": "ia-search",
+      "title": "Soundie reels",
+      "query": "mediatype:movies AND collection:PeriscopeFilm AND title:(soundie OR soundies) AND NOT identifier:(CIYWARuGkucCKCN8Aevy32frTmx0cj OR xd-45374a-african-american-soundies-2-vwr OR WJZchRpkSJlAfGxScd7RyapoStcKSd)",
+      "items": 40,
+      "filesPerItem": 1,
+      "minMinutes": 1
+    },
+    {
+      "kind": "ia-search",
+      "title": "Swing-era film clips (1928-1941)",
+      "query": "mediatype:movies AND identifier:(THE_ANDREWS_SISTERS_Boogie_Woogie_Bugle_Boy_1941 OR ETHEL_WATERS_Am_I_Blue_1929 OR THE_GLENN_MILLER_ORCHESTRA_In_the_Mood_1941 OR ALBERT_AMMONS_PETE_JOHNSON_Boogie_Woogie_Dream_1941 OR THE_ANDREWS_SISTERS_Mix_Songs_1944 OR XAVIER_CUGAT_LINA_ROMAY_Shes_a_Bonbshell_from_Brooklyn_1943 OR BILLIE_HOLIDAY_LOUIS_ARMSTRONG_The_Blues_Are_Brewin_1947 OR THE_ANDREWS_SISTERS_Bounce_Me_Brother_with_a_Solid_Four_1941 OR LOUIS_ARMSTRONG_BILLIE_HOLIDAY_Farewell_To_Storyville_1947 OR LEAD_BELLY_Pick_a_Bale_of_Cotton_1945 OR FATS_WALLER_The_Joint_Is_Jumpin_1937 OR FATS_WALLER_Aint_Misbehavin_1943 OR THE_GLENN_MILLER_ORCHESTRA_Chattanooga_Choo_Choo_1941 OR BILLIE_HOLIDAY_LOUIS_ARMSTRONG_AND_HIS_BAND_Do_You_Know_What_It_Means_to_Miss_Ne OR LOUIS_JORDAN_Is_You_Is_or_Is_You_Aint_Ma_Baby_1944 OR LEAD_BELLY_Take_this_Hammer_1945 OR LOUIS_ARMSTRONG_AND_HIS_BAND_Where_the_Blues_Were_Born_in_New_Orleans_1947 OR THE_ANDREWS_SISTERS_Steppin_Out_Tonight_1941 OR THE_ANDREWS_SISTERS_Hula-Ba-Luau_1941 OR LOUIS_ARMSTRONG_AND_AMERICAN_HOT_JAZZ_BAND_Endie_1947 OR THE_ANDREWS_SISTERS_Ill_Be_With_You_When_Its_Apple_Blossom_1941 OR FATS_WALLER_ADA_BROWN_That_Aint_Right_1943 OR LYNN_BARI_THE_GLENN_MILLER_ORCHESTRA_Why_and_So_Do_You_1941)",
+      "items": 40,
+      "filesPerItem": 1,
+      "minMinutes": 1
+    },
+    {
+      "kind": "ia-search",
+      "title": "Jazz, blues and pop film clips (1928-1956)",
+      "query": "mediatype:movies AND identifier:(LOUIS_JORDAN_Old_Man_Mose_1947 OR BIG_BILL_BROONZY_Worried_Man_Blues_1952 OR BIG_BILL_BROONZY_Hey_Hey_1952 OR BIG_BILL_BROONZY_How_You_Want_It_Done_1952 OR PATTI_PAGE_Changing_Partners_1956 OR LOUIS_JORDAN_Buzz_me_Baby_1946 OR HELEN_KANE_Dont_Be_Like_That_1928 OR MARTHA_RAYE_Mama_That_Moon_is_Here_Again_1938 OR PERRY_COMO_FONTANE_SISTERS_Silver_and_Gold_1952 OR HELEN_KANE_I_Love_Myself_Because_You_Love_Me_1931 OR DINAH_SHORE_Honeysuckle_Rose_Aired_1956 OR WHISTLER_HIS_JUG_BAND_Foldin_Bed_1930 OR BEA_GRIFFITH_AND_LOUIS_JORDAN_Tonight_Be_Tender_To_Me_1947 OR CORA_GREEN_Bei_Mir_Bistu_Shein_1938 OR KING_COLE_TRIO_IDA_JAMES_Whos_Been_Eating_My_Porrdge_1944 OR RED_NICOLS_AND_HIS_FIVE_PENNIES_Everybody_Loves_My_Baby_1935 OR EDDIE_FISHER_Downhearted_1952 OR RED_NICOLS_AND_HIS_FIVE_PENNIES_Troublesome_Trumpet_1933 OR MOUND_CITY_BLUE_BLOWERS_St._Louis_Blues_1931 OR KING_COLE_TRIO_Im_A_Shy_Guy_1945 OR ABE_LYMAN_AND_HIS_CALIFORNIANS_12th_St._Rag_1929)",
+      "items": 40,
+      "filesPerItem": 1,
+      "minMinutes": 1
+    },
+    {
+      "kind": "ia-search",
+      "title": "Jazz shorts and jazz on TV",
+      "query": "mediatype:movies AND identifier:(black-and-tan_1929 OR st-louis-blues_1929 OR 1934-USA-Archives-1934-00-00-Cab-Calloway-Orch-Cab-Calloways-Hi-De-Ho-film OR HarryJamesBluesForSaleStarsOfJazz OR HarryJamesLoverComeBackToMeStarsOfJazz OR HarryJamesJustForFunStarsOfJazz OR HarryJamesJustLuckyStartsOfJazz OR HarryJamesJayWalkingStarsOfJazz OR ArtFordsjazzParty1958 OR thesoundofjazz1957 OR nrsOjMUSqzEdFNRwrb19ifQ46LDg7T OR SHPX6FezLtSyohqaoIWx02ada0Enup OR ZDMaIZZhlMzHAjjfFECUQXFtqs2Irh)",
+      "items": 30,
+      "filesPerItem": 1,
+      "minMinutes": 2
+    },
+    {
+      "kind": "ia-search",
+      "title": "1950s TV music shows",
+      "query": "mediatype:movies AND collection:(classic_tv_1950s OR classic_tv_1960s) AND title:(\"Perry Como\" OR \"Coke Time\" OR \"Frankie Laine\" OR \"Liberace\" OR \"Patti Page\" OR \"Big Record\" OR \"Ray Anthony\" OR \"Rosemary Clooney\" OR \"Tony Martin Show\" OR \"Polly Bergen\" OR \"Patrice Munsel\" OR \"Fred Waring\" OR \"Ozark Jubilee\" OR \"Guy Lombardo\" OR \"Polka Parade\" OR \"Lawrence Welk Show\" OR \"Perry Presents\" OR \"Freddy Martin\" OR \"Dinah Shore Show\") AND NOT title:(Lucy OR Benny OR Berle OR Promo OR commercial OR Ozzie OR Chevy) AND NOT year:[1970 TO 2030]",
+      "items": 150,
+      "filesPerItem": 1,
+      "minMinutes": 10,
+      "maxYear": 1969
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "22:30",
+      "durationMin": 30,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "Your Hit Parade",
+        "query": "mediatype:movies AND collection:(classic_tv_1950s OR classic_tv OR PeriscopeFilm) AND title:(\"Your Hit Parade\") AND NOT title:(commercial OR infomercial OR \"Time Life\")",
+        "items": 60,
+        "filesPerItem": 1,
+        "minMinutes": 20,
+        "maxYear": 1969
+      }
+    },
+    {
+      "days": [
+        0
+      ],
+      "start": "21:00",
+      "durationMin": 60,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "The Dinah Shore Chevy Show",
+        "query": "mediatype:movies AND collection:(classic_tv_1950s OR classic_tv_1960s) AND title:(\"Dinah Shore Chevy Show\")",
+        "items": 40,
+        "filesPerItem": 1,
+        "minMinutes": 40,
+        "maxYear": 1969
+      }
+    }
+  ]
+}

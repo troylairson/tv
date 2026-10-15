@@ -1,0 +1,38 @@
+{
+  "id": "drive-in-double-feature",
+  "name": "Drive-In Double Feature",
+  "description": "Park the Chevy and turn up the speaker: 1950s and 60s drive-in fodder with hot rods (Hot Rod Girl, Dragstrip Girl, The Fast and the Furious), juvenile delinquents (The Violent Years, Teenage Doll, Girls Town), bikers (Hells Angels on Wheels, The Glory Stompers), beach parties, jungle adventures and Ed Wood-adjacent oddities like Glen or Glenda and The Wild Women of Wongo. Sword & Sandal Saturday brings Hercules and friends at 9:00 pm.",
+  "curated": "2026-10-15: about 67 hours of hand-picked 1938-1969 drive-in features (JD, hot rod, biker, beach, jungle, peplum and oddball programmers); sci-fi and horror titles left to Atomic Age and Shock Theater, Film_Noir-collection titles (Jail Bait, High School Big Shot, Five Minutes to Live) left to the noir channel, and MST3K riffs, trailers, colorized copies, split-reel uploads and sexploitation (Liane, Girl on a Chain Gang) excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Drive-in features (1938-1969)",
+      "query": "mediatype:movies AND identifier:(hot_rod_girl_1956 OR TeenageThunder OR T-BirdGang OR the-fast-and-the-furious-1954 OR TheWildRide_755 OR dragstrip-girl-1957 OR hot-rod-gang-1958 OR ghost-of-dragstrip-hollow-1959_202311 OR hot-car-girl-1958-full-movie OR TeenageDevilDolls OR TheViolentYears OR TheRebelSet1959_754 OR TheBeatniks OR cool-and-the-crazy-1958 OR teenage-doll-1957 OR sorority-girl-1957 OR reform-school-girl-1957-full-movie OR girls-town-1959 OR rock-all-night-1957 OR BillSpragueCollectionCARNIVALROCK OR TheChoppers OR Wild_Guitar_1962 OR Eegah OR 1957-motorcycle-gang OR hells-angels-on-wheels OR the-born-losers OR the-hellcats OR angels-from-hell OR the-glory-stompers OR the-wild-angels OR run-angel-run-1969 OR riot-on-sunset-strip OR catalina-caper-1967 OR its-a-bikini-world-1967 OR beach-party-1963 OR muscle-beach-party-1964_202507 OR AfricaScreams OR nabonga_1944 OR WhitePongo OR TheWhiteGorilla1945 OR JungleSiren1942 OR prehistoric-women-1950 OR RC_SwampWomen OR tarzans_revenge OR The_Wild_Women_Of_Wongo OR the-wild-world-of-batwoman OR glenorglenda_201305 OR hercules-1958 OR HerculesUnchained OR cco_TheGiantofMarathon OR cco__HerculesandtheCaptiveWomen OR Hercules_and_the_Tyrants_of_Babylon)",
+      "items": 70,
+      "filesPerItem": 1,
+      "minMinutes": 50,
+      "maxYear": 1975
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "21:00",
+      "durationMin": 180,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "Sword & Sandal Saturday",
+        "query": "mediatype:movies AND identifier:(hercules-1958 OR HerculesUnchained OR cco_TheGiantofMarathon OR cco__HerculesandtheCaptiveWomen OR Hercules_and_the_Tyrants_of_Babylon)",
+        "items": 10,
+        "filesPerItem": 1,
+        "minMinutes": 50,
+        "maxYear": 1975
+      }
+    }
+  ]
+}

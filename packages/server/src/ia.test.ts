@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fileStem, identifierFromLink, itemsFromMetadata, parseLength, pickPlayableFiles, type IaFile } from './ia';
+import { fileStem, identifierFromLink, isGenericName, itemsFromMetadata, parseLength, pickPlayableFiles, type IaFile } from './ia';
 
 // Trimmed from real archive.org metadata responses.
 const getSmart: IaFile[] = [
@@ -91,5 +91,20 @@ describe('identifierFromLink', () => {
   it('ignores ordinary searches', () => {
     expect(identifierFromLink('barbed wire deathmatch')).toBeNull();
     expect(identifierFromLink('archive.org')).toBeNull();
+  });
+});
+
+describe('generic file names', () => {
+  it('recognises names that say nothing', () => {
+    for (const n of ['VTS_01_1', 'VTS 02 1', 'video', 'Tape 2', '3', 'VIDEO_TS']) expect(isGenericName(n)).toBe(true);
+    for (const n of ['Duet S01E01 - Prelude', 'Bonanza s01e20', 'The Exorcist']) expect(isGenericName(n)).toBe(false);
+  });
+
+  it('names DVD-rip parts after the tape', () => {
+    const files = ['VTS_01_1', 'VTS_01_2'].map((stem) => ({ name: `ABC 11-16-80 WOC/VIDEO_TS/${stem}.mp4`, format: 'h.264', length: '2640', size: '1000' }));
+    const items = itemsFromMetadata('vts-01-1_20200818', { metadata: { mediatype: 'movies', title: 'ABC Primetime 11-16-80 WOC' }, files } as never);
+    expect(items.map((i) => i.title)).toEqual(['ABC Primetime 11-16-80 WOC (part 1)', 'ABC Primetime 11-16-80 WOC (part 2)']);
+    const untitled = itemsFromMetadata('vts-01-1_20220914', { metadata: { mediatype: 'movies', title: 'VTS 01 1' }, files } as never);
+    expect(untitled[0]!.title).toBe('ABC 11-16-80 WOC (part 1)');
   });
 });

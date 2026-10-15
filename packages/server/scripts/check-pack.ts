@@ -8,7 +8,7 @@ import fs from 'node:fs';
 import { resolveSources } from '../src/sources';
 import type { ChannelPack } from '../src/packs';
 
-const fmt = (sec: number) => `${Math.floor(sec / 3600)} h ${Math.round((sec % 3600) / 60)} min`;
+const fmt = (sec: number) => { const m = Math.round(sec / 60); return `${Math.floor(m / 60)} h ${m % 60} min`; };
 
 async function main() {
   const pack = JSON.parse(fs.readFileSync(process.argv[2]!, 'utf8')) as ChannelPack;
