@@ -48,7 +48,7 @@ app.get('/api/time', (c) => {
 
 app.get('/api/info', (c) => {
   const { channels, builtAt, building } = getChannels();
-  return c.json({ version: config.version, plexConfigured: plexConfigured(), channels: channels.length, builtAt, building, commercials: poolStatus() });
+  return c.json({ app: 'retro-tv', version: config.version, plexConfigured: plexConfigured(), channels: channels.length, builtAt, building, commercials: poolStatus() });
 });
 
 /** Channel list without the (large) item lists; what's on comes from /airings. */

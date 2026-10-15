@@ -23,6 +23,9 @@ const LOGO_BUG_KEY = 'retro-tv:logo-bug';
 /** How long the "Coming up on…" card shows. */
 const BUMPER_MS = 8000;
 
+/** The Android TV app's bridge (absent in a browser). */
+const tvApp = (window as unknown as { RetroTVApp?: { changeServer(): void; server(): string } }).RetroTVApp;
+
 function store(key: string, value?: string): string | null {
   try {
     if (value === undefined) return localStorage.getItem(key);
@@ -284,6 +287,16 @@ export function App() {
         }
       },
     },
+    ...(tvApp
+      ? [
+          {
+            label: 'Server address',
+            value: tvApp.server().replace(/^https?:\/\//, ''),
+            note: 'The Retro TV server this TV app connects to. OK to change it (or find it again on the network)',
+            activate: () => tvApp.changeServer(),
+          },
+        ]
+      : []),
     {
       label: 'Manage channels',
       value: 'Open on phone',
