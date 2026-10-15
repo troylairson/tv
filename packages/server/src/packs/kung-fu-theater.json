@@ -1,0 +1,38 @@
+{
+  "id": "kung-fu-theater",
+  "name": "Kung Fu Theater",
+  "description": "Dubbed chop-socky from the 1970s and early 80s, just like Saturday-afternoon Black Belt Theater: Sonny Chiba in The Street Fighter, Angela Mao in Lady Whirlwind, The Mystery of Chess Boxing, The 36 Crazy Fists, Raiders of the Shaolin Temple and a bunch of Bruce Lee clones. Bruceploitation Double Feature every Friday night at 10:00 pm.",
+  "curated": "2026-10-15: about 50 hours of hand-picked Hong Kong, Taiwanese and Japanese martial arts features (1971-1983), mostly the English-dubbed public-domain grindhouse prints; Blu-ray rips, multi-film re-uploads with commentary or reviews, riffs, trailers, Mandarin-only prints and modern films excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Kung fu features (1971-1983)",
+      "query": "mediatype:movies AND identifier:(Streetfighter_778 OR returnofthestreetfighter7.24pictuRes OR SisterStreetfighter1974 OR TheBodyguard OR KarateWarriors OR ReturnOfTheKungFuDragon OR BruceLeeFightsBackFromTheGrave1976 OR TheGuyWithTheSecretKungFu OR DeathMachines OR LADYWHIRLWIND1973_1 OR ImageofBruceLee OR TheRealBruceLee1973 OR ChaseStepByStep1974 OR MasterTheKid OR fist-of-fear-touch-of-death-1980 OR The36CrazyFists OR TheBigFight OR fearless-fighters-1971 OR the-mystery-of-chess-boxing-1979 OR HeroesofShaolin OR clones-of-bruce-lee OR goodbyebruceleehislastgameofdeathakanewgameofdeath OR war-of-the-shaolin-temple-1980 OR raiders-of-the-shaolin-temple-1982 OR dragon-on-fire-1979 OR tiger-over-wall-1980 OR shaolin-vs-lama-1983 OR blood-of-the-dragon_202608 OR TheFistsofBruceLee OR BruceLeeTheManTheMyth OR RumbleinHongKong OR MasterwithCrackedFingers OR SnakeCraneSecret OR BruceLeetheInvincible OR EdgeofFury_201708 OR Hands_Of_Death OR seven-steps-of-kung-fu-1979 OR eagles-claw-1978)",
+      "items": 60,
+      "filesPerItem": 1,
+      "minMinutes": 60,
+      "maxYear": 1990
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        5
+      ],
+      "start": "22:00",
+      "durationMin": 180,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "Bruceploitation Double Feature",
+        "query": "mediatype:movies AND identifier:(BruceLeeFightsBackFromTheGrave1976 OR ImageofBruceLee OR TheRealBruceLee1973 OR fist-of-fear-touch-of-death-1980 OR clones-of-bruce-lee OR goodbyebruceleehislastgameofdeathakanewgameofdeath OR TheFistsofBruceLee OR BruceLeeTheManTheMyth OR BruceLeetheInvincible)",
+        "items": 20,
+        "filesPerItem": 1,
+        "minMinutes": 60,
+        "maxYear": 1990
+      }
+    }
+  ]
+}

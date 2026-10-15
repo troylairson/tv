@@ -1,0 +1,203 @@
+{
+  "id": "eighties-cartoon-rewind",
+  "name": "80s Cartoon Rewind",
+  "description": "The after-school and Saturday-morning lineup of the 1980s: He-Man, She-Ra, ThunderCats, G.I. Joe, The Transformers, Jem, Inspector Gadget, M.A.S.K., Dungeons & Dragons, The Real Ghostbusters, DuckTales, SilverHawks, The Smurfs and more. He-Man and the Masters of the Universe airs in order weekdays at 3:30 pm, and Jim Henson's Muppet Babies kicks off Saturday mornings at 8.",
+  "curated": "2026-10-15: about 210 hours from one clean, complete English season upload per show (17 series, 1981-1989), plus He-Man season 1 and Muppet Babies seasons 1-7 for the slots. Excluded: 2002 He-Man, 2011 ThunderCats, 2018 She-Ra and other reboots, foreign dubs (Latino, PT-BR, Italian, Danish, Turkish), AI-upscaled re-uploads, broadcast tapes with commercials, intro compilations, reviews and video game longplays; Muppet Babies season 8 (1991) left out.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "He-Man and the Masters of the Universe (season 2)",
+      "query": "mediatype:movies AND identifier:(he-man-and-the-masters-of-the-universe-s02)",
+      "items": 1,
+      "filesPerItem": 65,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "She-Ra: Princess of Power",
+      "query": "mediatype:movies AND identifier:(she-ra-princess-of-power_202506)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "ThunderCats",
+      "query": "mediatype:movies AND identifier:(thunder-cats-season-01-1985)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "G.I. Joe: A Real American Hero",
+      "query": "mediatype:movies AND identifier:(g.i.-joe-a-real-american-hero-sunbow-dvd-rips)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Transformers",
+      "query": "mediatype:movies AND identifier:(Transformers-1984_2026)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Jem and the Holograms",
+      "query": "mediatype:movies AND identifier:(Jem_and_the_Holograms)",
+      "items": 1,
+      "filesPerItem": 30,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Inspector Gadget",
+      "query": "mediatype:movies AND identifier:(inspector-gadget-go-go-gadget-series)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "M.A.S.K.",
+      "query": "mediatype:movies AND identifier:(mask-season-1)",
+      "items": 1,
+      "filesPerItem": 30,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Dungeons & Dragons",
+      "query": "mediatype:movies AND identifier:(dungeons-dragons-tv-show)",
+      "items": 1,
+      "filesPerItem": 27,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Real Ghostbusters",
+      "query": "mediatype:movies AND identifier:(the-real-ghostbusters)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "DuckTales",
+      "query": "mediatype:movies AND identifier:(Ducktales-Complete-Series)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "SilverHawks",
+      "query": "mediatype:movies AND identifier:(silverhawks-1986-season-01)",
+      "items": 1,
+      "filesPerItem": 30,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "The Smurfs",
+      "query": "mediatype:movies AND identifier:(the-smurfs-1981_202601)",
+      "items": 1,
+      "filesPerItem": 40,
+      "minMinutes": 10,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Defenders of the Earth",
+      "query": "mediatype:movies AND identifier:(defenders-of-the-earth-s-01-)",
+      "items": 1,
+      "filesPerItem": 25,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Jayce and the Wheeled Warriors",
+      "query": "mediatype:movies AND identifier:(jayce-and-the-wheeled-warriors-e-59)",
+      "items": 1,
+      "filesPerItem": 20,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Visionaries: Knights of the Magical Light",
+      "query": "mediatype:movies AND identifier:(visionaries-full-series)",
+      "items": 1,
+      "filesPerItem": 13,
+      "minMinutes": 15,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Heathcliff and the Catillac Cats",
+      "query": "mediatype:movies AND identifier:(heathcliff-and-the-catillac-cats-1984-complete-series)",
+      "items": 1,
+      "filesPerItem": 30,
+      "minMinutes": 10,
+      "maxYear": 1990
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "15:30",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-search",
+        "title": "He-Man and the Masters of the Universe (season 1)",
+        "query": "mediatype:movies AND identifier:(he-man-and-the-masters-of-the-universe-s01)",
+        "items": 1,
+        "filesPerItem": 65,
+        "minMinutes": 15,
+        "maxYear": 1990
+      }
+    },
+    {
+      "days": [
+        6
+      ],
+      "start": "08:00",
+      "durationMin": 60,
+      "order": "next",
+      "source": {
+        "kind": "ia-search",
+        "title": "Jim Henson's Muppet Babies",
+        "query": "mediatype:movies AND identifier:(muppet_babies)",
+        "items": 1,
+        "filesPerItem": 99,
+        "minMinutes": 15,
+        "maxYear": 1990
+      }
+    }
+  ]
+}

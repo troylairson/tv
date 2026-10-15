@@ -1,0 +1,50 @@
+{
+  "id": "silent-laughs",
+  "name": "Silent Laughs",
+  "description": "TBD",
+  "curated": "TBD",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-item",
+      "title": "Chaplin at Mutual (1916-17)",
+      "identifier": "the-floorwalker-1916-1080p-blu-ray-x-265-garshasp",
+      "minMinutes": 8,
+      "maxYear": 1930
+    },
+    {
+      "kind": "ia-item",
+      "title": "Chaplin at Essanay (1915-16)",
+      "identifier": "burlesque-on-carmen-1916-1080p-blu-ray-x-265-garshasp",
+      "minMinutes": 8,
+      "maxYear": 1930
+    },
+    {
+      "kind": "ia-item",
+      "title": "Buster Keaton & Fatty Arbuckle shorts",
+      "identifier": "the-boat-1921-1080p-blu-ray-x-265-garshasp",
+      "minMinutes": 8,
+      "maxYear": 1930
+    },
+    {
+      "kind": "ia-search",
+      "title": "Laurel & Hardy silents",
+      "query": "identifier:(\"106-utopia-1951\" OR \"01-should-married-men-go-home\")",
+      "items": 2,
+      "filesPerItem": 12,
+      "minMinutes": 10,
+      "maxYear": 1929
+    },
+    {
+      "kind": "ia-search",
+      "title": "Silent comedy features and shorts",
+      "query": "identifier:(\"TheGeneral_201312\" OR \"MyMovie_201801\" OR \"mymovie_202004\" OR \"SteamboatBillJr_201411\" OR \"my-movie_202212\" OR \"my-movie_202111\" OR \"MyMovie_20190318\" OR \"my-movie_202208\" OR \"yorkmba99_hotmail_TA\" OR \"yorkmba99_hotmail_Vids\" OR \"College_201405\" OR \"the-cameraman_1928\" OR \"spite-marriage_1929\" OR \"silent-safety-last\" OR \"silent-the-freshman\" OR \"silent-hot-water\" OR \"silent-girl-shy\" OR \"silent-why-worry\" OR \"silent-grandmas-boy\" OR \"silent-dr-jack\" OR \"silent-a-sailor-made-man\" OR \"speedy_1928\" OR \"the-kid-brother_1927\" OR \"silent-young-mr-jazz\" OR \"silent-take-a-chance\" OR \"silent-over-the-fence\" OR \"silent-the-marathon\" OR \"silent-thats-him\" OR \"silent-why-pick-on-me\" OR \"silent-high-and-dizzy\" OR \"silent-an-eastern-westerner\" OR \"silent-his-royal-slyness\" OR \"silent-the-non-stop-kid\" OR \"a-dogs-life-1918-directed-by-charlie-chaplin\" OR \"the-pilgrim-1923-directed-by-charlie-chaplin\" OR \"shoulder-arms-1918-charlie-chaplin-short\" OR \"the-circus-charlie-chaplin\" OR \"adayspleasure_201909\" OR \"silent-tillies-punctured-romance\" OR \"silent-kid-auto-races-at-venice\" OR \"silent-the-rounders\" OR \"silent-a-busy-day\" OR \"silent-his-musical-career\" OR \"silent-the-masquerader\" OR \"silent-the-face-on-the-barroom-floor\" OR \"silent-his-new-profession-aka-the-good-for-nothing\" OR \"putting-pants-on-philip_1927\" OR \"the-battle-of-the-century_1927\" OR \"youre-darn-tootin_1928\" OR \"the-finishing-touch_1928\" OR \"their-purple-moment_1928\" OR \"flying-elephants_1928\" OR \"leave-em-laughing\" OR \"do-detectives-think\" OR \"silent-somewhere-in-wrong\" OR \"silent-scorching-sands\" OR \"silent-dr-pyckle-and-mr-pryde\" OR \"silent-west-of-hot-dog\" OR \"silent-the-soilers\" OR \"silent-oranges-and-lemons\" OR \"silent-roughest-africa\" OR \"silent-mud-and-sand\" OR \"silent-just-rambling-along\" OR \"HisNewMamma\" OR \"TheLuckOTheFoolish1924\" OR \"TheFirst100Years1924\" OR \"picking-peaches\" OR \"TheHansomCabman\" OR \"silent-all-night-long\" OR \"tramp_tramp_tramp_1926\" OR \"long-pants_1927\" OR \"frank-capra-the-strong-man-1926\" OR \"silent-isnt-life-terrible\" OR \"silent-all-wet\" OR \"silent-his-wooden-wedding\" OR \"ManyMammas\" OR \"BadBoy_201412\" OR \"ShouldHusbands\" OR \"PoorFish\" OR \"MightyLikeAMoose1926.mp4\" OR \"OurGangDerbyDay1923\" OR \"ourgangrainydays1928\" OR \"OurGangTheSpankingAge1928\" OR \"ourgangolympicgames1927\" OR \"1922.Fire.Fighters\" OR \"27.OurGangItsABear1924\" OR \"ourgangcrazyhouse1928\" OR \"ourganglovemydog1927\" OR \"ourgangtiredbusinessmen1927\" OR \"Our.GangYour.Own.Back.Yard1925\" OR \"ourganghighsociety1924\" OR \"silent-mabels-dramatic-career\" OR \"silent-a-muddy-romance\" OR \"silent-mabels-blunder\" OR \"silent-the-extra-girl\" OR \"silent-fattys-magic-pants\" OR \"silent-mabel-and-fattys-married-life\" OR \"silent-leap-year\" OR \"silent-the-iron-mule\" OR \"silent-butter-fingers\" OR \"silent-a-birds-a-bird\" OR \"silent-their-social-splash\" OR \"silent-bombs\" OR \"silent-his-bitter-pill\" OR \"silent-the-curtain-pole\" OR \"silent-the-perfect-clown\" OR \"silent-the-bell-hop\" OR \"silent-the-dome-doctor\" OR \"silent-horseshoes\" OR \"silent-seven-years-bad-luck\" OR \"silent-the-three-must-get-theres\" OR \"silent-its-a-gift\" OR \"silent-pool-sharks\" OR \"silent-the-villain\" OR \"silent-the-hero\" OR \"TheShriekOfAraby1921BenTurpin\" OR \"TheDaredevil1923--BenTurpin\" OR \"TenDollarsOrTenDays1924--BenTurpin\" OR \"YukonJake\" OR \"TheProdigalBridegroom\" OR \"PrideOfPikeville\")",
+      "items": 121,
+      "filesPerItem": 1,
+      "minMinutes": 5,
+      "maxYear": 1930
+    }
+  ],
+  "slots": []
+}

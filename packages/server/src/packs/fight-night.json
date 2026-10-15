@@ -1,0 +1,20 @@
+{
+  "id": "fight-night",
+  "name": "Fight Night",
+  "description": "",
+  "curated": "",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Championship fight films",
+      "query": "mediatype:movies AND uploader:\"m-baer@yandex.ru\" AND title:(vs OR versus)",
+      "items": 200,
+      "filesPerItem": 3,
+      "minMinutes": 1,
+      "maxYear": 1990
+    }
+  ],
+  "slots": []
+}

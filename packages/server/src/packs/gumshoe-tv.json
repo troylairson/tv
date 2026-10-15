@@ -1,0 +1,117 @@
+{
+  "id": "gumshoe-tv",
+  "name": "Gumshoe TV",
+  "description": "Trench coats, fedoras and just the facts: Dragnet, Sherlock Holmes (1954), Johnny Staccato, Man with a Camera, Racket Squad, Decoy, Treasury Men in Action, Highway Patrol, Michael Shayne, Martin Kane and Rocky King. Peter Gunn works the case weeknights at 9:00 pm, in episode order.",
+  "curated": "2026-10-15: about 150 hours of 1949-61 detective and police TV episodes from whole-series items and the Classic TV collection; Peter Gunn slot from the season 2 item. Excluded the 1984 Mike Hammer series, the 1975 Ellery Queen, colorized uploads, the theatrical Boston Blackie and Sherlock Holmes films, and untitled or duplicate Boston Blackie and Racket Squad uploads.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-item",
+      "title": "Dragnet (1951-55)",
+      "identifier": "Dragnet1951",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Sherlock Holmes (1954)",
+      "identifier": "SherlockHolmes1954",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Man with a Camera",
+      "identifier": "manwithacamera_202002",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Johnny Staccato",
+      "identifier": "johnny_staccato",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Peter Gunn season 3",
+      "identifier": "peter.-gunn.-s-03",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Decoy",
+      "identifier": "decoy-tv-series",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Treasury Men in Action",
+      "identifier": "ce-f-t-ed-cer",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Michael Shayne",
+      "identifier": "michael-shayne",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Martin Kane, Private Eye",
+      "identifier": "martin-kane-private-eye",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Mark Saber",
+      "identifier": "mark-saber-of-the-homicide-squad.",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Highway Patrol season 1",
+      "identifier": "highway-patrol-s-01-e-18",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-search",
+      "title": "Racket Squad, Front Page Detective, Rocky King and friends",
+      "query": "collection:(classic_tv) AND title:(\"Racket Squad\" OR \"Front Page Detective\" OR \"Rocky King\" OR \"Eddie Drake\" OR \"Boston Blackie\") AND NOT identifier:(BostonBlackieTvShow* OR TheBostonBlackieTvShow OR RacketSquadTvShow OR Racket_Squad_-_The_Racoon_Hunt) AND NOT title:(colorized OR trailer OR clip OR review)",
+      "items": 70,
+      "filesPerItem": 1,
+      "minMinutes": 15,
+      "maxYear": 1970
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "21:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "Peter Gunn season 2",
+        "identifier": "peter.-gunn.-s-02",
+        "minMinutes": 15,
+        "maxYear": 1970
+      }
+    }
+  ]
+}

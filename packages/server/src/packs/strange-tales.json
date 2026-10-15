@@ -1,0 +1,105 @@
+{
+  "id": "strange-tales",
+  "name": "Strange Tales",
+  "description": "Doorways to the unknown from early TV: Tales of Tomorrow, Lights Out, Science Fiction Theatre, Boris Karloff's The Veil, Roald Dahl's Way Out and the first season of The Twilight Zone. One Step Beyond opens the door weeknights at 10:00 pm, and Karloff's Thriller creeps in every Saturday at 11:00 pm, both in episode order.",
+  "curated": "2026-10-15: about 90 hours of 1949-62 anthology, suspense and science-fiction TV from whole-season items; One Step Beyond and Thriller slots from complete-season and complete-series items. Excluded colorized uploads (Outer Limits, Twilight Zone seasons 2-5, Science Fiction Theatre and Way Out sets), Lights Out season 2 and the short-cut season 1 item (duplicates of season 3), the 1970s-80s Tales of the Unexpected, Thriller 1973 and the poorly labelled Inner Sanctum item.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-item",
+      "title": "Tales of Tomorrow (1951-53)",
+      "identifier": "tales-of-tomorrow-1951-53",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Lights Out (season 3)",
+      "identifier": "lights-out-tv-series-season-3-of-4-mkv",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Lights Out (season 4)",
+      "identifier": "lights-out-tv-series-season-4-of-4-mkv",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Science Fiction Theatre season 1",
+      "identifier": "sf-theatre-s-01-e-16-stones-began-to-move",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Science Fiction Theatre season 2",
+      "identifier": "sf-theatre-s-02-e-33-facsimile",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "The Veil (1958)",
+      "identifier": "the-veil_202606",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Way Out (1961)",
+      "identifier": "roald-dahl-way-out-1961",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "The Twilight Zone season 1",
+      "identifier": "the-twilight-zone-1959-s-01-e-00-original-pilot",
+      "minMinutes": 15,
+      "maxYear": 1970
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "22:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-search",
+        "title": "One Step Beyond, seasons 1-3",
+        "query": "identifier:(one-step-beyond-season-1-1959 OR one-step-beyond-season-2 OR one-step-beyond-season-3)",
+        "items": 3,
+        "filesPerItem": 60,
+        "minMinutes": 15,
+        "maxYear": 1970,
+        "sort": "identifier"
+      }
+    },
+    {
+      "days": [
+        6
+      ],
+      "start": "23:00",
+      "durationMin": 60,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "Boris Karloff's Thriller (1960-62)",
+        "identifier": "s-01-e-26-papa-benjamin",
+        "minMinutes": 40,
+        "maxYear": 1970
+      }
+    }
+  ]
+}
