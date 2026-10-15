@@ -1,0 +1,62 @@
+{
+  "id": "holiday-hearth",
+  "name": "Holiday Hearth",
+  "description": "",
+  "curated": "",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Christmas features",
+      "query": "identifier:(\"BeyondTomorrow_750\" OR \"SantaClausConquerstheMartians1964\" OR \"its-a-wonderful-life-1946_202108\" OR \"MiracleOn34thStreet1947\" OR \"ChristmasInConnecticut1945_201811\" OR \"TheHollyAndTheIvy1952\" OR \"CHRISTMASEVE_201512\" OR \"great-rupert\" OR \"the-bishops-wife-1947-christmas-classic\" OR \"remember-the-night-1940\" OR \"BabesInToylandBW\" OR \"three-godfathers-1936-1080p-westerns\" OR \"silent-santa-claus\" OR \"SantaandtheThreeBears\")",
+      "items": 14,
+      "filesPerItem": 1,
+      "minMinutes": 40,
+      "maxYear": 1979
+    },
+    {
+      "kind": "ia-search",
+      "title": "Christmas cartoons, specials and TV episodes",
+      "query": "identifier:(\"HowTheGrinchStoleChristmas_201812\" OR \"a-charlie-brown-christmas-original-version\" OR \"RudolphTheRed-nosedReindeer1948\" OR \"Christmas_Comes_But_Once_A_Year_1936\" OR \"JackFrost_\" OR \"hectors_hectic_life\" OR \"SnowFoolin\" OR \"SantasSurprise1947ChristmasCartoonHD\" OR \"SomewhereInDreamland_24\" OR \"TheLittleKing-ChristmasNight\" OR \"TheChristmasVisitor\" OR \"TheCandleMaker\" OR \"TheSnow_man_1940\" OR \"TheNightBeforeChristmas_235\" OR \"Beverly_Hillbillies_Ep13_Home_For_Christmas\" OR \"Beverly_Hillbillies_Ep50__Christmas_At_The_Clampetts\" OR \"Dragnet_A_Gun_For_Christmas\" OR \"TheBigLittleJesus\" OR \"DateWithTheAngels-1950sFamilySitcom-ChristmasEpisode\" OR \"StudioOne-TheNativity\" OR \"Ozzie_and_Harriet_Christmas\" OR \"OzzieAndHarriet-BusyChristmas\" OR \"Ozzie-Harriet--Late_Christmas_Gift\" OR \"SherlockHolmesTheChristmasPudding\" OR \"Ruggles\" OR \"YourHitParade-ChristmasEveShow1955\" OR \"TheLiberaceShow-1954ChristmasEpisode\" OR \"AmahlNightVisitors12241951\" OR \"Love_That_Bob_Ep2x14_GrandpasChristmasVisit\" OR \"Christmas_1234567890\" OR \"Burns-Allen-Show_S2E7_Christmas\" OR \"Captain-Gallant_S1E36_The-Boy-Who-Found-Christmas\" OR \"ColgateComedyHourChristmasShow\" OR \"RacketSquad-TheChristmasCaper\" OR \"Joe_Santa_Clause\" OR \"thePerryComoShow-24december1952\" OR \"Window_on_Main_St--Christmas_Memory\" OR \"OurFirstChristmasTree\" OR \"MeetCorlissArcher-ChristmasEpisodecirca1954Syndicated\" OR \"AnnieOakleySanta\" OR \"PaulWinchellChristmas\" OR \"GeorgeBurnsShowLaVieEnRose\" OR \"TheLarkins1x07CheistmasWithTheLarkins\" OR \"holiday-time-at-disneyland\" OR \"HowdyDoodysChristmas\" OR \"Dear_Phoebe--The_Christmas_Show\" OR \"arthur1\" OR \"LorettaYoung--Christmas_Stopover\" OR \"571215TheJackBennyProgramS08e07ChristmasShoppingShow\" OR \"611224TheJackBennyProgramS12e10ChristmasParty\" OR \"541212TheJackBennyProgramS05e06JackDoesChristmasShopping\" OR \"HolidayAffair\" OR \"Videoplayback2.mp4\")",
+      "items": 53,
+      "filesPerItem": 1,
+      "minMinutes": 3,
+      "maxYear": 1979
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        0
+      ],
+      "start": "19:00",
+      "durationMin": 120,
+      "order": "next",
+      "source": {
+        "kind": "ia-search",
+        "title": "A Christmas Carol, five ways",
+        "query": "identifier:(\"Scrooge_1935\" OR \"AChristmasCarolScrooge1951_201602\" OR \"AChristmasCarol1910\" OR \"ScroogeOrMarleysGhost1901\" OR \"TheChristmasCarolastoldbyVincentPrice\" OR \"a-christmas-carol-shower-of-stars-episode-1954\" OR \"mister-magoos-christmas-carol-1962\")",
+        "items": 7,
+        "filesPerItem": 1,
+        "minMinutes": 3,
+        "maxYear": 1979
+      }
+    },
+    {
+      "days": [
+        6
+      ],
+      "start": "18:00",
+      "durationMin": 60,
+      "order": "random",
+      "source": {
+        "kind": "ia-item",
+        "title": "Rankin/Bass Christmas specials",
+        "identifier": "rankin-bass-christmas-specials",
+        "minMinutes": 15,
+        "maxYear": 1979
+      }
+    }
+  ]
+}
