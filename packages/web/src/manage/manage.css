@@ -168,3 +168,6 @@ body.manage #app { height: auto; overflow: visible; }
 .mg-upload:hover { border-color: var(--mg-dim); }
 .mg-upload.disabled { opacity: 0.5; cursor: default; }
 .mg-upload input { position: absolute; inset: 0; opacity: 0; cursor: inherit; }
+.mg-warn-text { color: var(--mg-warn, #f0b429); }
+.mg-unavailable { opacity: 0.6; text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, 0.4); }
+.mg-unavailable .mg-badge { margin-left: 8px; text-decoration: none; display: inline-block; }

@@ -114,6 +114,7 @@ function ChannelList() {
               {c.resolving && <div class="mg-badge">Updating…</div>}
               {!c.resolving && c.itemCount === 0 && <div class="mg-badge warn">Nothing to play yet: add content</div>}
               {c.errors.length > 0 && <div class="mg-error small">{c.errors.join(' · ')}</div>}
+              {c.unavailable > 0 && <div class="mg-badge warn">{c.unavailable} unavailable (skipped)</div>}
             </div>
             <div class="mg-actions">
               <button onClick={() => go(`/manage/${encodeURIComponent(c.id)}`)}>Edit</button>
@@ -300,10 +301,10 @@ function Editor({ id }: { id: string | null }) {
 
   // While the server is resolving sources, keep the status fresh.
   useEffect(() => {
-    if (!saved?.resolving && saved?.upToDate !== false) return;
+    if (!saved?.resolving && !saved?.checking && saved?.upToDate !== false) return;
     const t = setInterval(() => void load(), 2000);
     return () => clearInterval(t);
-  }, [saved?.resolving, saved?.upToDate, dirty]);
+  }, [saved?.resolving, saved?.checking, saved?.upToDate, dirty]);
 
   const set = (patch: Partial<Form>) => {
     setForm((f) => ({ ...f, ...patch }));
@@ -468,12 +469,18 @@ function Editor({ id }: { id: string | null }) {
 }
 
 function Items({ channel, onExclude }: { channel: ChannelStatus; onExclude: (excluded: string[]) => void }) {
-  const [items, setItems] = useState<ChannelItem[] | null>(null);
+  const [items, setItems] = useState<(ChannelItem & { unavailable?: string })[] | null>(null);
+  const [checkStarted, setCheckStarted] = useState(false);
+  const checking = checkStarted || channel.checking;
+  // The server reports checking once it starts; after that its flag is the truth.
+  useEffect(() => {
+    if (channel.checking) setCheckStarted(false);
+  }, [channel.checking]);
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
     if (open) void api.items(channel.id).then((r) => setItems(r.items));
-  }, [open, channel.resolvedAt]);
+  }, [open, channel.resolvedAt, channel.unavailable, channel.checking]);
 
   return (
     <div class="mg-card">
@@ -482,10 +489,22 @@ function Items({ channel, onExclude }: { channel: ChannelStatus; onExclude: (exc
           {channel.resolving ? 'Updating… ' : ''}
           {channel.itemCount} items · {fmtDuration(channel.totalSec)}
           {channel.excluded.length > 0 && ` · ${channel.excluded.length} removed`}
+          {channel.unavailable > 0 && <span class="mg-warn-text"> · {channel.unavailable} unavailable (skipped)</span>}
         </span>
         <span class="mg-actions">
           {channel.excluded.length > 0 && <button onClick={() => onExclude([])}>Restore removed</button>}
           <button onClick={() => void api.refresh(channel.id)}>Refresh from sources</button>
+          <button
+            disabled={checking}
+            title="Check that every video still plays; ones that don't are skipped until they're back"
+            onClick={() => {
+              setCheckStarted(true);
+              void api.check(channel.id);
+              setTimeout(() => setCheckStarted(false), 4000);
+            }}
+          >
+            {checking ? 'Checking…' : 'Check videos'}
+          </button>
           <button onClick={() => setOpen(!open)}>{open ? 'Hide list' : 'Show list'}</button>
         </span>
       </div>
@@ -495,7 +514,10 @@ function Items({ channel, onExclude }: { channel: ChannelStatus; onExclude: (exc
           {!items && <li class="mg-dim">Loading…</li>}
           {items?.map((item) => (
             <li key={item.id}>
-              <span class="mg-item-title">{item.title}</span>
+              <span class={`mg-item-title ${item.unavailable ? 'mg-unavailable' : ''}`} title={item.unavailable}>
+                {item.title}
+                {item.unavailable && <span class="mg-badge warn">Unavailable: {item.unavailable}</span>}
+              </span>
               <span class="mg-dim small">{fmtDuration(item.durationSec)}</span>
               <button
                 class="mg-icon"

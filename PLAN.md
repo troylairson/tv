@@ -414,8 +414,16 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
 - New channels start at their first item when created (anchor = creation time).
 - Upgrading kept the existing five IA channels (and the Plex sampler) as
   ordinary editable channels without re-resolving.
-- Still to do from Phase 2 below: the bench/screening workflow, in/out points,
-  health checks and understudies.
+- Still to do from Phase 2 below: the bench/screening workflow, in/out points
+  and understudies.
+- **Health checks** (`server/src/health.ts`): nightly, the shows airing in the next
+  24 h plus anything already unavailable; a TV's playback error (`/api/diag` with
+  `itemId`) checks that item at once. IA: ranged GET of the download URL (401/403/404/410
+  = gone); Plex: `/library/metadata/:key` (404 or no file = gone). Network errors,
+  5xx and runs where >50 % fail are inconclusive. Two failures → left out of the
+  channel's items (lineups rebase after what's on now; a channel is never emptied);
+  a later success puts it back. State in `health.json`; the manager shows counts,
+  marks items and has *Check videos*.
 
 **Phase 2 — Discover (IA channel building)**
 - Search/filter UI, expand items into episodes, preview, bench, screening,

@@ -1,6 +1,6 @@
 import { randomUUID } from 'node:crypto';
 import { seededShuffle } from '@retro-tv/schedule';
-import { config } from './config';
+import { config, plexConfigured } from './config';
 import { AUDIO_LANGUAGES, getSettings } from './settings';
 import { prettifyTitle, shortDescription } from './titles';
 import type { ChannelItem } from './types';
@@ -270,6 +270,17 @@ function transcodeParams(ratingKey: string, offsetSec: number, session: string):
     'X-Plex-Client-Profile-Extra':
       'add-transcode-target(type=videoProfile&context=streaming&protocol=hls&container=mpegts&videoCodec=h264&audioCodec=aac)',
   });
+}
+
+/** Is this item still in Plex with a file to play? Throws when Plex can't be asked (down, not set up). */
+export async function mediaStatus(ratingKey: string): Promise<'ok' | 'missing' | 'nofile'> {
+  if (!plexConfigured()) throw new Error('Plex is not set up');
+  const res = await fetch(`${config.plexUrl}/library/metadata/${encodeURIComponent(ratingKey)}`, { headers: plexHeaders(), signal: AbortSignal.timeout(15_000) });
+  if (res.status === 404) return 'missing';
+  if (!res.ok) throw new Error(`Plex → HTTP ${res.status}`);
+  const m = ((await res.json()) as PlexContainer<{ Metadata?: PlexMetadata[] }>).MediaContainer.Metadata?.[0];
+  if (!m) return 'missing';
+  return m.Media?.some((media) => media.Part?.length) ? 'ok' : 'nofile';
 }
 
 export async function playback(ratingKey: string, offsetSec: number, mode: PlexPlayMode): Promise<PlexPlayback> {

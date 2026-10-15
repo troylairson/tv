@@ -207,7 +207,7 @@ export class Tuner {
     this.failures.set(key, attempts);
     if (this.failures.size > 50) this.failures.delete(this.failures.keys().next().value!);
     if (attempts === 1 || attempts % 5 === 0) {
-      report('error', { channel: channel?.number, title: airing?.item.title, source: airing?.item.source, error, attempts });
+      report('error', { channel: channel?.number, title: airing?.item.title, source: airing?.item.source, itemId: airing?.item.id, error, attempts });
     }
 
     // Archive hiccups are usually brief: keep trying the show (picking up where it should be by now)

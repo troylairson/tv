@@ -8,6 +8,8 @@ export interface ChannelStatus extends ChannelConfig {
   resolvedAt: string | null;
   errors: string[];
   upToDate: boolean;
+  unavailable: number;
+  checking: boolean;
 }
 
 export interface PlexSection {
@@ -75,7 +77,8 @@ export const api = {
     call<ChannelConfig>(`/api/manage/channels/${id}/logo`, { method: 'POST', headers: { 'content-type': file.type || 'application/octet-stream' }, body: file }),
   remove: (id: string) => call<{ ok: true }>(`/api/manage/channels/${id}`, { method: 'DELETE' }),
   refresh: (id: string) => call<{ ok: true }>(`/api/manage/channels/${id}/refresh`, { method: 'POST' }),
-  items: (id: string) => call<{ items: ChannelItem[] }>(`/api/manage/channels/${id}/items`),
+  check: (id: string) => call<{ ok: true }>(`/api/manage/channels/${id}/check`, { method: 'POST' }),
+  items: (id: string) => call<{ items: (ChannelItem & { unavailable?: string })[] }>(`/api/manage/channels/${id}/items`),
   preview: (id: string) => call<{ blocks: PreviewBlock[] }>(`/api/manage/channels/${id}/preview?hours=24`),
   packs: () => call<{ packs: PackInfo[] }>('/api/manage/packs'),
   installPack: (id: string) => call<ChannelConfig>(`/api/manage/packs/${id}/install`, { method: 'POST' }),

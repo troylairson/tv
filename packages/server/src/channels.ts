@@ -8,6 +8,7 @@ import fs from 'node:fs/promises';
 import path from 'node:path';
 import { hashString, type ChannelMode } from '@retro-tv/schedule';
 import { config as serverConfig } from './config';
+import { healthVersion, isChecking, isUnavailable } from './health';
 import { resolveSources } from './sources';
 import type { Channel, ChannelConfig, ChannelItem, SlotConfig, SourceRef } from './types';
 
@@ -98,9 +99,25 @@ const saveConfigs = () => writeJson(configFile(), { channels: configs });
 // `described`: items carry descriptions (older caches get one full refresh to pick them up).
 const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, described: true, resolved: Object.fromEntries(resolved) });
 
+/**
+ * A list without the items health checks found unavailable. The same array comes back
+ * until something changes, so schedules (keyed on the list) stay put.
+ */
+const playableCache = new WeakMap<ChannelItem[], { version: number; items: ChannelItem[] }>();
+function playable(list: ChannelItem[]): ChannelItem[] {
+  const hit = playableCache.get(list);
+  if (hit?.version === healthVersion()) return hit.items;
+  const kept = list.filter((i) => !isUnavailable(i.id));
+  // Never empty a list on the checks' say-so: a channel of dead videos stays as it was.
+  const items = kept.length === list.length || !kept.length ? list : kept;
+  playableCache.set(list, { version: healthVersion(), items });
+  return items;
+}
+
 function toChannel(c: ChannelConfig): Channel | null {
-  const r = resolved.get(c.id);
-  if (!r) return null;
+  const raw = resolved.get(c.id);
+  if (!raw) return null;
+  const r = { items: playable(raw.items), slotItems: Object.fromEntries(Object.entries(raw.slotItems ?? {}).map(([id, list]) => [id, playable(list)])) };
   const slots = (c.slots ?? []).map((s) => ({
     id: s.id,
     days: s.days,
@@ -108,7 +125,7 @@ function toChannel(c: ChannelConfig): Channel | null {
     durationMin: s.durationMin,
     order: s.order,
     title: s.source.title,
-    items: r.slotItems?.[s.id] ?? [],
+    items: r.slotItems[s.id] ?? [],
   }));
   // A channel needs regular programming or at least one slot with something in it.
   if (!r.items.length && !slots.some((s) => s.items.length)) return null;
@@ -149,6 +166,10 @@ export interface ChannelStatus extends ChannelConfig {
   errors: string[];
   /** false while saved changes haven't been resolved yet. */
   upToDate: boolean;
+  /** Items health checks found broken (left out of the schedule). */
+  unavailable: number;
+  /** A health check of this channel is running. */
+  checking: boolean;
 }
 
 export function channelStatuses(): ChannelStatus[] {
@@ -164,6 +185,8 @@ export function channelStatuses(): ChannelStatus[] {
         resolvedAt: r?.resolvedAt ?? null,
         errors: r?.errors ?? [],
         upToDate: r?.configHash === contentHash(c),
+        unavailable: allItemsOf(c.id).filter((i) => isUnavailable(i.id)).length,
+        checking: isChecking(allItemsOf(c.id).map((i) => i.id)),
       };
     })
     .sort((a, b) => a.number - b.number);
@@ -171,6 +194,12 @@ export function channelStatuses(): ChannelStatus[] {
 
 export const getConfig = (id: string) => configs.find((c) => c.id === id);
 export const resolvedItems = (id: string) => resolved.get(id)?.items ?? [];
+/** Regular programming and time-slot items, unavailable ones included. */
+export const allItemsOf = (id: string): ChannelItem[] => {
+  const r = resolved.get(id);
+  return r ? [...r.items, ...Object.values(r.slotItems ?? {}).flat()] : [];
+};
+export const allItems = (): ChannelItem[] => configs.flatMap((c) => allItemsOf(c.id));
 
 /** Re-resolve one channel's sources. Concurrent calls for the same channel share the work. */
 const inFlight = new Map<string, Promise<void>>();

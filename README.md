@@ -97,7 +97,12 @@ guide → Settings → *Manage channels* shows the address and a QR code).
   or SVG up to 2 MB; a wide image on a transparent background looks best). Uploads
   are kept in the data folder under `logos/`.
 - **What plays:** the resolved episode list; ✕ removes an episode without
-  removing its show.
+  removing its show. *Check videos* makes sure each one still plays.
+- **Health checks:** every night (and whenever a TV can't play something) the
+  server checks the next day's shows. A video that's gone from the Internet
+  Archive or Plex twice in a row is skipped, marked *Unavailable* in the list, and
+  put back if a later check finds it again. Network trouble or an outage never
+  counts against a video.
 - **Next 24 hours:** the schedule as the guide will show it.
 
 - **Time slots:** "these days, at this time, for this long, play this", e.g.

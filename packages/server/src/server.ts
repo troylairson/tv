@@ -4,6 +4,8 @@ import { serve } from '@hono/node-server';
 import { serveStatic } from '@hono/node-server/serve-static';
 import { Hono } from 'hono';
 import {
+  allItems,
+  allItemsOf,
   channelStatuses,
   createChannel,
   deleteChannel,
@@ -24,6 +26,7 @@ import { getPack, PACKS } from './packs';
 import * as plex from './plex';
 import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
 import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
+import { checkItems, checkSoon, isUnavailable, lastHealthRun, loadHealth, startHealthChecks, unavailableError } from './health';
 import { deleteLogo, LogoError, MAX_LOGO_BYTES, readLogo, saveLogo } from './logos';
 
 const app = new Hono();
@@ -212,8 +215,18 @@ app.post('/api/manage/channels/:id/refresh', (c) => {
 /** What the channel's sources produced (for listing and removing items). */
 app.get('/api/manage/channels/:id/items', (c) => {
   if (!getConfig(c.req.param('id'))) return c.json({ error: 'No such channel' }, 404);
-  return c.json({ items: resolvedItems(c.req.param('id')) });
+  const items = resolvedItems(c.req.param('id')).map((i) => (isUnavailable(i.id) ? { ...i, unavailable: unavailableError(i.id) ?? 'Unavailable' } : i));
+  return c.json({ items });
 });
+
+/** Check now whether every item still plays (results show up in the channel's status). */
+app.post('/api/manage/channels/:id/check', (c) => {
+  if (!getConfig(c.req.param('id'))) return c.json({ error: 'No such channel' }, 404);
+  void checkItems(allItemsOf(c.req.param('id')), { record: false });
+  return c.json({ ok: true }, 202);
+});
+
+app.get('/api/manage/health', (c) => c.json({ lastRun: lastHealthRun(), unavailable: new Set(allItems().filter((i) => isUnavailable(i.id)).map((i) => i.id)).size }));
 
 /** The next N hours as the guide will show them. */
 app.get('/api/manage/channels/:id/preview', (c) => {
@@ -292,6 +305,11 @@ app.post('/api/diag', async (c) => {
   const body = (await c.req.json().catch(() => ({}))) as Record<string, unknown>;
   const entry: DiagEntry = { ...body, at: new Date().toISOString(), from: c.req.header('user-agent') ?? '?' };
   diag.push(entry);
+  // A TV couldn't play something: see whether it's gone for good.
+  if (body.type === 'error' && typeof body.itemId === 'string') {
+    const item = allItems().find((i) => i.id === body.itemId);
+    if (item) checkSoon(item);
+  }
   if (diag.length > 500) diag.shift();
   await fs.mkdir(config.dataDir, { recursive: true });
   await fs.appendFile(path.join(config.dataDir, 'diag.log'), JSON.stringify(entry) + '\n').catch(() => undefined);
@@ -313,6 +331,7 @@ app.get('*', serveStatic({ root: webRoot, path: 'index.html' }));
 
 await loadSettings();
 await loadLineups();
+await loadHealth();
 await initChannels();
 await startCommercialPool({
   onChange: () => regenerate(getChannels().channels),
@@ -322,6 +341,17 @@ await startCommercialPool({
 setInterval(() => {
   for (const channel of getChannels().channels) ensureLineup(channel);
 }, 10 * 60_000);
+startHealthChecks({
+  upcoming: () => {
+    const now = Date.now();
+    return getChannels().channels.flatMap((ch) => airingsFor(ch, now, now + 24 * 3600_000).filter((a) => a.kind === 'show').map((a) => a.item));
+  },
+  all: allItems,
+  // Lineups notice their item list changed and rebuild after what's on now.
+  changed: () => {
+    for (const channel of getChannels().channels) ensureLineup(channel);
+  },
+});
 serve({ fetch: app.fetch, port: config.port, hostname: '0.0.0.0' }, ({ port }) => {
   console.log(`retro-tv ${config.version} listening on http://0.0.0.0:${port} (web: ${config.webDir}, data: ${config.dataDir}, plex: ${plexConfigured() ? config.plexUrl : 'off'})`);
 });
