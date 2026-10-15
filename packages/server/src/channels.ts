@@ -312,7 +312,7 @@ function applyInput(base: ChannelConfig, input: ChannelInput, selfId?: string): 
   if (input.logo !== undefined) {
     const logo = String(input.logo);
     if (logo === 'auto' || logo === '') delete next.logo;
-    else if (/^(none|hand:[a-z0-9-]{1,40}|gen:\d{1,4})$/.test(logo)) next.logo = logo;
+    else if (/^(none|hand:[a-z0-9-]{1,40}|gen:\d{1,4}|upload:\d{1,15})$/.test(logo)) next.logo = logo;
     else throw new ValidationError(`not a valid logo: ${logo}`);
   }
   if (input.name !== undefined) {

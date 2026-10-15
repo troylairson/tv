@@ -24,6 +24,7 @@ import { getPack, PACKS } from './packs';
 import * as plex from './plex';
 import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
 import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
+import { deleteLogo, LogoError, MAX_LOGO_BYTES, readLogo, saveLogo } from './logos';
 
 const app = new Hono();
 
@@ -35,7 +36,7 @@ app.use('/api/*', async (c, next) => {
 });
 
 app.onError((err, c) => {
-  if (err instanceof ValidationError || err instanceof SettingsError) return c.json({ error: err.message }, 400);
+  if (err instanceof ValidationError || err instanceof SettingsError || err instanceof LogoError) return c.json({ error: err.message }, 400);
   console.error(`${c.req.method} ${c.req.path}:`, err.message);
   return c.json({ error: err.message }, 500);
 });
@@ -115,6 +116,20 @@ app.get('/media/commercials/:file', (c) => {
   return serveFile(file, c.req.header('range'));
 });
 
+/** Uploaded channel logos. SVGs can carry scripts, so they get a policy that forbids them. */
+app.get('/logos/:id', async (c) => {
+  const logo = await readLogo(c.req.param('id'));
+  if (!logo) return c.text('Not found', 404);
+  return new Response(new Uint8Array(logo.bytes), {
+    headers: {
+      'content-type': logo.type,
+      'cache-control': 'public, max-age=31536000, immutable',
+      'content-security-policy': "default-src 'none'; style-src 'unsafe-inline'; img-src data:",
+      'x-content-type-options': 'nosniff',
+    },
+  });
+});
+
 app.post('/api/channels/rebuild', (c) => {
   void refreshAll().catch((err) => console.error('channel refresh failed', err));
   return c.json({ ok: true, building: true }, 202);
@@ -166,8 +181,26 @@ app.put('/api/manage/channels/:id', async (c) => {
   return c.json(result.config);
 });
 
+app.post('/api/manage/channels/:id/logo', async (c) => {
+  if (!getConfig(c.req.param('id'))) return c.json({ error: 'No such channel' }, 404);
+  const declared = Number(c.req.header('content-length') ?? 0);
+  if (declared > MAX_LOGO_BYTES) return c.json({ error: 'The image is too big (2 MB at most)' }, 413);
+  const logo = await saveLogo(c.req.param('id'), new Uint8Array(await c.req.arrayBuffer()));
+  const result = await updateChannel(c.req.param('id'), { logo });
+  return c.json(result!.config);
+});
+
+app.delete('/api/manage/channels/:id/logo', async (c) => {
+  if (!getConfig(c.req.param('id'))) return c.json({ error: 'No such channel' }, 404);
+  await deleteLogo(c.req.param('id'));
+  const result = await updateChannel(c.req.param('id'), { logo: 'auto' });
+  return c.json(result!.config);
+});
+
 app.delete('/api/manage/channels/:id', async (c) => {
-  return (await deleteChannel(c.req.param('id'))) ? c.json({ ok: true }) : c.json({ error: 'No such channel' }, 404);
+  const deleted = await deleteChannel(c.req.param('id'));
+  if (deleted) await deleteLogo(c.req.param('id')).catch(() => undefined);
+  return deleted ? c.json({ ok: true }) : c.json({ error: 'No such channel' }, 404);
 });
 
 app.post('/api/manage/channels/:id/refresh', (c) => {

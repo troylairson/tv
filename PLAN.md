@@ -506,7 +506,10 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       manager shows them and has a picker (automatic / generated + *Try another* /
       any hand-drawn / number only). New packs get a logo by adding it to
       `AUTO_HAND_LOGO`.
-- [ ] **Upload your own channel logo** in the manager (stored in the data dir).
+- [x] **Upload your own channel logo** in the manager: `POST /api/manage/channels/:id/logo`
+      stores it as `<data dir>/logos/<channel id>.<ext>` (type sniffed from the bytes,
+      2 MB max) and sets the logo to `upload:<timestamp>`; served at `/logos/:id` with a
+      no-script CSP so an SVG can't run anything. Deleted with the channel.
 - [x] **Paste an Internet Archive link** into the manager's IA search box
       (`archive.org/details/<id>`) to jump straight to that item and add it.
 

@@ -184,10 +184,38 @@ type Form = Omit<ChannelFields, 'slots'> & { slots: DraftSlot[] };
 const EMPTY: Form = { number: 0, name: '', mode: 'loop', breaks: true, sources: [], excluded: [], slots: [] };
 
 /** Pick the channel's logo: automatic, a generated one (try another), a hand-drawn one, or just the number. */
-function LogoPicker({ channel, onChange }: { channel: { id: string; name: string; logo?: string; packId?: string; sources: SourceRef[] }; onChange: (logo: string | undefined) => void }) {
+function LogoPicker({
+  channel,
+  savedLogo,
+  canUpload,
+  onChange,
+  onUploaded,
+}: {
+  channel: { id: string; name: string; logo?: string; packId?: string; sources: SourceRef[] };
+  savedLogo?: string;
+  canUpload: boolean;
+  onChange: (logo: string | undefined) => void;
+  onUploaded: (logo: string | undefined) => void;
+}) {
+  const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState<string | null>(null);
   const spec = logoSpec(channel);
   const choice = !channel.logo ? 'auto' : channel.logo.startsWith('gen:') ? 'gen' : channel.logo;
   const seed = spec.startsWith('gen:') ? Number(spec.slice(4)) || 0 : 0;
+  // The uploaded image stays on the server when another logo is picked, so it can be picked again.
+  const uploaded = channel.logo?.startsWith('upload:') ? channel.logo : savedLogo?.startsWith('upload:') ? savedLogo : null;
+  const upload = async (file: File | undefined) => {
+    if (!file) return;
+    setUploading(true);
+    setUploadError(null);
+    try {
+      onUploaded((await api.uploadLogo(channel.id, file)).logo);
+    } catch (e) {
+      setUploadError((e as Error).message);
+    } finally {
+      setUploading(false);
+    }
+  };
   return (
     <div class="mg-card mg-logo-picker">
       <div class="mg-logo-previews">
@@ -214,11 +242,26 @@ function LogoPicker({ channel, onChange }: { channel: { id: string; name: string
               </option>
             ))}
           </optgroup>
+          {uploaded && <option value={uploaded}>Uploaded image</option>}
           <option value="none">None (number only)</option>
         </select>
         {spec.startsWith('gen:') && <button onClick={() => onChange(`gen:${(seed + 1) % 1000}`)}>Try another</button>}
+        <label class={`mg-upload ${canUpload ? '' : 'disabled'}`}>
+          {uploading ? 'Uploading…' : 'Upload your own…'}
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif,image/svg+xml"
+            disabled={!canUpload || uploading}
+            onChange={(e) => {
+              const input = e.target as HTMLInputElement;
+              void upload(input.files?.[0]).then(() => (input.value = ''));
+            }}
+          />
+        </label>
+        {!canUpload && <span class="mg-dim small">Create the channel first to upload a logo.</span>}
+        {uploadError && <span class="mg-error">{uploadError}</span>}
         <p class="mg-dim small">
-          Generated logos pick their look from the channel's name and content, and follow each TV's theme (Retro, Modern, 70s shown above).
+          Uploads: PNG, JPEG, WebP, GIF or SVG up to 2 MB. A wide image on a transparent background looks best. Generated logos pick their look from the channel's name and content, and follow each TV's theme (Retro, Modern, 70s shown above).
         </p>
       </div>
     </div>
@@ -351,7 +394,17 @@ function Editor({ id }: { id: string | null }) {
       </div>
 
       <h2>Logo</h2>
-      <LogoPicker channel={{ id: id ?? 'new', name: form.name || 'New Channel', logo: form.logo, packId: saved?.packId, sources: form.sources }} onChange={(logo) => set({ logo })} />
+      <LogoPicker
+        channel={{ id: id ?? 'new', name: form.name || 'New Channel', logo: form.logo, packId: saved?.packId, sources: form.sources }}
+        savedLogo={saved?.logo}
+        canUpload={!!id}
+        onChange={(logo) => set({ logo })}
+        onUploaded={(logo) => {
+          // Already saved on the server: no need to mark the form changed.
+          setForm((f) => ({ ...f, logo }));
+          setSaved((s) => s && { ...s, logo });
+        }}
+      />
 
       <h2>Regular programming</h2>
       <div class="mg-card">

@@ -20,10 +20,17 @@ export function logoSpec(channel: LogoChannel): string {
   return hand ? `hand:${hand}` : 'gen:0';
 }
 
-/** SVG markup for a channel's logo, or null for "number only". */
+/** Where an uploaded logo is served, or null when the channel doesn't use one. */
+export function logoUpload(channel: LogoChannel): string | null {
+  const spec = logoSpec(channel);
+  return spec.startsWith('upload:') ? `/logos/${encodeURIComponent(channel.id)}?v=${spec.slice(7)}` : null;
+}
+
+/** SVG markup for a channel's logo, or null for "number only". An uploaded image gives ''. */
 export function logoSvg(channel: LogoChannel, theme: LogoTheme): string | null {
   const spec = logoSpec(channel);
   if (spec === 'none') return null;
+  if (spec.startsWith('upload:')) return '';
   if (spec.startsWith('hand:')) {
     const hand = HAND_LOGOS[spec.slice(5)];
     if (hand) return hand.svg;
@@ -35,6 +42,8 @@ export function logoSvg(channel: LogoChannel, theme: LogoTheme): string | null {
 
 export function Logo({ channel, theme, class: cls = '' }: { channel: LogoChannel; theme: LogoTheme; class?: string }) {
   const svg = useMemo(() => logoSvg(channel, theme), [channel.id, channel.name, channel.logo, channel.packId, channel.logoHint, theme]);
+  const upload = logoUpload(channel);
+  if (upload) return <img class={`logo ${cls}`} src={upload} alt={channel.name} style={{ objectFit: 'contain' }} />;
   if (!svg) return null;
   return <svg class={`logo ${cls}`} viewBox="0 0 360 210" role="img" aria-label={channel.name} dangerouslySetInnerHTML={{ __html: svg }} />;
 }

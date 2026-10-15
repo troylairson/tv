@@ -90,7 +90,9 @@ guide → Settings → *Manage channels* shows the address and a QR code).
 - **Logo:** every channel has one. Channel ideas and the default channels come
   with hand-drawn logos; others get one generated from the name and content (it
   follows each TV's theme). Pick *Try another* for a different design, choose any
-  hand-drawn logo, or just the number.
+  hand-drawn logo, or just the number. Or *Upload your own…* (PNG, JPEG, WebP, GIF
+  or SVG up to 2 MB; a wide image on a transparent background looks best). Uploads
+  are kept in the data folder under `logos/`.
 - **What plays:** the resolved episode list; ✕ removes an episode without
   removing its show.
 - **Next 24 hours:** the schedule as the guide will show it.

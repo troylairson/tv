@@ -164,3 +164,7 @@ body.manage #app { height: auto; overflow: visible; }
 .mg-ideas { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
 .mg-idea p { margin: 6px 0; line-height: 1.45; }
 .mg-idea .mg-row { margin-top: 8px; }
+.mg-upload { position: relative; display: inline-block; padding: 6px 12px; border: 1px solid var(--mg-line); border-radius: 6px; cursor: pointer; }
+.mg-upload:hover { border-color: var(--mg-dim); }
+.mg-upload.disabled { opacity: 0.5; cursor: default; }
+.mg-upload input { position: absolute; inset: 0; opacity: 0; cursor: inherit; }

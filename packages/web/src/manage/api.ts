@@ -71,6 +71,8 @@ export const api = {
   channels: () => call<{ channels: ChannelStatus[]; plexConfigured: boolean }>('/api/manage/channels'),
   create: (fields: Partial<ChannelFields>) => call<ChannelConfig>('/api/manage/channels', json('POST', fields)),
   update: (id: string, fields: Partial<ChannelFields>) => call<ChannelConfig>(`/api/manage/channels/${id}`, json('PUT', fields)),
+  uploadLogo: (id: string, file: File) =>
+    call<ChannelConfig>(`/api/manage/channels/${id}/logo`, { method: 'POST', headers: { 'content-type': file.type || 'application/octet-stream' }, body: file }),
   remove: (id: string) => call<{ ok: true }>(`/api/manage/channels/${id}`, { method: 'DELETE' }),
   refresh: (id: string) => call<{ ok: true }>(`/api/manage/channels/${id}/refresh`, { method: 'POST' }),
   items: (id: string) => call<{ items: ChannelItem[] }>(`/api/manage/channels/${id}/items`),
