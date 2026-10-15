@@ -1,0 +1,92 @@
+{
+  "id": "kiddie-matinee",
+  "name": "Kiddie Matinee",
+  "description": "It's Howdy Doody time! Afternoon TV for kids from the 1940s to the early 60s: Howdy Doody, Kukla, Fran and Ollie, Ding Dong School, Rootie Kazootie, Winky Dink, Pinky Lee, Super Circus, Watch Mr. Wizard, Captain Video, Space Patrol, Tom Corbett, Flash Gordon, Ramar of the Jungle and Supercar. Rocky Jones, Space Ranger blasts off weekdays at 5:00 pm, and Fireball XL5 flies Saturday mornings at 9:00, both in episode order.",
+  "curated": "2026-10-15: about 85 hours of 1948-62 children's TV episodes from the Classic TV collection and whole-series items; Rocky Jones and Fireball XL5 slots from complete-series items. Excluded westerns already on Saddle Up, the 1987 Howdy Doody anniversary special, colorized Commando Cody and Fireball XL5 uploads, a three-hour Rootie Tootie party broadcast, Diver Dan (seven-minute fragments), commercials and older duplicate uploads of the same Howdy Doody, Super Circus, Pinky Lee, Mr. Wizard, Winky Dink and Captain Video episodes.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Howdy Doody",
+      "query": "collection:(classic_tv) AND title:(\"Howdy Doody\") AND NOT identifier:(Howdy_Doody_52 OR Howdy_Doody_4 OR Howdy_Doody_51 OR Jeice_The_Cuddly_Warrior-Howdy-Doody-Upload-2 OR Howdy_Doody_3_Uploaded_By_Jeice_The_Cuddly_Warrior OR 1953WasBetterThan1983 OR 1949NBC-Howdy_Doody_Uploaded-By-Jeice_The_Cuddly_Warrior OR its-howdy-doody-time-a-40-year-celebration-1987) AND NOT title:(commercial OR commercials OR colorized OR clip OR documentary OR interview OR celebration OR tribute)",
+      "items": 90,
+      "filesPerItem": 1,
+      "minMinutes": 12,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-search",
+      "title": "Kids' TV classics",
+      "query": "collection:(classic_tv) AND title:(\"Pinky Lee\" OR \"Ding Dong School\" OR \"Rootie Kazootie\" OR \"Winky Dink\" OR \"Mr. Wizard\" OR \"Captain Video\" OR \"Captain Midnight\" OR \"Tom Corbett\" OR \"Time for Beany\" OR \"Super Circus\" OR \"Paul Winchell\" OR \"Mr. I. Magination\" OR \"Lassie\" OR \"Ramar of the Jungle\" OR \"z-ro\") AND NOT identifier:(Mr-Wizard-1-1-1 OR IfYouWannaBeHappy OR Yugi-Moto_likes-to_Fart OR Super-Circus_1956 OR Circus_3 OR Circus_4 OR Super_Circus_Unknown_Date OR Super_Circus_6 OR Pinky_Lee_Show OR Pinky_Lee_Show2 OR WinkyDinkAndYou1 OR captain-video-and-his-video-rangers-v01e01 OR captain-video-and-his-video-rangers-episode-2-of-4-mkv OR captain-video-and-his-video-rangers-episode-3-of-4-mkv OR captain-video-and-his-video-rangers-episode-4-of-4-mkv) AND NOT title:(commercial OR commercials OR colorized OR promo OR Lucy OR party)",
+      "items": 100,
+      "filesPerItem": 1,
+      "minMinutes": 12,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Kukla, Fran and Ollie",
+      "identifier": "kukla-fran-and-ollie-tv-series-1947-through-1957-mp4",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Space Patrol",
+      "identifier": "space-patrol",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Flash Gordon (1954-55)",
+      "identifier": "flash-gordon-tv-show",
+      "minMinutes": 15,
+      "maxYear": 1970
+    },
+    {
+      "kind": "ia-item",
+      "title": "Supercar",
+      "identifier": "Supercar.Series1",
+      "minMinutes": 15,
+      "maxYear": 1970
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "17:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "Rocky Jones, Space Ranger",
+        "identifier": "rocky-jones-space-rangers-1954-s-01e-01-beyond-the-curtain-of-space-chap-1-low-360p-1",
+        "minMinutes": 15,
+        "maxYear": 1970
+      }
+    },
+    {
+      "days": [
+        6
+      ],
+      "start": "09:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-item",
+        "title": "Fireball XL5",
+        "identifier": "FireballXL5.complete",
+        "minMinutes": 15,
+        "maxYear": 1970
+      }
+    }
+  ]
+}

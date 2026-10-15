@@ -1,0 +1,65 @@
+{
+  "id": "space-race",
+  "name": "Space Race",
+  "description": "America's road to the Moon as NASA filmed it, 1958 to 1975: Explorer 1 and Discoverer launches, Freedom 7, Friendship 7 and Aurora 7, Four Days of Gemini 4 and the Gemini VI-VII rendezvous, The Eagle Has Landed, Apollo Digests, Skylab and Apollo-Soyuz, plus David Wolper's The Race for Space and Race for the Moon. Every Saturday at 10:00 am the official Apollo mission films air in order, from Apollo 7 to Apollo 17.",
+  "curated": "2026-10-15: about 26 hours of hand-listed 1957-1975 NASA, Air Force and educational space films (one copy of each film, picked from the JSC, avgeeks, Periscope and National Archives uploads) plus an in-order Apollo 7-17 mission-film slot; shuttle-era and ISS videos, 1980s-90s retrospectives, raw silent footage, press-conference tapes, hoax and ancient-astronaut films excluded.",
+  "mode": "shuffle",
+  "breaks": true,
+  "sources": [
+    {
+      "kind": "ia-search",
+      "title": "Satellites and Project Mercury",
+      "query": "mediatype:movies AND identifier:(71512TheBigPicture OR gov.archives.arc.67747 OR 201296_Earth_Satellites_Explorers OR 12494scienceinspaceplanetearthvwr OR gov.dod.dimoc.26630 OR gov.dod.dimoc.26379 OR 51264TheRaceToSpace OR 27094BiographyWernherVonBraun OR 71112CanaveralToKennedy OR project_mercury_mr-1_launch OR project_mercury_freedom_7 OR gov.archives.arc.1151850 OR voyage_of_friendship_7 OR friendship7 OR 16jpye8DoTSKc7bGHF9T3d3StBih2a OR project_mercury_summation OR project_mercury_8th_quarterly_report OR 72922BProjectMercury)",
+      "items": 40,
+      "filesPerItem": 1,
+      "minMinutes": 3,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "Project Gemini",
+      "query": "mediatype:movies AND identifier:(0478_Astronauts_Walk_in_Space_01_36_05_10 OR four_days_of_gemini_4 OR proud_conquest_gemini_vi_vii OR gemini_x_a_quick_look OR gemini_xi OR gemini_xii_mission OR gemini_status_report OR gemini_ii_reentry_mission OR gemini_science_program OR 78084TheTwelveGemini OR 77424NASAFlightControllerOrientation OR xd-49994-race-to-the-moon-vwr OR 72692CamerasInSpace OR 30482ManIntoSpacePart1 OR 30492ManIntoSpacePart2)",
+      "items": 40,
+      "filesPerItem": 1,
+      "minMinutes": 3,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "Project Apollo",
+      "query": "mediatype:movies AND identifier:(ProjectApollo OR 71182ApolloSaturnTheGiantStep OR 79944NASAApolloInPerspective OR Apollo4Apollo5Missions OR 77444THeApollo5Mission OR 71452Apollo7MannedFlightMissionReport OR debrief_apollo_8 OR 76844NASAApollo8 OR Apollo9SpaceDuetOfSpidergumdrop OR gov.archives.arc.45017 OR 75362Apollo11MoonLanding OR 78114TheLunarSamplesOfApollo11 OR 66324-we-come-in-peace-vwr OR 59034VoyageToTheOceanOfStorms OR 71252Apollo15 OR 72902TheFlightOfApollo15 OR 71932NASAApollo16MissionToTheMoonHighlands OR time_of_apollo OR gov.archives.arc.45015 OR 76474NASAHighlights1967)",
+      "items": 40,
+      "filesPerItem": 1,
+      "minMinutes": 3,
+      "maxYear": 1975
+    },
+    {
+      "kind": "ia-search",
+      "title": "Apollo Digests, Skylab and Apollo-Soyuz",
+      "query": "mediatype:movies AND identifier:(77434NASAApolloDigestTestingApollo OR 78104ApolloDigestTheCommandModule OR 78134ApolloDigestMissionControl OR 86144NASAFlightCrewSupportDivision OR 55554NASAFireUnderControl OR 78074NASAApolloReEntrySimulation OR JSC336_Launch_Windows_for_Lunar_Landing.wmv OR JSC344_Lunar_Orbit_Rendezvous.wmv OR JSC345_Apollo_Atmospheric_Entry_Phase.wmv OR JSC272_Lunar_Space_Suits.wmv OR JSC315_Fly_Me_To_The_Moon_And_Back.wmv OR HQ167_Assignment_Shoot_The_Moon_Episode5.wmv OR Hq-219_mansReachShouldExceedHisGrasp.wmv OR 87174bNASA3ManApolloNextAndSwitchboardInTheSky OR 87174cNASAApollo12AndWinglessSpacecraft OR 87174dNASAComingUpApolloAndMarinerMars69 OR 71922AeronauticsAndSpace1973 OR JSC627_Skylab_The_2nd_Manned_Mission_A_Scientific_Harvest.wmv OR JSC637_Spaceship_Skylab_Wings_of_Discovery.wmv OR 71902NASASkylab3 OR MissionOfApollo-soyuz OR 59114ApolloSoyuzSpaceshipEarth)",
+      "items": 40,
+      "filesPerItem": 1,
+      "minMinutes": 3,
+      "maxYear": 1975
+    }
+  ],
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "10:00",
+      "durationMin": 45,
+      "order": "next",
+      "source": {
+        "kind": "ia-search",
+        "title": "Apollo mission films",
+        "query": "mediatype:movies AND identifier:(Jsc-498FlightOfApollo7.wmv OR Jsc-500Apollo8-goForTli.wmv OR Jsc-509Apollo9-threeToMakeReady.wmv OR Jsc-519Apollo10-toSortOutTheUnknowns.wmv OR Jsc-527_apollo11ForAllOfMankind.wmv OR Jsc-536_apollo12PinpointForScience.wmv OR Jsc-548_apollo13HoustonWeHaveAProblem1.wmv OR Jsc-563Apollo14-MissionToFraMauro.wmv OR Jsc-572Apollo15-InTheMountainsOfTheMoon OR Jsc-580Apollo16-NothingSoHidden.wmv OR Jsc-603Apollo17-OnTheShouldersOfGiants.wmv)",
+        "items": 11,
+        "filesPerItem": 1,
+        "minMinutes": 10,
+        "sort": "identifier"
+      }
+    }
+  ]
+}

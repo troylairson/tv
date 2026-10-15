@@ -1,20 +1,65 @@
 {
   "id": "fight-night",
   "name": "Fight Night",
-  "description": "",
-  "curated": "",
+  "description": "Ringside from the silent era to the 80s: Jack Johnson, Dempsey and Tunney, Joe Louis and Schmeling, Patterson and Liston, then full TV broadcasts of Holmes, Duran, Leonard, Hearns, Hagler, Chavez and the young Mike Tyson. Saturday nights at 9 pm belong to The Greatest, with Muhammad Ali's fights against Liston, Frazier, Foreman, Norton and more.",
+  "curated": "2026-10-15: about 115 hours of complete fights and fight films from 1908 to 1990, mostly from two careful uploaders (a historic fight-film archive and a collection of dated TV broadcasts) plus a 1980s fight collection and hand-picked broadcasts. Excluded: duplicate uploads of the same bout, newsreel snippets under 8 minutes, wrestling and MMA, colorized and modern 'HD production' re-edits, knockout compilations, documentaries, and anything after 1990.",
   "mode": "shuffle",
   "breaks": true,
   "sources": [
     {
       "kind": "ia-search",
-      "title": "Championship fight films",
-      "query": "mediatype:movies AND uploader:\"m-baer@yandex.ru\" AND title:(vs OR versus)",
+      "title": "Golden-age fight films (1908-1972)",
+      "query": "mediatype:movies AND uploader:\"m-baer@yandex.ru\" AND title:(vs OR versus) AND NOT identifier:(\"MuhammadAliVersusFloydPatterson\" OR \"MuhammadAliVsSonnyListon\" OR \"MuhammadAliVsFloydPatterson\" OR \"SonnyListonVsCassiusClay\" OR \"MuhammadAliVsRussianBoxers\" OR \"MuhammadAliVersusRussianBoxers\" OR \"JackDempseyVsGeorgesCarpentier\" OR \"JackDempseyVersusTommyGibbons\" OR \"JackDempseyVTommyGibbons\" OR \"GeneTunneyVsJackDempsey\" OR \"MaxSchmelingVsJoeLouis\" OR \"JackDempseyVsJackSharkey\" OR \"PrimoCarneraVsJimLondos\" OR \"PrimoCarneraVersusErnieSchaaf\" OR \"JackDempseyVsLuisFirpo\")",
+      "items": 200,
+      "filesPerItem": 1,
+      "minMinutes": 8,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "TV fight broadcasts (1963-1990)",
+      "query": "mediatype:movies AND uploader:\"aaronscottvid@gmail.com\" AND title:(vs) AND title:(1950 OR 1951 OR 1952 OR 1953 OR 1954 OR 1955 OR 1956 OR 1957 OR 1958 OR 1959 OR 1960 OR 1961 OR 1962 OR 1963 OR 1964 OR 1965 OR 1966 OR 1967 OR 1968 OR 1969 OR 1970 OR 1971 OR 1972 OR 1973 OR 1974 OR 1975 OR 1976 OR 1977 OR 1978 OR 1979 OR 1980 OR 1981 OR 1982 OR 1983 OR 1984 OR 1985 OR 1986 OR 1987 OR 1988 OR 1989 OR 1990) AND NOT title:(WWF OR WWE OR WCW OR NWA OR NJPW OR AJPW OR UWF OR UWFi OR RINGS OR Wrestling OR Wrestlemania OR Inoki OR SNME OR WWWF OR AWA OR ECW OR GCW OR Stampede OR Starrcade OR Coliseum OR Clash OR Puroresu OR Hogan OR Andre OR UFC OR kickboxing OR K-1 OR MMA) AND NOT identifier:(\"muhammad-ali-vs-ken-norton-ii-sep-10-1973-the-forum-inglewood-ca\" OR \"cassius-clay-vs-henry-cooper-jun-18-1963-wembley-stadium\" OR \"muhammad-ali-vs-henry-cooper-ii-may-21-1966-highbury-stadium-london\" OR \"aaron-pryor-vs-alexis-arguello-nov-12-1982\" OR \"mike-tyson-vs-larry-holmes-jan-22-1988-atlantic-city-conv.-ctr-nj-wbc-wba-ibf-championship\")",
       "items": 200,
       "filesPerItem": 3,
-      "minMinutes": 1,
+      "minMinutes": 8,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "1980s fights: Hagler, Leonard, Hearns, Tyson",
+      "query": "mediatype:movies AND identifier:(1980sbox)",
+      "items": 1,
+      "filesPerItem": 80,
+      "minMinutes": 5,
+      "maxYear": 1990
+    },
+    {
+      "kind": "ia-search",
+      "title": "Classic broadcasts: Cavalcade of Sports, Holmes, Camacho, Sanchez",
+      "query": "mediatype:movies AND identifier:(\"GiletteCavalcadeOfSportsmay151953\" OR \"wednesday-night-fights-12-10-58\" OR \"19730122GeorgeForemanVsJoeFrazierFULLFIGHT\" OR \"Jason1234-SugarRayRobinsonVsRockyGraziano690\" OR \"LarryHolmesVsKenNortonHighQuality\" OR \"SalvadorSanchezVsWilfredoGomez\" OR \"LarryHolmesVsCarlTheTruthWilliamsNBCBroadcast\" OR \"RayManciniV.sHectorCamacho\" OR \"HectorCamachoV.sEdwinRosario\" OR \"MikeMcCallumVsDonaldCurry\" OR \"HerolGrahamVJulianJackson.\" OR \"PernellWhitakerVs.JoseLuisRamirezII\" OR \"thomas-hearns-vs-wilfredo-benitez\" OR \"tyson-vs-douglas\")",
+      "items": 30,
+      "filesPerItem": 1,
+      "minMinutes": 8,
       "maxYear": 1990
     }
   ],
-  "slots": []
+  "slots": [
+    {
+      "days": [
+        6
+      ],
+      "start": "21:00",
+      "durationMin": 120,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "The Greatest: Muhammad Ali",
+        "query": "mediatype:movies AND identifier:(\"JoeFrazierVsMuhammadAliMarch81971FullFight\" OR \"MuhammadAliVsJoeFrazier2FULLFIGHT\" OR \"rumble-in-the-jungle-george-foreman-vs-muhammad-ali-oct-30-1974-entire-fight-in-kinshasa-zaire\" OR \"MuhammadAliVsKenNortonIII19760928\" OR \"MuhammadAliLarryHolmes.19801002\" OR \"muhammad-ali-vs-george-chuvalo-ii-may-01-1972-pacific-coliseum-vancouver-bc\" OR \"muhammad-ali-vs-ken-norton-ii-sep-10-1973-the-forum-inglewood-ca\" OR \"cassius-clay-vs-henry-cooper-jun-18-1963-wembley-stadium\" OR \"muhammad-ali-vs-henry-cooper-ii-may-21-1966-highbury-stadium-london\" OR \"MuhammadAliVersusFloydPatterson\" OR \"MuhammadAliVsSonnyListon\" OR \"MuhammadAliVsFloydPatterson\" OR \"SonnyListonVsCassiusClay\" OR \"MuhammadAliVsRussianBoxers\")",
+        "items": 30,
+        "filesPerItem": 1,
+        "minMinutes": 8,
+        "maxYear": 1990
+      }
+    }
+  ]
 }

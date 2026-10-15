@@ -1,50 +1,96 @@
 {
   "id": "silent-laughs",
   "name": "Silent Laughs",
-  "description": "TBD",
-  "curated": "TBD",
+  "description": "Pratfalls, pianos and title cards: Chaplin's Keystone, Essanay and Mutual shorts, Buster Keaton in The General, Sherlock Jr. and Steamboat Bill, Jr., Harold Lloyd dangling from the clock in Safety Last!, plus Harry Langdon, Charley Chase, Mabel Normand, Fatty Arbuckle and the Sennett gang. Laurel & Hardy's silent two-reelers play weeknights at 6:00 pm in release order, and the Our Gang kids take over Saturday mornings at 9:00.",
+  "curated": "2026-10-15: about 78 hours of hand-listed silent comedy items (1909-1929), picked from the Internet Archive's silent_films and Silent Hall of Fame collections and the 1927-29 Comedy_Films uploads, plus 23 Laurel & Hardy silents (weeknight slot) and 11 Our Gang silents (Saturday slot). Excluded: colorized prints, modern compilations and documentaries, talkies, incomplete or mislabeled copies (several silent-* Keaton uploads were fragments, swapped for complete prints), Blu-ray box-set items whose file names left junk in titles, and racially caricatured shorts (Haunted Spooks, Spook Spoofing, Uncle Tom's Uncle, Shootin' Injuns).",
   "mode": "shuffle",
   "breaks": true,
   "sources": [
     {
-      "kind": "ia-item",
-      "title": "Chaplin at Mutual (1916-17)",
-      "identifier": "the-floorwalker-1916-1080p-blu-ray-x-265-garshasp",
-      "minMinutes": 8,
-      "maxYear": 1930
-    },
-    {
-      "kind": "ia-item",
-      "title": "Chaplin at Essanay (1915-16)",
-      "identifier": "burlesque-on-carmen-1916-1080p-blu-ray-x-265-garshasp",
-      "minMinutes": 8,
-      "maxYear": 1930
-    },
-    {
-      "kind": "ia-item",
-      "title": "Buster Keaton & Fatty Arbuckle shorts",
-      "identifier": "the-boat-1921-1080p-blu-ray-x-265-garshasp",
-      "minMinutes": 8,
+      "kind": "ia-search",
+      "title": "Charlie Chaplin shorts and features",
+      "query": "identifier:(\"silent-a-burlesque-on-carmen\" OR \"silent-a-busy-day\" OR \"silent-a-jitney-elopement\" OR \"silent-a-night-out\" OR \"silent-by-the-sea\" OR \"silent-his-musical-career\" OR \"silent-in-the-park\" OR \"silent-kid-auto-races-at-venice\" OR \"silent-shanghaied\" OR \"silent-the-champion\" OR \"silent-the-count\" OR \"silent-the-face-on-the-barroom-floor\" OR \"silent-the-fireman\" OR \"silent-the-masquerader\" OR \"silent-the-pilgrim\" OR \"silent-the-rounders\" OR \"silent-tillies-punctured-romance\" OR \"silent-triple-trouble\" OR \"silent-work\" OR \"silent-his-new-job\" OR \"silent-the-rink\" OR \"CC_1916_05_15_TheFloorwalker\" OR \"CC_1916_10_02_ThePawnshop\" OR \"CC_1916_08_07_One_A_M\" OR \"CC_1917_06_17_TheImmigrant\" OR \"CC_1917_10_22_TheAdventurer\" OR \"CC_1916_05_27_Police\" OR \"CC_1916_11_13_BehindtheScreen\" OR \"CC_1917_04_16_TheCure\" OR \"CC_1914_02_02_MakingALiving\" OR \"CC_1914_10_26_DoughandDynamite\" OR \"CC_1914_06_11_TheKnockout\" OR \"CC_1914_12_07_HisPrehistoricpast\" OR \"CC_1914_07_09_LaffingGas\" OR \"CC_1914_04_27_CaughtinaCaberet\" OR \"EasyStreet1917\" OR \"TheVagabond1916\" OR \"AWoman1915\" OR \"TheTramp1915\" OR \"1915bank\" OR \"ANightInTheShow1915\" OR \"adayspleasure_201909\" OR \"a-dogs-life-1918-directed-by-charlie-chaplin\" OR \"shoulder-arms-1918-charlie-chaplin-short\" OR \"the-circus-charlie-chaplin\")",
+      "items": 45,
+      "filesPerItem": 1,
+      "minMinutes": 5,
       "maxYear": 1930
     },
     {
       "kind": "ia-search",
-      "title": "Laurel & Hardy silents",
-      "query": "identifier:(\"106-utopia-1951\" OR \"01-should-married-men-go-home\")",
-      "items": 2,
-      "filesPerItem": 12,
-      "minMinutes": 10,
-      "maxYear": 1929
+      "title": "Buster Keaton shorts and features",
+      "query": "identifier:(\"silent-back-stage\" OR \"silent-convict-13\" OR \"Cops1922\" OR \"silent-daydreams\" OR \"silent-good-night-nurse\" OR \"HardLuck_201401\" OR \"silent-my-wifes-relations\" OR \"silent-neighbors\" OR \"silent-one-week\" OR \"silent-the-balloonatic\" OR \"silent-the-bell-boy\" OR \"silent-the-blacksmith\" OR \"silent-the-boat\" OR \"silent-the-butcher-boy\" OR \"silent-the-electric-house\" OR \"TheFrozenNorth1922\" OR \"silent-the-goat\" OR \"silent-the-haunted-house\" OR \"silent-the-high-sign\" OR \"silent-the-love-nest\" OR \"BusterKeatonsThePaleface\" OR \"silent-the-play-house\" OR \"silent-the-rough-house\" OR \"silent-the-cook\" OR \"silent-moonshine\" OR \"silent-coney-island\" OR \"silent-the-garage\" OR \"silent-his-wedding-night\" OR \"silent-oh-doctor\" OR \"silent-out-west\" OR \"silent-the-hayseed\" OR \"TheScarecrow1920\" OR \"silent-sherlock-jr-\" OR \"silent-seven-chances\" OR \"yorkmba99_hotmail_TA\" OR \"silent-go-west\" OR \"silent-the-saphead\" OR \"TheGeneral_201312\" OR \"MyMovie_201801\" OR \"mymovie_202004\" OR \"SteamboatBillJr_201411\" OR \"my-movie_202212\" OR \"College_201405\" OR \"the-cameraman_1928\" OR \"spite-marriage_1929\")",
+      "items": 45,
+      "filesPerItem": 1,
+      "minMinutes": 5,
+      "maxYear": 1930
     },
     {
       "kind": "ia-search",
-      "title": "Silent comedy features and shorts",
-      "query": "identifier:(\"TheGeneral_201312\" OR \"MyMovie_201801\" OR \"mymovie_202004\" OR \"SteamboatBillJr_201411\" OR \"my-movie_202212\" OR \"my-movie_202111\" OR \"MyMovie_20190318\" OR \"my-movie_202208\" OR \"yorkmba99_hotmail_TA\" OR \"yorkmba99_hotmail_Vids\" OR \"College_201405\" OR \"the-cameraman_1928\" OR \"spite-marriage_1929\" OR \"silent-safety-last\" OR \"silent-the-freshman\" OR \"silent-hot-water\" OR \"silent-girl-shy\" OR \"silent-why-worry\" OR \"silent-grandmas-boy\" OR \"silent-dr-jack\" OR \"silent-a-sailor-made-man\" OR \"speedy_1928\" OR \"the-kid-brother_1927\" OR \"silent-young-mr-jazz\" OR \"silent-take-a-chance\" OR \"silent-over-the-fence\" OR \"silent-the-marathon\" OR \"silent-thats-him\" OR \"silent-why-pick-on-me\" OR \"silent-high-and-dizzy\" OR \"silent-an-eastern-westerner\" OR \"silent-his-royal-slyness\" OR \"silent-the-non-stop-kid\" OR \"a-dogs-life-1918-directed-by-charlie-chaplin\" OR \"the-pilgrim-1923-directed-by-charlie-chaplin\" OR \"shoulder-arms-1918-charlie-chaplin-short\" OR \"the-circus-charlie-chaplin\" OR \"adayspleasure_201909\" OR \"silent-tillies-punctured-romance\" OR \"silent-kid-auto-races-at-venice\" OR \"silent-the-rounders\" OR \"silent-a-busy-day\" OR \"silent-his-musical-career\" OR \"silent-the-masquerader\" OR \"silent-the-face-on-the-barroom-floor\" OR \"silent-his-new-profession-aka-the-good-for-nothing\" OR \"putting-pants-on-philip_1927\" OR \"the-battle-of-the-century_1927\" OR \"youre-darn-tootin_1928\" OR \"the-finishing-touch_1928\" OR \"their-purple-moment_1928\" OR \"flying-elephants_1928\" OR \"leave-em-laughing\" OR \"do-detectives-think\" OR \"silent-somewhere-in-wrong\" OR \"silent-scorching-sands\" OR \"silent-dr-pyckle-and-mr-pryde\" OR \"silent-west-of-hot-dog\" OR \"silent-the-soilers\" OR \"silent-oranges-and-lemons\" OR \"silent-roughest-africa\" OR \"silent-mud-and-sand\" OR \"silent-just-rambling-along\" OR \"HisNewMamma\" OR \"TheLuckOTheFoolish1924\" OR \"TheFirst100Years1924\" OR \"picking-peaches\" OR \"TheHansomCabman\" OR \"silent-all-night-long\" OR \"tramp_tramp_tramp_1926\" OR \"long-pants_1927\" OR \"frank-capra-the-strong-man-1926\" OR \"silent-isnt-life-terrible\" OR \"silent-all-wet\" OR \"silent-his-wooden-wedding\" OR \"ManyMammas\" OR \"BadBoy_201412\" OR \"ShouldHusbands\" OR \"PoorFish\" OR \"MightyLikeAMoose1926.mp4\" OR \"OurGangDerbyDay1923\" OR \"ourgangrainydays1928\" OR \"OurGangTheSpankingAge1928\" OR \"ourgangolympicgames1927\" OR \"1922.Fire.Fighters\" OR \"27.OurGangItsABear1924\" OR \"ourgangcrazyhouse1928\" OR \"ourganglovemydog1927\" OR \"ourgangtiredbusinessmen1927\" OR \"Our.GangYour.Own.Back.Yard1925\" OR \"ourganghighsociety1924\" OR \"silent-mabels-dramatic-career\" OR \"silent-a-muddy-romance\" OR \"silent-mabels-blunder\" OR \"silent-the-extra-girl\" OR \"silent-fattys-magic-pants\" OR \"silent-mabel-and-fattys-married-life\" OR \"silent-leap-year\" OR \"silent-the-iron-mule\" OR \"silent-butter-fingers\" OR \"silent-a-birds-a-bird\" OR \"silent-their-social-splash\" OR \"silent-bombs\" OR \"silent-his-bitter-pill\" OR \"silent-the-curtain-pole\" OR \"silent-the-perfect-clown\" OR \"silent-the-bell-hop\" OR \"silent-the-dome-doctor\" OR \"silent-horseshoes\" OR \"silent-seven-years-bad-luck\" OR \"silent-the-three-must-get-theres\" OR \"silent-its-a-gift\" OR \"silent-pool-sharks\" OR \"silent-the-villain\" OR \"silent-the-hero\" OR \"TheShriekOfAraby1921BenTurpin\" OR \"TheDaredevil1923--BenTurpin\" OR \"TenDollarsOrTenDays1924--BenTurpin\" OR \"YukonJake\" OR \"TheProdigalBridegroom\" OR \"PrideOfPikeville\")",
-      "items": 121,
+      "title": "Harold Lloyd shorts and features",
+      "query": "identifier:(\"silent-safety-last\" OR \"silent-the-freshman\" OR \"silent-hot-water\" OR \"silent-girl-shy\" OR \"silent-why-worry\" OR \"silent-grandmas-boy\" OR \"silent-dr-jack\" OR \"silent-a-sailor-made-man\" OR \"speedy_1928\" OR \"the-kid-brother_1927\" OR \"Never_Weaken_1921\" OR \"silent-young-mr-jazz\" OR \"silent-take-a-chance\" OR \"silent-the-marathon\" OR \"silent-thats-him\" OR \"silent-why-pick-on-me\" OR \"silent-high-and-dizzy\" OR \"silent-an-eastern-westerner\" OR \"silent-his-royal-slyness\" OR \"silent-the-non-stop-kid\")",
+      "items": 20,
+      "filesPerItem": 1,
+      "minMinutes": 5,
+      "maxYear": 1930
+    },
+    {
+      "kind": "ia-search",
+      "title": "Harry Langdon, Charley Chase, Stan Laurel solo",
+      "query": "identifier:(\"silent-somewhere-in-wrong\" OR \"silent-scorching-sands\" OR \"silent-dr-pyckle-and-mr-pryde\" OR \"silent-west-of-hot-dog\" OR \"silent-the-soilers\" OR \"silent-oranges-and-lemons\" OR \"silent-roughest-africa\" OR \"silent-mud-and-sand\" OR \"silent-just-rambling-along\" OR \"HisNewMamma\" OR \"HarryLangdonSaturdayAfternoon1926\" OR \"picking-peaches\" OR \"TheHansomCabman\" OR \"silent-all-night-long\" OR \"long-pants_1927\" OR \"frank-capra-the-strong-man-1926\" OR \"silent-isnt-life-terrible\" OR \"silent-all-wet\" OR \"silent-his-wooden-wedding\" OR \"ManyMammas\" OR \"BadBoy_201412\" OR \"ShouldHusbands\" OR \"PoorFish\")",
+      "items": 23,
+      "filesPerItem": 1,
+      "minMinutes": 5,
+      "maxYear": 1930
+    },
+    {
+      "kind": "ia-search",
+      "title": "Sennett, Arbuckle, Semon, Turpin & friends",
+      "query": "identifier:(\"silent-mabels-dramatic-career\" OR \"silent-a-muddy-romance\" OR \"silent-mabels-blunder\" OR \"silent-the-extra-girl\" OR \"silent-fattys-magic-pants\" OR \"silent-mabel-and-fattys-married-life\" OR \"silent-leap-year\" OR \"silent-the-iron-mule\" OR \"silent-butter-fingers\" OR \"silent-a-birds-a-bird\" OR \"silent-their-social-splash\" OR \"silent-bombs\" OR \"silent-his-bitter-pill\" OR \"silent-the-perfect-clown\" OR \"silent-the-bell-hop\" OR \"silent-the-dome-doctor\" OR \"silent-horseshoes\" OR \"silent-tough-luck-and-tin-lizzies\" OR \"silent-seven-years-bad-luck\" OR \"silent-the-three-must-get-theres\" OR \"silent-its-a-gift\" OR \"silent-pool-sharks\" OR \"silent-the-villain\" OR \"silent-the-hero\" OR \"YukonJake\" OR \"TheProdigalBridegroom\" OR \"PrideOfPikeville\")",
+      "items": 27,
       "filesPerItem": 1,
       "minMinutes": 5,
       "maxYear": 1930
     }
   ],
-  "slots": []
+  "slots": [
+    {
+      "days": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "start": "18:00",
+      "durationMin": 30,
+      "order": "next",
+      "source": {
+        "kind": "ia-search",
+        "title": "Laurel & Hardy silents",
+        "query": "identifier:(\"wrong-again_1929\" OR \"the-battle-of-the-century_1927\" OR \"putting-pants-on-philip_1927\" OR \"the-second-100-years_1927\" OR \"big-business_1929\" OR \"youre-darn-tootin_1928\" OR \"two-tars_1928\" OR \"we-faw-down_1928\" OR \"call-of-the-cuckoo_1927\" OR \"from-soup-to-nuts_1928\" OR \"habeas-corpus_1928\" OR \"early-to-bed_1928\" OR \"the-finishing-touch_1928\" OR \"their-purple-moment_1928\" OR \"flying-elephants_1928\" OR \"double-whoopee_1929\" OR \"should-married-men-go-home_1928\" OR \"angora-love_1929\" OR \"bacon-grabbers_1929\" OR \"liberty_1929\" OR \"thats-my-wife_1929\" OR \"laurel-and-hardy-leave-em-laughing-silent\" OR \"do-detectives-think\")",
+        "items": 23,
+        "filesPerItem": 1,
+        "minMinutes": 10,
+        "maxYear": 1930,
+        "sort": "date"
+      }
+    },
+    {
+      "days": [
+        6
+      ],
+      "start": "09:00",
+      "durationMin": 60,
+      "order": "random",
+      "source": {
+        "kind": "ia-search",
+        "title": "Our Gang silents",
+        "query": "identifier:(\"OurGangDerbyDay1923\" OR \"ourgangrainydays1928\" OR \"OurGangTheSpankingAge1928\" OR \"ourgangolympicgames1927\" OR \"1922.Fire.Fighters\" OR \"27.OurGangItsABear1924\" OR \"ourgangcrazyhouse1928\" OR \"ourganglovemydog1927\" OR \"ourgangtiredbusinessmen1927\" OR \"Our.GangYour.Own.Back.Yard1925\" OR \"ourganghighsociety1924\")",
+        "items": 11,
+        "filesPerItem": 1,
+        "minMinutes": 10,
+        "maxYear": 1930
+      }
+    }
+  ]
 }
