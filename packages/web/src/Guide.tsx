@@ -16,6 +16,43 @@ interface GuideBlock {
   description?: string;
   show?: string;
   episode?: string;
+  logo?: string;
+}
+
+/** Title art that has loaded (or failed), remembered so moving around the grid doesn't flicker. */
+const artStatus = new Map<string, 'ok' | 'failed'>();
+
+/**
+ * A show's title art in place of its name, like a streaming guide. The name shows until the
+ * image has loaded, and stays if there isn't one (most Internet Archive shows).
+ */
+function ShowTitle({ block }: { block: GuideBlock }) {
+  const [, rerender] = useState(0);
+  const url = block.logo;
+  const status = url ? artStatus.get(url) : 'failed';
+  const name = block.show ?? block.title;
+  return (
+    <>
+      {url && status !== 'failed' && (
+        <img
+          key={url}
+          class={`guide-details-art ${status === 'ok' ? '' : 'loading'}`}
+          src={url}
+          alt={name}
+          onLoad={(e) => {
+            const img = e.currentTarget as HTMLImageElement;
+            artStatus.set(url, img.naturalWidth > 0 ? 'ok' : 'failed');
+            rerender((n) => n + 1);
+          }}
+          onError={() => {
+            artStatus.set(url, 'failed');
+            rerender((n) => n + 1);
+          }}
+        />
+      )}
+      {status !== 'ok' && <div class={`guide-details-title ${block.description || block.episode ? 'one-line' : ''}`}>{name}</div>}
+    </>
+  );
 }
 
 interface GuideRow {
@@ -197,10 +234,16 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
             </>
           ) : focused && focusedRow ? (
             <>
-              <div class="guide-details-ch heading">
-                {focusedRow.number} {focusedRow.name}
+              <div class="guide-details-head">
+                <div class="guide-details-ch heading">
+                  {focusedRow.number} {focusedRow.name}
+                </div>
+                {(() => {
+                  const info = channels.find((c) => c.id === focusedRow.id);
+                  return info && <Logo channel={info} theme={theme.logo} class="guide-details-chlogo" />;
+                })()}
               </div>
-              <div class={`guide-details-title ${focused.description || focused.episode ? 'one-line' : ''}`}>{focused.show ?? focused.title}</div>
+              <ShowTitle key={focused.logo ?? focused.title} block={focused} />
               {focused.episode && <div class="guide-details-episode">{focused.episode}</div>}
               <div class="guide-details-meta">
                 {fmtTime(focused.startMs)} – {fmtTime(focused.endMs)}

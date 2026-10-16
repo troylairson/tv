@@ -100,7 +100,7 @@ export function ensureLineup(channel: Channel, untilMs = Date.now() + HORIZON_MS
 }
 
 /** Details a refresh can add to an item that's already scheduled. */
-const LATEST_FIELDS = ['description', 'show', 'episode'] as const;
+const LATEST_FIELDS = ['description', 'show', 'episode', 'logo'] as const;
 
 /** Each channel's items by id, rebuilt whenever its item list is replaced. */
 const itemIndex = new WeakMap<object, Map<string, ChannelItem>>();
@@ -164,6 +164,7 @@ export interface GuideBlock {
   thumb?: string;
   show?: string;
   episode?: string;
+  logo?: string;
 }
 
 /** The channel's programmes for a guide row: shows only, each spanning up to the next show. */
@@ -184,6 +185,7 @@ export function guideBlocks(channel: Channel, fromMs: number, toMs: number): Gui
         thumb: a.item.thumb,
         show: a.item.show,
         episode: a.item.episode,
+        logo: a.item.logo,
       });
     } else if (a.kind === 'offair') {
       if (last?.kind === 'offair' && last.endMs === a.startMs) last.endMs = a.endMs;

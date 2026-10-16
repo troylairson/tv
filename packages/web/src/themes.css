@@ -741,3 +741,4 @@
 /* Next show's episode line takes the description's place where the rows are tight. */
 .tv[data-theme='prevue'] .bumper-episode ~ .bumper-desc, .tv[data-theme='broadcast'] .bumper-episode ~ .bumper-desc { display: none; }
 .tv[data-theme='vcr'] .bumper-episode, .tv[data-theme='vcr'] .guide-details-episode, .tv[data-theme='vcr'] .banner-episode { font-size: 3vh; }
+.tv[data-theme='console'] .guide-details-hint { display: none; }

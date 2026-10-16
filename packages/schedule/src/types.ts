@@ -15,6 +15,8 @@ export interface ChannelItem extends ScheduleItem {
   /** For two-line listings: the series, and the episode under it. Unset for movies and one-offs. */
   show?: string;
   episode?: string;
+  /** The show's title art (a transparent "clear logo"), when there is one. */
+  logo?: string;
 }
 
 export interface Channel {

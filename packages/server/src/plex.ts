@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { seededShuffle } from '@retro-tv/schedule';
 import { config, plexConfigured } from './config';
 import { AUDIO_LANGUAGES, getSettings } from './settings';
-import { prettifyTitle, shortDescription } from './titles';
+import { prettifyTitle, shortDescription, splitTitle } from './titles';
 import type { ChannelItem } from './types';
 
 function plexHeaders(): Record<string, string> {
@@ -43,6 +43,7 @@ interface PlexMetadata {
   leafCount?: number;
   childCount?: number;
   grandparentTitle?: string;
+  grandparentRatingKey?: string;
   parentIndex?: number;
   index?: number;
   year?: number;
@@ -78,9 +79,13 @@ function toItem(m: PlexMetadata): ChannelItem {
   const parts =
     m.type === 'episode' && m.grandparentTitle
       ? { show: prettifyTitle(m.grandparentTitle), episode: `S${m.parentIndex ?? 0}E${m.index ?? 0} · ${prettifyTitle(m.title)}` }
-      : null;
+      : // Unmatched files ("Other videos" libraries) still often carry "Show S01E02 Name".
+        splitTitle(prettifyTitle(m.title));
+  // The show's (or movie's) title art, where Plex has one; the TV hides it if there isn't.
+  const logoKey = m.type === 'episode' ? m.grandparentRatingKey : m.ratingKey;
   return {
     ...(parts ?? {}),
+    ...(logoKey && { logo: `/plex/library/metadata/${encodeURIComponent(logoKey)}/clearLogo` }),
     id: `plex:${m.ratingKey}`,
     source: 'plex',
     ref: m.ratingKey,

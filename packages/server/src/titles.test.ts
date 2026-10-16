@@ -100,6 +100,10 @@ describe('splitTitle', () => {
     ['S01E186 to Tell the Truth 1970 04 21 0381', 'To Tell the Truth (1969)', 'To Tell the Truth', 'S1E186 · 1970 04 21 0381'],
     ['01-01 - Life Begins for Andy Panda (1939)', "Woody Woodpecker & Friends: The Collector's Edition", 'Woody Woodpecker & Friends', 'S1E1 · Life Begins for Andy Panda (1939)'],
     ['The Rifleman TV 1958 colorized s01e01 The Sharpshooter', 'The Rifleman', 'The Rifleman', 'S1E1 · The Sharpshooter'],
+    ['Twenty Five Twenty One Ep 11', undefined, 'Twenty Five Twenty One', 'Ep. 11'],
+    ['Beverly Hillbillies Ep01 The Clampetts Strike Oil', undefined, 'Beverly Hillbillies', 'Ep. 1 · The Clampetts Strike Oil'],
+    ['1951-11-22 You Bet Your Life #112 The Secret Word Is Hand', undefined, 'You Bet Your Life', 'Ep. 112 · The Secret Word Is Hand'],
+    ['Friends S06E14 – The One Where Chandler Can\'t Cry', undefined, 'Friends', "S6E14 · The One Where Chandler Can't Cry"],
     ['01 - Baseball Bugs', 'LOONEY TUNES COLLECTION', 'Looney Tunes', 'Ep. 1 · Baseball Bugs'],
   ])('%s', (title, collection, show, episode) => {
     expect(splitTitle(title, collection)).toEqual({ show, episode });
@@ -108,6 +112,15 @@ describe('splitTitle', () => {
     expect(splitTitle('His Girl Friday')).toBeNull();
     expect(splitTitle('Patriotic Popeye', 'Patriotic Popeye')).toBeNull();
     expect(splitTitle('Plan 9 from Outer Space')).toBeNull();
+    expect(splitTitle('Epic Hero Adventures 2')).toBeNull();
     expect(splitTitle('Fifties Advertising: UNIVAC Computer Commercial (Ad 2 of 2)')).toBeNull();
+  });
+});
+
+describe('shortDescription file details', () => {
+  it('drops sentences about the file', () => {
+    expect(
+      shortDescription('The Dick Van Dyke Show - Season 1 of 5 - MKV. Video Size: 1440x1080. The Dick Van Dyke Show is an American television sitcom that initially aired on CBS.'),
+    ).toBe('The Dick Van Dyke Show is an American television sitcom that initially aired on CBS.');
   });
 });

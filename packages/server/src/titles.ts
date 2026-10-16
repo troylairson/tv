@@ -77,7 +77,7 @@ export function commercialTitle(path: string): { title: string; year?: number } 
 
 const ENTITIES: Record<string, string> = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'", nbsp: ' ', mdash: '—', ndash: '–', hellip: '…', rsquo: '’', lsquo: '‘', rdquo: '”', ldquo: '“' };
 /** Sentences about the file rather than the show: uploads, rips, links, licences, appeals. */
-const NOT_ABOUT_THE_SHOW = /https?:|www\.|\.com\b|upload|ripped|\brip\b|digiti[sz]|transferred|subscribe|donat|patreon|paypal|copyright|public domain|licen[cs]e|creative commons|torrent|download|\bvhs\b.*\b(quality|tracking)|please (note|enjoy)|enjoy!?$/i;
+const NOT_ABOUT_THE_SHOW = /https?:|www\.|\.com\b|upload|ripped|\brip\b|digiti[sz]|transferred|subscribe|donat|patreon|paypal|copyright|public domain|licen[cs]e|creative commons|torrent|download|\bvhs\b.*\b(quality|tracking)|please (note|enjoy)|enjoy!?$|\b(mkv|avi|xvid|x264|h\.?264|bitrate|codec|video size|file size)\b|\b\d{3,4}\s*[x×]\s*\d{3,4}\b/i;
 
 /**
  * A short plain-text description for the guide: HTML stripped, entities decoded,
@@ -217,6 +217,12 @@ export function splitTitle(title: string, collection?: string): TitleParts | nul
     const { show } = showName(lead, series);
     const n = Number(numbered[2]);
     return done(show, episodeLine(n ? `Ep. ${n}` : '', numbered[3]!, show));
+  }
+  // "Twenty Five Twenty One Ep 11", "Beverly Hillbillies EP01 The Clampetts Strike Oil", "1951-11-22 You Bet Your Life #112"
+  const ep = /^(.*?)(?:\bep(?:isode)?\.?\s*|#\s*)(\d{1,4})\b(.*)$/i.exec(title);
+  if (ep && tidyName(ep[1]!)) {
+    const { show, rest } = showName(ep[1]!, series);
+    return done(show, episodeLine(`Ep. ${Number(ep[2])}`, [rest, ep[3]!].filter((x) => tidyName(x)).join(' – '), show));
   }
   // "Ken Burns The Civil War (3 of 9) Forever Free"
   const part = /^(.*?)\(?\b(\d{1,2}) of (\d{1,2})\b\)?(.*)$/i.exec(title);

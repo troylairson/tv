@@ -346,6 +346,12 @@ html, body, #app {
 .guide-cell-show, .guide-cell-episode { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .guide-cell-show { font-size: 0.82em; }
 .guide-cell-episode { font-size: 0.62em; font-weight: normal; font-style: normal; text-transform: none; opacity: 0.85; }
+.guide-details-head { display: flex; align-items: center; justify-content: space-between; gap: 1vw; }
+.guide-details-head .guide-details-ch { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.guide-details-chlogo { flex: none; width: 7.7vh; height: 4.5vh; }
+/* The show's title art (transparent), in place of its name. */
+.guide-details-art { display: block; height: 7vh; max-width: 70%; object-fit: contain; object-position: left center; filter: drop-shadow(0 0.3vh 0.6vh rgba(0, 0, 0, 0.6)); }
+.guide-details-art.loading { position: absolute; visibility: hidden; }
 .guide-details-episode { font-size: 2.9vh; font-weight: bold; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .banner-episode { font-size: 2.9vh; font-weight: bold; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ident-episode { font-size: 3.6vh; font-weight: bold; opacity: 0.9; }
