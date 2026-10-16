@@ -69,6 +69,34 @@ const json = (method: string, data: unknown): RequestInit => ({
 
 export type ChannelFields = Pick<ChannelConfig, 'number' | 'name' | 'mode' | 'breaks' | 'sources' | 'excluded' | 'slots' | 'logo' | 'bumpers'>;
 
+export interface DiscoverShelf {
+  id: string;
+  group: string;
+  name: string;
+  blurb: string;
+  inSeason?: boolean;
+}
+
+export interface DiscoverResult {
+  identifier: string;
+  title: string;
+  date?: string;
+  downloads?: number;
+  description?: string;
+  thumb: string;
+}
+
+export type DiscoverSort = 'popular' | 'gems' | 'newest' | 'oldest';
+
+export interface DiscoverFilters {
+  shelf?: string;
+  q?: string;
+  kind: string;
+  decade: string;
+  vintage: boolean;
+  sort: DiscoverSort;
+}
+
 export const api = {
   channels: () => call<{ channels: ChannelStatus[]; plexConfigured: boolean }>('/api/manage/channels'),
   create: (fields: Partial<ChannelFields>) => call<ChannelConfig>('/api/manage/channels', json('POST', fields)),
@@ -85,6 +113,14 @@ export const api = {
   plexSections: () => call<PlexSection[]>('/api/plex/sections'),
   plexBrowse: (key: string, q: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/items?q=${encodeURIComponent(q)}`),
   plexCollections: (key: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/collections`),
+  discoverShelves: () => call<{ shelves: DiscoverShelf[]; kinds: { id: string; name: string }[]; decades: string[] }>('/api/discover/shelves'),
+  discover: (f: DiscoverFilters, page = 1) => {
+    const p = new URLSearchParams({ kind: f.kind, decade: f.decade, vintage: f.vintage ? '1' : '0', sort: f.sort, page: String(page) });
+    if (f.shelf) p.set('shelf', f.shelf);
+    if (f.q) p.set('q', f.q);
+    return call<{ query: string; total: number; results: DiscoverResult[] }>(`/api/discover?${p}`);
+  },
+  related: (id: string) => call<{ pivots: { label: string; query: string }[] }>(`/api/discover/related/${encodeURIComponent(id)}`),
   iaSearch: (q: string, collection: string) =>
     call<{ query: string; total: number; link?: boolean; results: IaResult[] }>(
       `/api/ia/search?q=${encodeURIComponent(q)}&collection=${encodeURIComponent(collection)}`,

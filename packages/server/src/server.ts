@@ -27,6 +27,8 @@ import * as plex from './plex';
 import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
 import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
 import { checkItems, checkSoon, isUnavailable, lastHealthRun, loadHealth, startHealthChecks, unavailableError } from './health';
+import { DECADES, discoverQuery, KINDS, shelvesFor, SORTS, type DiscoverSort } from './discover';
+import { shortDescription } from './titles';
 import { deleteLogo, LogoError, MAX_LOGO_BYTES, readLogo, saveLogo } from './logos';
 
 const app = new Hono();
@@ -262,6 +264,52 @@ app.get('/api/ia/search', async (c) => {
     total: numFound,
     results: docs.map((d) => ({ ...d, thumb: ia.thumbUrl(d.identifier) })),
   });
+});
+
+// ── Discover: browsing the Internet Archive for things to put on ─────────────
+
+app.get('/api/discover/shelves', (c) =>
+  c.json({
+    shelves: shelvesFor().map(({ id, group, name, blurb, inSeason }) => ({ id, group, name, blurb, inSeason })),
+    kinds: Object.entries(KINDS).map(([id, k]) => ({ id, name: k.name })),
+    decades: Object.keys(DECADES),
+  }),
+);
+
+app.get('/api/discover', async (c) => {
+  const q = (c.req.query('q') ?? '').trim();
+  const linked = ia.identifierFromLink(q);
+  const sort = (c.req.query('sort') ?? 'popular') as DiscoverSort;
+  const query = linked
+    ? `identifier:"${linked}"`
+    : discoverQuery({ shelf: c.req.query('shelf'), q, kind: c.req.query('kind'), decade: c.req.query('decade'), vintage: c.req.query('vintage') !== '0', sort });
+  const { numFound, docs } = await ia.search(query, { rows: 30, page: Number(c.req.query('page')) || 1, sort: SORTS[sort] ?? SORTS.popular, fields: ['date', 'description'] });
+  return c.json({
+    query,
+    total: numFound,
+    results: docs.map((d) => ({
+      identifier: d.identifier,
+      title: d.title ?? d.identifier,
+      date: (d.date ?? '').slice(0, 10) || (d.year ? String(d.year) : undefined),
+      downloads: d.downloads,
+      description: shortDescription(d.description, d.title ?? '', 160),
+      thumb: ia.thumbUrl(d.identifier),
+    })),
+  });
+});
+
+/** Ways to find more like an item: same uploader, same collection, same subjects. */
+app.get('/api/discover/related/:id', async (c) => {
+  const meta = (await ia.metadata(c.req.param('id'))).metadata ?? {};
+  const list = (v: string | string[] | undefined) => (Array.isArray(v) ? v : v ? [v] : []).flatMap((s) => s.split(/\s*;\s*/)).filter(Boolean);
+  const quote = (s: string) => `"${s.replace(/"/g, '')}"`;
+  const pivots: { label: string; query: string }[] = [];
+  if (meta.uploader) pivots.push({ label: 'More from this uploader', query: `uploader:${quote(meta.uploader)}` });
+  for (const creator of list(meta.creator).slice(0, 1)) pivots.push({ label: `By ${creator}`, query: `creator:${quote(creator)}` });
+  const generic = /^(opensource|opensource_movies|movies|community|fav-|test_videos|computersandtechvideos|additional_collections)/i;
+  for (const coll of list(meta.collection).filter((x) => !generic.test(x)).slice(0, 2)) pivots.push({ label: `In collection “${coll}”`, query: `collection:${quote(coll)}` });
+  for (const subject of list(meta.subject).filter((x) => x.length < 40).slice(0, 6)) pivots.push({ label: subject, query: `subject:${quote(subject)}` });
+  return c.json({ pivots });
 });
 
 // ── Plex ─────────────────────────────────────────────────────────────────────

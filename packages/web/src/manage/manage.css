@@ -171,3 +171,36 @@ body.manage #app { height: auto; overflow: visible; }
 .mg-warn-text { color: var(--mg-warn, #f0b429); }
 .mg-unavailable { opacity: 0.6; text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, 0.4); }
 .mg-unavailable .mg-badge { margin-left: 8px; text-decoration: none; display: inline-block; }
+
+/* ── Header nav ── */
+.mg-nav { display: flex; gap: 4px; margin-left: 20px; margin-right: auto; }
+.mg-nav a { color: var(--mg-dim); text-decoration: none; padding: 6px 12px; border-radius: 7px; font-weight: 600; }
+.mg-nav a.on { color: var(--mg-fg); background: var(--mg-line); }
+
+/* ── Discover ── */
+.mg-shelves h2 { margin: 16px 0 6px; }
+.mg-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.mg-chips.small { margin-top: 8px; }
+.mg .mg-chip { border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+.mg .mg-chips.small .mg-chip { padding: 3px 10px; font-size: 13px; }
+.mg .mg-chip.on { background: var(--mg-accent); color: #1c0a57; border-color: var(--mg-accent); font-weight: 700; }
+.mg-chip-badge { margin-left: 6px; padding: 0 6px; border-radius: 999px; font-size: 11px; background: #e8452c; color: #fff; font-weight: 700; }
+.mg-discover-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 18px; margin-top: 16px; }
+.mg-discover-filters label { display: flex; align-items: center; gap: 6px; font-size: 14px; color: var(--mg-dim); }
+.mg .mg-segmented button.on { background: var(--mg-accent); color: #1c0a57; font-weight: 700; }
+.mg-discover-grid { list-style: none; margin: 12px 0 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 14px; }
+.mg-discover-card { background: var(--mg-card); border: 1px solid var(--mg-line); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; }
+.mg .mg-discover-thumb { position: relative; display: block; width: 100%; aspect-ratio: 4 / 3; border: 0; border-radius: 0; padding: 0; background: #000 center / cover no-repeat; }
+.mg-discover-thumb span { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 40px; color: #fff; text-shadow: 0 2px 8px #000; opacity: 0; transition: opacity 0.15s; }
+.mg-discover-thumb:hover span, .mg-discover-thumb:focus span { opacity: 1; }
+.mg-discover-player { width: 100%; aspect-ratio: 4 / 3; border: 0; background: #000; }
+.mg-discover-body { padding: 10px 12px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; }
+.mg-discover-title { color: var(--mg-fg); font-weight: 700; text-decoration: none; }
+.mg-discover-title:hover { text-decoration: underline; }
+.mg-discover-desc { margin: 2px 0 4px; font-size: 13px; color: var(--mg-dim); display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.mg-discover-body .mg-actions { margin-top: auto; flex-wrap: wrap; }
+.mg-discover-body select { max-width: 150px; }
+@media (max-width: 600px) {
+  .mg-brand span, .mg-version { display: none; }
+  .mg-nav { margin-left: 8px; }
+}

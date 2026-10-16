@@ -165,6 +165,27 @@ guide → Settings → *Manage channels* shows the address and a QR code).
   `packages/server/src/packs/`; new ones are curated by researching the Internet
   Archive (ask Claude for a theme).
 
+### Discover
+
+**Discover** (top of the manager) browses the Internet Archive for things worth
+putting on:
+
+- **Shelves:** *Off the air* (home VHS tapes, broadcasts with original commercials,
+  network prime time nights, Saturday morning blocks, late-night TV, local
+  stations, unsorted uploads), *Holidays* (the next one comes first, marked
+  *coming up*: Halloween, Thanksgiving, Christmas, New Year's Eve, Valentine's,
+  St. Patrick's, Easter, Fourth of July) and *Genres*.
+- **Filters:** kind (TV, movies, cartoons, commercials), decade, and *Before 2000
+  only* (on by default). Video-game footage, social-media templates, fan cams and
+  adult material are always left out.
+- **Sort:** *Popular*, *Hidden gems* (25–2,500 views, the best-liked first),
+  *Newest uploads*, *Oldest first*.
+- Each result: *Watch* it right there, *More like this* (same uploader, creator,
+  collection or subjects), or *Add to…* a channel.
+- *Make a channel from this* turns the whole view into a channel (shuffled, with
+  commercials); *Add this search to…* adds it to an existing one. Either way the
+  search re-runs nightly, so new uploads keep arriving.
+
 Changes take effect after whatever is on now. A new channel starts at its first
 episode the moment it's created. Sources are refreshed nightly (new Plex
 episodes, new Internet Archive search results). Settings live in

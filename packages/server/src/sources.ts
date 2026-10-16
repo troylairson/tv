@@ -23,6 +23,9 @@ const IA_SORTS: Record<IaSort, string> = {
   identifier: 'identifier asc',
   date: 'date asc',
   title: 'titleSorter asc',
+  // Discover's "hidden gems" query limits views to a low range; the best of those first.
+  gems: 'downloads desc',
+  newest: 'addeddate desc',
 };
 
 async function iaSearchItems(query: string, items: number, filesPerItem: number, sort: IaSort = 'popular'): Promise<ChannelItem[]> {

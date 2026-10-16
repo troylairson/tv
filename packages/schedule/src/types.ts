@@ -63,7 +63,7 @@ export type SourceRef =
     }
   | { kind: 'ia-item'; identifier: string; title: string; minMinutes?: number; maxYear?: number };
 
-export type IaSort = 'popular' | 'identifier' | 'date' | 'title';
+export type IaSort = 'popular' | 'identifier' | 'date' | 'title' | 'gems' | 'newest';
 
 /** "These days, at this time, for this long, play this." Times are in the house time zone. */
 export interface SlotConfig {

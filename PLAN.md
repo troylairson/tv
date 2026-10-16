@@ -525,6 +525,12 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       by `shortDescription` (HTML and entities, links, uploader chatter, licences dropped;
       cut at a sentence near 240 chars). Already-scheduled airings pick it up from the
       channel's current items; caches from before it get one background refresh.
+- [x] **Discover** in the manager (`/manage/discover`, `server/src/discover.ts`):
+      shelves (off-air tapes, holidays ordered by the next one, genres), kind / decade /
+      before-2000 filters with a junk filter, sorts (popular, hidden gems, newest,
+      oldest), inline preview, "more like this" pivots, add to a channel or make one.
+      Still to do: a shortlist to collect finds before building a channel, and a
+      "Channel Surf" channel of rarely-watched tapes.
 - [x] **Paste an Internet Archive link** into the manager's IA search box
       (`archive.org/details/<id>`) to jump straight to that item and add it.
 

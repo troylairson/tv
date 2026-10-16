@@ -13,7 +13,16 @@ export interface IaFile {
 
 export interface IaMetadata {
   is_dark?: boolean;
-  metadata?: { identifier?: string; title?: string | string[]; mediatype?: string; description?: string | string[] };
+  metadata?: {
+    identifier?: string;
+    title?: string | string[];
+    mediatype?: string;
+    description?: string | string[];
+    uploader?: string;
+    creator?: string | string[];
+    collection?: string | string[];
+    subject?: string | string[];
+  };
   files?: IaFile[];
 }
 
@@ -163,6 +172,8 @@ export interface SearchOptions {
   rows?: number;
   page?: number;
   sort?: string;
+  /** Extra fields to return besides identifier, title, year and downloads. */
+  fields?: string[];
 }
 
 export interface SearchDoc {
@@ -170,11 +181,13 @@ export interface SearchDoc {
   title?: string;
   year?: string | number;
   downloads?: number;
+  date?: string;
+  description?: string | string[];
 }
 
-export async function search(query: string, { rows = 50, page = 1, sort = 'downloads desc' }: SearchOptions = {}) {
+export async function search(query: string, { rows = 50, page = 1, sort = 'downloads desc', fields = [] }: SearchOptions = {}) {
   const params = new URLSearchParams({ q: `(${query}) AND mediatype:movies`, rows: String(rows), page: String(page), output: 'json' });
-  for (const field of ['identifier', 'title', 'year', 'downloads']) params.append('fl[]', field);
+  for (const field of ['identifier', 'title', 'year', 'downloads', ...fields]) params.append('fl[]', field);
   params.append('sort[]', sort);
   const data = await getJson<{ response: { numFound: number; docs: SearchDoc[] } }>(`${IA}/advancedsearch.php?${params}`);
   return data.response;
