@@ -2,7 +2,7 @@ import { randomUUID } from 'node:crypto';
 import { seededShuffle } from '@retro-tv/schedule';
 import { config, plexConfigured } from './config';
 import { AUDIO_LANGUAGES, getSettings } from './settings';
-import { prettifyTitle, shortDescription, splitTitle } from './titles';
+import { cleanShowName, prettifyTitle, shortDescription, splitTitle } from './titles';
 import type { ChannelItem } from './types';
 
 function plexHeaders(): Record<string, string> {
@@ -78,7 +78,10 @@ function displayTitle(m: PlexMetadata): string {
 function toItem(m: PlexMetadata): ChannelItem {
   const parts =
     m.type === 'episode' && m.grandparentTitle
-      ? { show: prettifyTitle(m.grandparentTitle), episode: `S${m.parentIndex ?? 0}E${m.index ?? 0} · ${prettifyTitle(m.title)}` }
+      ? {
+          show: cleanShowName(prettifyTitle(m.grandparentTitle)),
+          episode: `S${m.parentIndex ?? 0}E${m.index ?? 0}${/^episode\s*\d+$/i.test(m.title.trim()) ? '' : ` · ${prettifyTitle(m.title)}`}`,
+        }
       : // Unmatched files ("Other videos" libraries) still often carry "Show S01E02 Name".
         splitTitle(prettifyTitle(m.title));
   // The show's (or movie's) title art, where Plex has one; the TV hides it if there isn't.

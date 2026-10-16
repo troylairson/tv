@@ -742,3 +742,10 @@
 .tv[data-theme='prevue'] .bumper-episode ~ .bumper-desc, .tv[data-theme='broadcast'] .bumper-episode ~ .bumper-desc { display: none; }
 .tv[data-theme='vcr'] .bumper-episode, .tv[data-theme='vcr'] .guide-details-episode, .tv[data-theme='vcr'] .banner-episode { font-size: 3vh; }
 .tv[data-theme='console'] .guide-details-hint { display: none; }
+/* Themes restyle the guide's Settings button; its highlight must still win. */
+.tv[data-theme] .guide-settings.focused { color: var(--focus-fg); background: var(--focus-bg); }
+.tv[data-theme='vcr'] .guide-settings.focused { border-right-color: var(--focus-bg); }
+/* VCR rows are one line of big pixel type: the episode follows the show on the same line. */
+.tv[data-theme='vcr'] .guide-cell-title.two { flex-direction: row; align-items: baseline; gap: 0.5em; line-height: 1; }
+.tv[data-theme='vcr'] .guide-cell-show { flex: none; max-width: 70%; font-size: 1em; }
+.tv[data-theme='vcr'] .guide-cell-episode { flex: 1 1 auto; min-width: 0; font-size: 0.7em; }

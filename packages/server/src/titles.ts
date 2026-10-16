@@ -27,9 +27,23 @@ function titleCaseSmallWords(t: string): string {
  * is set (IA file stems are always file names) or the title has no spaces and
  * uses dots/underscores as separators.
  */
+/** Release tags on the end of an otherwise human title: "Night of the Living Dead ( 1968) English Full HD". */
+const TRAILING_TAGS = /[\s\-–([]*\b(?:english|full\s*hd|hd|hq|uhd|4k|\d{3,4}p|remux|dvd-?rip|web-?dl|web-?rip|amzn|bluray)\b[)\]]*\s*$/i;
+function tidyEnds(t: string): string {
+  let out = t.replace(/\(\s+/g, '(').replace(/\s+\)/g, ')');
+  for (let i = 0; i < 4 && TRAILING_TAGS.test(out); i++) out = out.replace(TRAILING_TAGS, '');
+  return out.trim() || t;
+}
+
+/** A series name without season markers and release tags: "Max and Ruby S01 AMZN WEB-DL" → "Max and Ruby". */
+export function cleanShowName(s: string): string {
+  const cut = s.replace(/\s+(?:S\d{1,2}|Season\s*\d+)(?:\s.*)?$/i, '').trim();
+  return tidyEnds(cut || s);
+}
+
 export function prettifyTitle(raw: string, { filename = false } = {}): string {
   let t = raw.trim();
-  if (!filename && !looksLikeFilename(t)) return t;
+  if (!filename && !looksLikeFilename(t)) return tidyEnds(t);
   const wasAllLower = t === t.toLowerCase();
 
   t = t.replace(VIDEO_EXT, '');
@@ -47,7 +61,7 @@ export function prettifyTitle(raw: string, { filename = false } = {}): string {
   t = t.replace(/[\s\-–]+$/, '');
   if (wasAllLower) t = t.replace(/\b[a-z]/g, (c) => c.toUpperCase());
   t = t.charAt(0).toUpperCase() + t.slice(1);
-  return titleCaseSmallWords(t);
+  return tidyEnds(titleCaseSmallWords(t));
 }
 
 /** "Commercials/2003/[2003] Goodyear Tires - Stopping Power.mp4" → { title: "Goodyear Tires - Stopping Power", year: 2003 } */
@@ -187,6 +201,8 @@ function episodeLine(label: string, name: string, show: string): string {
     if (words.length) n = tidyName(n.replace(new RegExp(`^\\W*${words.join('\\W+')}(?![\\w'’])`, 'i'), '')) || n;
   }
   n = capitalise(unshout(n));
+  // "S1E31 · Episode 31" says it twice.
+  if (label && /^(?:ep(?:isode)?\.?\s*)?\d{1,4}$/i.test(n)) n = '';
   if (!label) return n;
   return n ? `${label} · ${n}` : label;
 }
@@ -200,7 +216,10 @@ function episodeLine(label: string, name: string, show: string): string {
 export function splitTitle(title: string, collection?: string): TitleParts | null {
   const series = collection ? seriesName(collection) : undefined;
   // A bare number left over ("Sky King 1", "… Vol. 1") is a tape split in parts, not an episode.
-  const done = (show: string, episode: string) => (show && episode && norm(show) !== norm(episode) && !/^\d+$/.test(episode) ? { show, episode } : null);
+  const done = (rawShow: string, episode: string) => {
+    const show = cleanShowName(rawShow);
+    return show && episode && norm(show) !== norm(episode) && !/^\d+$/.test(episode) ? { show, episode } : null;
+  };
   const seLabel = (s: number, e: number) => (s === 0 && e === 0 ? 'Special' : s === 0 ? `Special ${e}` : `S${s}E${e}`);
 
   // "Get Smart S01E02 (Diplomat's Daughter)", "S01e03The Lone Rangers Triumph", "Bonanza - The Abduction Ep 2x08", "(S04E01)"

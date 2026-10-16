@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { commercialTitle, looksLikeFilename, prettifyTitle, shortDescription, splitTitle } from './titles';
+import { cleanShowName, commercialTitle, looksLikeFilename, prettifyTitle, shortDescription, splitTitle } from './titles';
 
 describe('prettifyTitle', () => {
   it('cleans dotted file names', () => {
@@ -104,6 +104,7 @@ describe('splitTitle', () => {
     ['Beverly Hillbillies Ep01 The Clampetts Strike Oil', undefined, 'Beverly Hillbillies', 'Ep. 1 · The Clampetts Strike Oil'],
     ['1951-11-22 You Bet Your Life #112 The Secret Word Is Hand', undefined, 'You Bet Your Life', 'Ep. 112 · The Secret Word Is Hand'],
     ['Friends S06E14 – The One Where Chandler Can\'t Cry', undefined, 'Friends', "S6E14 · The One Where Chandler Can't Cry"],
+    ['Max and Ruby S01 AMZN WEB-DL S01E31 Episode 31', undefined, 'Max and Ruby', 'S1E31'],
     ['01 - Baseball Bugs', 'LOONEY TUNES COLLECTION', 'Looney Tunes', 'Ep. 1 · Baseball Bugs'],
   ])('%s', (title, collection, show, episode) => {
     expect(splitTitle(title, collection)).toEqual({ show, episode });
@@ -122,5 +123,16 @@ describe('shortDescription file details', () => {
     expect(
       shortDescription('The Dick Van Dyke Show - Season 1 of 5 - MKV. Video Size: 1440x1080. The Dick Van Dyke Show is an American television sitcom that initially aired on CBS.'),
     ).toBe('The Dick Van Dyke Show is an American television sitcom that initially aired on CBS.');
+  });
+});
+
+describe('title tidying', () => {
+  it('drops release tags from the end of human titles', () => {
+    expect(prettifyTitle('Night of the Living Dead ( 1968) English Full HD')).toBe('Night of the Living Dead (1968)');
+    expect(prettifyTitle('The English Patient')).toBe('The English Patient');
+  });
+  it('cleans show names', () => {
+    expect(cleanShowName('Max and Ruby S01 AMZN WEB-DL')).toBe('Max and Ruby');
+    expect(cleanShowName('Victorious')).toBe('Victorious');
   });
 });

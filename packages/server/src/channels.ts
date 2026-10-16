@@ -97,10 +97,10 @@ async function writeJson(file: string, data: unknown) {
 
 const saveConfigs = () => writeJson(configFile(), { channels: configs });
 /**
- * What resolved items carry beyond the basics: 1 descriptions, 2 show/episode split, 3 more splits and Plex title art.
+ * What resolved items carry beyond the basics: 1 descriptions, 2 show/episode split, 3 more splits and Plex title art, 4 cleaner show names.
  * An older cache stays playable and gets one full refresh in the background to catch up.
  */
-const ITEM_DETAILS = 3;
+const ITEM_DETAILS = 4;
 const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, details: ITEM_DETAILS, resolved: Object.fromEntries(resolved) });
 
 /**
