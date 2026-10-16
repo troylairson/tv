@@ -75,7 +75,12 @@ function displayTitle(m: PlexMetadata): string {
 }
 
 function toItem(m: PlexMetadata): ChannelItem {
+  const parts =
+    m.type === 'episode' && m.grandparentTitle
+      ? { show: prettifyTitle(m.grandparentTitle), episode: `S${m.parentIndex ?? 0}E${m.index ?? 0} · ${prettifyTitle(m.title)}` }
+      : null;
   return {
+    ...(parts ?? {}),
     id: `plex:${m.ratingKey}`,
     source: 'plex',
     ref: m.ratingKey,

@@ -99,6 +99,9 @@ export function ensureLineup(channel: Channel, untilMs = Date.now() + HORIZON_MS
   return lineup;
 }
 
+/** Details a refresh can add to an item that's already scheduled. */
+const LATEST_FIELDS = ['description', 'show', 'episode'] as const;
+
 /** Each channel's items by id, rebuilt whenever its item list is replaced. */
 const itemIndex = new WeakMap<object, Map<string, ChannelItem>>();
 function currentItem(channel: Channel, item: ChannelItem): ChannelItem {
@@ -121,7 +124,10 @@ export function airingsFor(channel: Channel, fromMs: number, toMs: number): Line
     .map((a) => {
       if (a.kind !== 'show') return a;
       const latest = currentItem(channel, a.item);
-      return latest === a.item || latest.description === a.item.description ? a : { ...a, item: { ...a.item, description: latest.description } };
+      if (latest === a.item || LATEST_FIELDS.every((k) => latest[k] === a.item[k])) return a;
+      const item = { ...a.item };
+      for (const k of LATEST_FIELDS) item[k] = latest[k];
+      return { ...a, item };
     });
 }
 
@@ -156,6 +162,8 @@ export interface GuideBlock {
   slot?: boolean;
   description?: string;
   thumb?: string;
+  show?: string;
+  episode?: string;
 }
 
 /** The channel's programmes for a guide row: shows only, each spanning up to the next show. */
@@ -174,6 +182,8 @@ export function guideBlocks(channel: Channel, fromMs: number, toMs: number): Gui
         slot: Boolean(a.slotId) || undefined,
         description: a.item.description,
         thumb: a.item.thumb,
+        show: a.item.show,
+        episode: a.item.episode,
       });
     } else if (a.kind === 'offair') {
       if (last?.kind === 'offair' && last.endMs === a.startMs) last.endMs = a.endMs;

@@ -123,3 +123,117 @@ export function shortDescription(raw: unknown, title = '', max = 240): string | 
   if (out.split(' ').length < 6 || norm(out).includes(norm(title)) && out.length < title.length + 20) return undefined;
   return out;
 }
+
+export interface TitleParts {
+  /** The series ("Get Smart"). */
+  show: string;
+  /** Which one, on the line under it ("S1E2 · Diplomat's Daughter", "Part 3 of 9 · Forever Free"). */
+  episode: string;
+}
+
+const tidyName = (s: string) =>
+  s
+    .replace(/\[[^\]]*\]|\{[^}]*\}/g, ' ') // [360p], [HD], {50-01L01}
+    .replace(/\(\s*\)/g, ' ')
+    .replace(/^[\s\-–—:·|.,!?)\]]+|[\s\-–—:·|.,(\[]+$/g, '')
+    .replace(/^\((.*)\)$/, '$1')
+    .replace(/-\d{5,}$/, '') // upload ids: "A Gal for Grandma-510018"
+    .replace(/\s{2,}/g, ' ')
+    .trim();
+const SMALL = new Set(['a', 'an', 'and', 'at', 'for', 'in', 'of', 'on', 'or', 'the', 'to', 'with']);
+/** "BAD MEN OF RIMROCK" → "Bad Men of Rimrock"; anything already in mixed case is left alone. */
+const unshout = (s: string) =>
+  /[a-z]/.test(s) || !/[A-Z]{3}/.test(s)
+    ? s
+    : s.toLowerCase().replace(/[a-z][a-z']*/g, (w, i: number) => (i > 0 && SMALL.has(w) ? w : w[0]!.toUpperCase() + w.slice(1)));
+const capitalise = (s: string) => (s ? s[0]!.toUpperCase() + s.slice(1) : s);
+const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9]/g, '');
+const DATE = /^\d{1,4}[-./]\d{1,2}[-./]\d{1,4}$/;
+/** Leading dates and running numbers in front of a show's name: "1962-01-02 - ", "001 - ", "001. ". */
+const LEADING_JUNK = /^(?:\d{1,4}[-./]\d{1,2}[-./]\d{1,4}|\d{1,4}\.?)(?:\s*[-–.]\s*|\s+)/;
+
+/** A collection's title as a show name: "Green Acres Complete Series" → "Green Acres". */
+function seriesName(collection: string): string {
+  let s = collection
+    .replace(/\([^)]*\)|\[[^\]]*\]/g, ' ')
+    .replace(/\s+[-–]\s+.*$/, '')
+    .replace(/[:\s-]+the\s+collector'?s\s+edition\b/gi, ' ')
+    .replace(/\b(the\s+)?(complete\s+(tv\s+)?series|complete\s+collection|updated\s+collection|collection|tv\s+show|tv\s+series)\b/gi, ' ');
+  s = tidyName(s);
+  return unshout(s || tidyName(collection));
+}
+
+/** The show's name from the text before the episode number, falling back to the collection. */
+function showName(before: string, series: string | undefined): { show: string; rest: string } {
+  let text = before;
+  while (LEADING_JUNK.test(text)) text = text.replace(LEADING_JUNK, '');
+  text = text.replace(/\b(ep(isode)?\.?)\s*$/i, '');
+  // "Bonanza - The Abduction" before the number: the show, then the episode's name.
+  const dash = /^(.+?)\s+[-–]\s+(.+)$/.exec(tidyName(text));
+  let show = tidyName(dash ? dash[1]! : text);
+  let rest = dash ? tidyName(dash[2]!) : '';
+  // The collection's name is cleaner when the file name is the same show with extras ("The Rifleman TV 1958 colorized").
+  if (series && (!show || (norm(show).startsWith(norm(series)) && norm(show) !== norm(series)))) show = series;
+  if (!show || DATE.test(show)) show = series ?? '';
+  if (dash && !series && !rest) rest = '';
+  return { show: unshout(show), rest };
+}
+
+function episodeLine(label: string, name: string, show: string): string {
+  let n = tidyName(name);
+  // "S01E186 To Tell the Truth 1970 04 21": don't repeat the show.
+  if (show && norm(n) !== norm(show)) {
+    const words = show.split(/\W+/).filter(Boolean).map((w) => w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
+    if (words.length) n = tidyName(n.replace(new RegExp(`^\\W*${words.join('\\W+')}(?![\\w'’])`, 'i'), '')) || n;
+  }
+  n = capitalise(unshout(n));
+  if (!label) return n;
+  return n ? `${label} · ${n}` : label;
+}
+
+/**
+ * Split an episode's title into the show and the episode, for two-line guide listings.
+ * `collection` is the title of what it came from (an Internet Archive item holding a
+ * whole series), used when the file name leaves the show out. Null for anything that
+ * doesn't look like an episode of something (a movie, a one-off).
+ */
+export function splitTitle(title: string, collection?: string): TitleParts | null {
+  const series = collection ? seriesName(collection) : undefined;
+  // A bare number left over ("Sky King 1", "… Vol. 1") is a tape split in parts, not an episode.
+  const done = (show: string, episode: string) => (show && episode && norm(show) !== norm(episode) && !/^\d+$/.test(episode) ? { show, episode } : null);
+  const seLabel = (s: number, e: number) => (s === 0 && e === 0 ? 'Special' : s === 0 ? `Special ${e}` : `S${s}E${e}`);
+
+  // "Get Smart S01E02 (Diplomat's Daughter)", "S01e03The Lone Rangers Triumph", "Bonanza - The Abduction Ep 2x08", "(S04E01)"
+  const se = /^(.*?)\(?\bS(\d{1,2})\s*E(\d{1,3})(?!\d)\)?(.*)$/i.exec(title) ?? /^(.*?)\(?\b(\d{1,2})x(\d{2,3})\b\)?(.*)$/i.exec(title);
+  if (se) {
+    const { show, rest } = showName(se[1]!, series);
+    return done(show, episodeLine(seLabel(Number(se[2]), Number(se[3])), [rest, se[4]!].filter((x) => tidyName(x)).join(' – '), show));
+  }
+  // "Green Acres - 001 - Oliver Buys a Farm", "01-07-95 - 1 - Saturday Night"
+  const numbered = /^(.+?)\s+[-–]\s+(?:ep(?:isode)?\.?\s*)?(\d{1,3})\s+[-–]\s+(.+)$/i.exec(title);
+  if (numbered) {
+    const lead = tidyName(numbered[1]!);
+    if (DATE.test(lead)) return series ? done(series, episodeLine(lead, numbered[3]!, series)) : null;
+    const { show } = showName(lead, series);
+    const n = Number(numbered[2]);
+    return done(show, episodeLine(n ? `Ep. ${n}` : '', numbered[3]!, show));
+  }
+  // "Ken Burns The Civil War (3 of 9) Forever Free"
+  const part = /^(.*?)\(?\b(\d{1,2}) of (\d{1,2})\b\)?(.*)$/i.exec(title);
+  if (part && !/\(\s*(ad|part|pt)\s*$/i.test(part[1]!)) {
+    const { show } = showName(part[1]!, series);
+    return done(show, episodeLine(`Part ${Number(part[2])} of ${Number(part[3])}`, part[4]!, show));
+  }
+  if (!series) return null;
+  // "01 A New Germany (1933–1939)", "01-01 - Life Begins for Andy Panda", "000 - Knock-Knock (1940)"
+  const lead = /^(\d{1,3})(?:-(\d{1,3}))?(?:[\s.\-–)]+|(?=[A-Z]))(.+)$/.exec(title);
+  if (lead && !norm(title).startsWith(norm(series))) {
+    const label = lead[2] ? seLabel(Number(lead[1]), Number(lead[2])) : Number(lead[1]) ? `Ep. ${Number(lead[1])}` : '';
+    return done(series, episodeLine(label, lead[3]!, series));
+  }
+  // "Dragnet - The Big Con" from the collection "Dragnet"; "Portland Wrestling … (part 1)"
+  if (norm(title).startsWith(norm(series)) && norm(title) !== norm(series)) {
+    return done(series, episodeLine('', title, series));
+  }
+  return null;
+}

@@ -9,6 +9,7 @@ import { Settings, type SettingRow } from './Settings';
 import { initStaticAudio, setStaticMuted, Static } from './Static';
 import { Tuner, type ChannelInfo, type PlexMode, type TunerState } from './tuner';
 import { Logo, logoSvg } from './logos/Logo';
+import { fullTitle } from './titles';
 import { findTheme, THEMES } from './themes';
 
 const params = new URLSearchParams(location.search);
@@ -470,7 +471,8 @@ export function App() {
                   </div>
                 )}
                 <div class="ident-label heading">{nextShow ? theme.upNext : 'Thanks for watching'}</div>
-                <div class="ident-title">{nextShow ? nextShow.item.title : channel.name}</div>
+                <div class="ident-title">{nextShow ? (nextShow.item.show ?? nextShow.item.title) : channel.name}</div>
+                {nextShow?.item.episode && <div class="ident-episode">{nextShow.item.episode}</div>}
                 {nextShow?.item.description && <div class="ident-desc">{nextShow.item.description}</div>}
                 {nextShow && (
                   <div class="ident-time">
@@ -493,7 +495,7 @@ export function App() {
           <h1 class="heading">Off the Air</h1>
           <p>
             {channel?.name} returns at {fmtTime(airing.endMs)}
-            {nextShow ? ` with ${nextShow.item.title}` : ''}
+            {nextShow ? ` with ${fullTitle(nextShow.item)}` : ''}
           </p>
         </div>
       )}
@@ -514,12 +516,12 @@ export function App() {
           <p>We're experiencing technical difficulties.</p>
           {tunerState.retryAt && tunerState.retryAt > t ? (
             <p class="dim">
-              Trying {airing?.kind === 'show' ? `${airing.item.title} ` : ''}again in {Math.max(1, Math.ceil((tunerState.retryAt - t) / 1000))} s…
+              Trying {airing?.kind === 'show' ? `${fullTitle(airing.item)} ` : ''}again in {Math.max(1, Math.ceil((tunerState.retryAt - t) / 1000))} s…
             </p>
           ) : (
             nextShow && (
               <p class="dim">
-                Back at {fmtTime(airing?.endMs ?? nextShow.startMs)} with {nextShow.item.title}
+                Back at {fmtTime(airing?.endMs ?? nextShow.startMs)} with {fullTitle(nextShow.item)}
               </p>
             )
           )}
@@ -564,13 +566,16 @@ export function App() {
               </span>
               <span class="banner-clock">{fmtTime(now())}</span>
             </div>
-            <div class="banner-title">{airing.kind === 'show' || isBreak ? airing.item.title : (nextShow?.item.title ?? channel.name)}</div>
+            <div class="banner-title">
+              {airing.kind === 'show' ? (airing.item.show ?? airing.item.title) : isBreak ? airing.item.title : (nextShow?.item.title ?? channel.name)}
+            </div>
+            {airing.kind === 'show' && airing.item.episode && <div class="banner-episode">{airing.item.episode}</div>}
             <div class="banner-row banner-meta">
               <span>
                 {airing.kind === 'show' ? `${fmtTime(airing.startMs)} – ${fmtTime(airing.endMs)}` : `until ${fmtTime(airing.endMs)}`}
               </span>
-              {nextShow && airing.kind === 'show' && <span class="banner-next">Next: {nextShow.item.title}</span>}
-              {nextShow && isBreak && <span class="banner-next">Up next: {nextShow.item.title}</span>}
+              {nextShow && airing.kind === 'show' && <span class="banner-next">Next: {fullTitle(nextShow.item)}</span>}
+              {nextShow && isBreak && <span class="banner-next">Up next: {fullTitle(nextShow.item)}</span>}
             </div>
             <div class="progress">
               <div class="progress-fill" style={{ width: `${progress * 100}%` }} />
@@ -579,7 +584,7 @@ export function App() {
           {nextShow && (
             <div class="banner-upnext">
               Up next · {fmtTime(nextShow.startMs)}
-              <b>{nextShow.item.title}</b>
+              <b>{nextShow.item.show ?? nextShow.item.title}</b>
             </div>
           )}
           {hasLogo && (
@@ -599,7 +604,7 @@ export function App() {
               .slice(0, 5)
               .map((a) => (
                 <span key={a.startMs}>
-                  {a.item.title} <i>{fmtTime(a.startMs)}</i>
+                  {fullTitle(a.item)} <i>{fmtTime(a.startMs)}</i>
                 </span>
               ))}
           </div>

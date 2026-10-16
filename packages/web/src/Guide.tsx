@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { now } from './clock';
 import type { Action } from './keys';
 import { Logo } from './logos/Logo';
+import { fullTitle } from './titles';
 import type { Theme } from './themes';
 import type { ChannelInfo } from './tuner';
 
@@ -13,6 +14,8 @@ interface GuideBlock {
   kind: 'show' | 'break' | 'offair';
   slot?: boolean;
   description?: string;
+  show?: string;
+  episode?: string;
 }
 
 interface GuideRow {
@@ -197,13 +200,14 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
               <div class="guide-details-ch heading">
                 {focusedRow.number} {focusedRow.name}
               </div>
-              <div class={`guide-details-title ${focused.description ? 'one-line' : ''}`}>{focused.title}</div>
+              <div class={`guide-details-title ${focused.description || focused.episode ? 'one-line' : ''}`}>{focused.show ?? focused.title}</div>
+              {focused.episode && <div class="guide-details-episode">{focused.episode}</div>}
               <div class="guide-details-meta">
                 {fmtTime(focused.startMs)} – {fmtTime(focused.endMs)}
                 {focused.startMs <= t && t < focused.endMs ? ' · ON NOW' : ` · starts in ${Math.round((focused.startMs - t) / 60_000)} min`}
               </div>
               {focused.description && <div class="guide-details-desc">{focused.description}</div>}
-              {!focused.description && nextAfterFocused && nextAfterFocused !== focused && <div class="guide-details-next">Then: {nextAfterFocused.title}</div>}
+              {!focused.description && nextAfterFocused && nextAfterFocused !== focused && <div class="guide-details-next">Then: {fullTitle(nextAfterFocused)}</div>}
               <div class="guide-details-hint">OK watch channel {focusedRow.number}</div>
             </>
           ) : (
@@ -247,7 +251,14 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
                       style={{ left: `${pct(b.startMs)}%`, width: `${pct(b.endMs) - pct(b.startMs)}%` }}
                     >
                       {b.startMs < windowStart && <span class="guide-more">◀</span>}
-                      <span class="guide-cell-title">{b.title}</span>
+                      {b.show && b.episode ? (
+                        <span class="guide-cell-title two">
+                          <span class="guide-cell-show">{b.show}</span>
+                          <span class="guide-cell-episode">{b.episode}</span>
+                        </span>
+                      ) : (
+                        <span class="guide-cell-title">{b.title}</span>
+                      )}
                       {b.endMs > windowEnd && <span class="guide-more">▶</span>}
                     </div>
                   ))}

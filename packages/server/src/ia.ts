@@ -1,4 +1,4 @@
-import { prettifyTitle, shortDescription } from './titles';
+import { prettifyTitle, shortDescription, splitTitle } from './titles';
 import type { ChannelItem } from './types';
 
 const IA = 'https://archive.org';
@@ -119,6 +119,8 @@ export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles
   const title = (Array.isArray(rawTitle) ? rawTitle[0] : rawTitle) ?? identifier;
   const files = pickPlayableFiles(meta.files).slice(0, maxFiles);
   const description = shortDescription(meta.metadata?.description, title);
+  // An item holding several episodes is usually the series, so its title names the show.
+  const series = files.length > 1 && !isGenericName(title) ? prettifyTitle(title) : undefined;
   let part = 0;
   const fileTitle = (f: (typeof files)[number]) => {
     if (files.length === 1) return prettifyTitle(isGenericName(title) ? fallbackName(identifier, title, f.name) : title);
@@ -126,16 +128,21 @@ export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles
     // DVD rips of off-air tapes: "ABC Primetime 11-30-80 (part 2)" rather than "VTS 01 2".
     return `${prettifyTitle(fallbackName(identifier, title, f.name))} (part ${++part})`;
   };
-  return files.map((f) => ({
-    id: `ia:${identifier}/${f.name}`,
-    source: 'ia' as const,
-    ref: `${identifier}/${f.name}`,
-    title: fileTitle(f),
-    durationSec: Math.round(f.durationSec * 100) / 100,
-    url: downloadUrl(identifier, f.name),
-    thumb: thumbUrl(identifier),
-    ...(description && { description }),
-  }));
+  return files.map((f) => {
+    const fTitle = fileTitle(f);
+    const parts = splitTitle(fTitle, series);
+    return {
+      id: `ia:${identifier}/${f.name}`,
+      source: 'ia' as const,
+      ref: `${identifier}/${f.name}`,
+      title: fTitle,
+      ...(parts && { show: parts.show, episode: parts.episode }),
+      durationSec: Math.round(f.durationSec * 100) / 100,
+      url: downloadUrl(identifier, f.name),
+      thumb: thumbUrl(identifier),
+      ...(description && { description }),
+    };
+  });
 }
 
 /** GET JSON from archive.org, retrying network errors and 5xx (it has the occasional hiccup). */

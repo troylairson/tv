@@ -1,5 +1,6 @@
 import type { ChannelInfo, Airing } from './tuner';
 import { Logo } from './logos/Logo';
+import { fullTitle } from './titles';
 import type { Theme } from './themes';
 
 const fmtTime = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
@@ -33,7 +34,7 @@ export function Bumper({ channel, shows, theme, nowMs }: { channel: ChannelInfo;
       {next.item.thumb && (
         <div class="bumper-photo-wrap">
           <div class="bumper-photo" style={{ backgroundImage: `url(${next.item.thumb})` }} />
-          <div class="bumper-caption">Next: {next.item.title}</div>
+          <div class="bumper-caption">Next: {fullTitle(next.item)}</div>
         </div>
       )}
       <ol class="bumper-list">
@@ -49,7 +50,8 @@ export function Bumper({ channel, shows, theme, nowMs }: { channel: ChannelInfo;
             </span>
             <span class="bumper-title">
               {i === 0 && <span class="bumper-chip">In {mins} min</span>}
-              <b>{a.item.title}</b>
+              <b>{a.item.show ?? a.item.title}</b>
+              {a.item.episode && <span class="bumper-episode">{a.item.episode}</span>}
               {i === 0 && a.item.description && <span class="bumper-desc">{a.item.description}</span>}
             </span>
             <span class="bumper-dots" />

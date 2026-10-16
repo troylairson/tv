@@ -96,8 +96,12 @@ async function writeJson(file: string, data: unknown) {
 }
 
 const saveConfigs = () => writeJson(configFile(), { channels: configs });
-// `described`: items carry descriptions (older caches get one full refresh to pick them up).
-const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, described: true, resolved: Object.fromEntries(resolved) });
+/**
+ * What resolved items carry beyond the basics: 1 descriptions, 2 show/episode split.
+ * An older cache stays playable and gets one full refresh in the background to catch up.
+ */
+const ITEM_DETAILS = 2;
+const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, details: ITEM_DETAILS, resolved: Object.fromEntries(resolved) });
 
 /**
  * A list without the items health checks found unavailable. The same array comes back
@@ -420,7 +424,7 @@ export async function deleteChannel(id: string): Promise<boolean> {
 
 interface LegacyCache {
   version?: number;
-  described?: boolean;
+  details?: number;
   channels?: Channel[];
   resolved?: Record<string, Resolved>;
 }
@@ -470,8 +474,9 @@ export async function initChannels(): Promise<void> {
 
   const stale = configs.filter((c) => resolved.get(c.id)?.configHash !== contentHash(c)).length;
   console.log(`${configs.length} channels configured, ${configs.length - stale} ready${stale ? `, resolving ${stale}…` : ''}`);
-  // Caches from before show descriptions: re-resolve everything once (what's cached keeps playing meanwhile).
-  if (!cache.described && resolved.size) console.log('fetching show descriptions for every channel in the background…');
-  void refreshAll(cache.described === true || !resolved.size);
+  // Caches from before newer item details: re-resolve everything once (what's cached keeps playing meanwhile).
+  const current = cache.details === ITEM_DETAILS;
+  if (!current && resolved.size) console.log('updating show details for every channel in the background…');
+  void refreshAll(current || !resolved.size);
   setInterval(() => void refreshAll(), REFRESH_EVERY_MS);
 }

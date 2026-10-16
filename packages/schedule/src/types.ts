@@ -12,6 +12,9 @@ export interface ChannelItem extends ScheduleItem {
   thumb?: string;
   /** A sentence or two about it (IA description, Plex summary), for the guide and "up next" cards. */
   description?: string;
+  /** For two-line listings: the series, and the episode under it. Unset for movies and one-offs. */
+  show?: string;
+  episode?: string;
 }
 
 export interface Channel {

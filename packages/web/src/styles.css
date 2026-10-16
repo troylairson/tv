@@ -156,6 +156,8 @@ html, body, #app {
 .banner-body { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; }
 .banner-row { display: flex; justify-content: space-between; gap: 2vw; }
 .banner-row > span:last-child { text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.banner-meta > span:first-child { flex: none; white-space: nowrap; }
+.banner-meta > span:last-child { min-width: 0; }
 .banner-label { color: var(--accent); font-weight: bold; font-family: var(--font-display); letter-spacing: var(--heading-spacing); text-transform: var(--heading-case); font-size: 2.7vh; }
 .banner-title { font-size: 4.9vh; font-weight: bold; margin: 0.6vh 0 1vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-family: var(--font-display); }
 .progress { margin-top: 1.5vh; height: 0.8vh; border-radius: 0.4vh; background: var(--progress-track); overflow: hidden; }
@@ -339,6 +341,15 @@ html, body, #app {
 .guide-cell.tiny { padding: 0; }
 .guide-cell.tiny > * { display: none; }
 .guide-cell-title { overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+/* Episodes: the show, with the season/episode and its name under it. */
+.guide-cell-title.two { display: flex; flex-direction: column; justify-content: center; line-height: 1.08; }
+.guide-cell-show, .guide-cell-episode { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.guide-cell-show { font-size: 0.82em; }
+.guide-cell-episode { font-size: 0.62em; font-weight: normal; font-style: normal; text-transform: none; opacity: 0.85; }
+.guide-details-episode { font-size: 2.9vh; font-weight: bold; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.banner-episode { font-size: 2.9vh; font-weight: bold; opacity: 0.9; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ident-episode { font-size: 3.6vh; font-weight: bold; opacity: 0.9; }
+.bumper-episode { display: block; font-size: 2.3vh; font-weight: normal; opacity: 0.85; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: none; letter-spacing: normal; }
 .guide-more { flex: none; font-size: 2.2vh; opacity: 0.8; }
 .guide-now { position: absolute; top: 0; bottom: 0; width: 0.25vw; margin-left: -0.125vw; background: var(--now-line); box-shadow: 0 0 0.6vw var(--now-line); z-index: 2; pointer-events: none; }
 

@@ -432,7 +432,7 @@
 .tv[data-theme='stationid'] .settings-value { --focus-bg: #c9651b; --focus-fg: #fbecd0; }
 .tv[data-theme='stationid'] .heading { font-family: var(--font-display); }
 
-.tv[data-theme='stationid'] .banner { border-radius: 13vh 4vh 4vh 13vh; padding: 0 3vw 0 0; gap: 2vw; height: 24vh; align-items: center; overflow: hidden; }
+.tv[data-theme='stationid'] .banner { border-radius: 13vh 4vh 4vh 13vh; padding: 0 3vw 0 0; gap: 2vw; min-height: 24vh; align-items: center; overflow: hidden; }
 .tv[data-theme='stationid'] .banner-badge {
   width: 24vh; height: 24vh; border-radius: 50%; padding: 2.4vh; background: conic-gradient(from 200deg, #e8452c, #f6a623, #c9651b, #6b3417, #e8452c);
 }
@@ -738,3 +738,6 @@
 .tv[data-theme='prevue'] .bumper-desc, .tv[data-theme='vcr'] .bumper-desc { -webkit-line-clamp: 1; }
 /* The masthead already shows the date; the bigger time labels need the room. */
 .tv[data-theme='vcr'] .guide-day { display: none; }
+/* Next show's episode line takes the description's place where the rows are tight. */
+.tv[data-theme='prevue'] .bumper-episode ~ .bumper-desc, .tv[data-theme='broadcast'] .bumper-episode ~ .bumper-desc { display: none; }
+.tv[data-theme='vcr'] .bumper-episode, .tv[data-theme='vcr'] .guide-details-episode, .tv[data-theme='vcr'] .banner-episode { font-size: 3vh; }
