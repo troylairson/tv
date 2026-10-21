@@ -42,7 +42,14 @@ const fmtTime = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: 'num
 interface HouseSettings {
   commercialBreaks: boolean;
   audioLanguage?: string;
+  videoSources?: 'both' | 'plex' | 'ia';
 }
+
+const VIDEO_SOURCES: ['both' | 'plex' | 'ia', string][] = [
+  ['both', 'Plex + Archive'],
+  ['plex', 'Plex only'],
+  ['ia', 'Archive only'],
+];
 
 /** Matches the server's AUDIO_LANGUAGES. */
 const AUDIO_LANGUAGES: [string, string][] = [
@@ -253,6 +260,24 @@ export function App() {
         });
         setHouse((await res.json()) as HouseSettings);
         if (tunerState.airing?.item.source === 'plex') tuner.current?.retune();
+      },
+    },
+    {
+      label: 'Video sources',
+      value: house ? (VIDEO_SOURCES.find(([id]) => id === (house.videoSources ?? 'both'))?.[1] ?? 'Plex + Archive') : '…',
+      note: 'Where shows and movies come from (commercials always come from the Archive). Applies to every TV',
+      activate: async () => {
+        if (!house) return;
+        const i = VIDEO_SOURCES.findIndex(([id]) => id === (house.videoSources ?? 'both'));
+        const next = VIDEO_SOURCES[(i + 1) % VIDEO_SOURCES.length]![0];
+        const res = await fetch('/api/settings', {
+          method: 'PUT',
+          headers: { 'content-type': 'application/json' },
+          body: JSON.stringify({ videoSources: next }),
+        });
+        setHouse((await res.json()) as HouseSettings);
+        // Channels come and go with this: pick up the new lineup now.
+        void loadChannels().catch(() => undefined);
       },
     },
     {

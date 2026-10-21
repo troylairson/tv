@@ -10,7 +10,15 @@ export interface Settings {
   timeZone: string;
   /** Preferred audio track for Plex files with several (a key of AUDIO_LANGUAGES). */
   audioLanguage: string;
+  /**
+   * Where shows and movies come from: both, Plex only or Internet Archive only. Commercials
+   * always come from the Archive. Channels keep their sources; the other kind is just left out.
+   */
+  videoSources: VideoSources;
 }
+
+export type VideoSources = 'both' | 'plex' | 'ia';
+export const VIDEO_SOURCES: VideoSources[] = ['both', 'plex', 'ia'];
 
 /** Audio languages to pick from, with the codes and names Plex may tag a track with. "file" keeps the file's own default. */
 export const AUDIO_LANGUAGES: Record<string, { name: string; codes: string[] }> = {
@@ -24,7 +32,7 @@ export const AUDIO_LANGUAGES: Record<string, { name: string; codes: string[] }> 
 };
 
 const envZone = process.env.TZ && isValidTimeZone(process.env.TZ) ? process.env.TZ : 'UTC';
-const DEFAULTS: Settings = { commercialBreaks: true, timeZone: envZone, audioLanguage: 'eng' };
+const DEFAULTS: Settings = { commercialBreaks: true, timeZone: envZone, audioLanguage: 'eng', videoSources: 'both' };
 const file = () => path.join(config.dataDir, 'settings.json');
 
 let current: Settings = { ...DEFAULTS };
@@ -51,6 +59,10 @@ export async function updateSettings(patch: Partial<Settings>): Promise<Settings
   if (patch.audioLanguage !== undefined) {
     if (typeof patch.audioLanguage !== 'string' || !AUDIO_LANGUAGES[patch.audioLanguage]) throw new SettingsError(`Unknown audio language "${String(patch.audioLanguage)}"`);
     next.audioLanguage = patch.audioLanguage;
+  }
+  if (patch.videoSources !== undefined) {
+    if (!VIDEO_SOURCES.includes(patch.videoSources)) throw new SettingsError(`Unknown video sources "${String(patch.videoSources)}"`);
+    next.videoSources = patch.videoSources;
   }
   current = next;
   await fs.mkdir(config.dataDir, { recursive: true });

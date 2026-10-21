@@ -165,6 +165,28 @@ guide → Settings → *Manage channels* shows the address and a QR code).
   `packages/server/src/packs/`; new ones are curated by researching the Internet
   Archive (ask Claude for a theme).
 
+### Build channels from Plex
+
+**From Plex** (top of the manager, when Plex is set up) reads your movie and TV
+libraries and proposes a lineup; tick the ones you want and *Create*:
+
+- **By era and genre:** *80s Sitcoms*, *90s Cartoons*, *Dramas*… (from Plex's
+  genres and years; three shows or eight movies make a channel).
+- **Networks:** one channel per network with three or more of your shows (Plex's
+  *studio* field: NBC, FOX, Nickelodeon…).
+- **Kids' TV** (TV-Y / TV-Y7 shows), **Marathons** of your biggest shows (every
+  episode in order), **your Plex collections**, and **movies by genre, era and
+  decade**.
+
+These channels use Plex filters rather than fixed lists, so new shows and movies
+that match join them by themselves. Channels you already have are marked.
+
+**Video sources** (on the Channels page, and Settings on the TV) picks where
+shows and movies come from: *Plex and Internet Archive*, *Plex only* or *Internet
+Archive only*. The other kind is left out (channels of only that kind are hidden,
+not deleted), and the manager hides what doesn't apply (Discover and channel ideas
+in Plex-only mode). Commercials always come from the Internet Archive.
+
 ### Discover
 
 **Discover** (top of the manager) browses the Internet Archive for things worth

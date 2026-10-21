@@ -4,6 +4,7 @@ import { config, plexConfigured } from './config';
 import { AUDIO_LANGUAGES, getSettings } from './settings';
 import { cleanShowName, prettifyTitle, shortDescription, splitTitle } from './titles';
 import type { ChannelItem } from './types';
+import type { PlexFilterSource } from '@retro-tv/schedule';
 
 function plexHeaders(): Record<string, string> {
   return {
@@ -44,6 +45,9 @@ interface PlexMetadata {
   childCount?: number;
   grandparentTitle?: string;
   grandparentRatingKey?: string;
+  studio?: string;
+  contentRating?: string;
+  Genre?: { tag: string }[];
   parentIndex?: number;
   index?: number;
   year?: number;
@@ -185,6 +189,58 @@ export async function resolveLibrary(sectionKey: string, type: 'movie' | 'show')
   const list = await metadataList(`/library/sections/${encodeURIComponent(sectionKey)}/all?type=${type === 'movie' ? 1 : 4}&sort=titleSort`);
   if (type === 'show') list.sort(byEpisodeOrder);
   return list.filter(playable).map(toItem);
+}
+
+/** A show or movie as the channel generator sees it. */
+export interface LibraryTitle {
+  ratingKey: string;
+  title: string;
+  year?: number;
+  studio?: string;
+  contentRating?: string;
+  genres: string[];
+  /** Episodes (shows); 1 for a movie. */
+  episodes: number;
+  /** Typical length of one episode or the movie, in minutes. */
+  minutes: number;
+}
+
+function libraryTitle(m: PlexMetadata): LibraryTitle {
+  return {
+    ratingKey: m.ratingKey,
+    title: m.title,
+    year: m.year,
+    studio: m.studio?.trim() || undefined,
+    contentRating: m.contentRating?.trim() || undefined,
+    genres: (m.Genre ?? []).map((g) => g.tag),
+    episodes: m.type === 'show' ? (m.leafCount ?? 0) : 1,
+    minutes: Math.round((m.duration ?? (m.type === 'show' ? 22 : 95) * 60_000) / 60_000),
+  };
+}
+
+const sectionAll = async (sectionKey: string) =>
+  (await metadataList(`/library/sections/${encodeURIComponent(sectionKey)}/all?sort=titleSort`)).filter((m) => m.type === 'show' || m.type === 'movie');
+
+/** Every show or movie in a library, with the details channels are built from. */
+export async function libraryTitles(sectionKey: string): Promise<LibraryTitle[]> {
+  return (await sectionAll(sectionKey)).map(libraryTitle);
+}
+
+const tagMatch = (want: string[] | undefined, have: string[]) => !want?.length || want.some((w) => have.some((h) => h.toLowerCase() === w.toLowerCase()));
+
+/** Does a show or movie match a channel's Plex filter? */
+export function matchesFilter(t: Pick<LibraryTitle, 'year' | 'studio' | 'contentRating' | 'genres'>, f: PlexFilterSource): boolean {
+  if (f.years && (!t.year || t.year < f.years[0] || t.year > f.years[1])) return false;
+  return tagMatch(f.genres, t.genres) && tagMatch(f.studios, t.studio ? [t.studio] : []) && tagMatch(f.ratings, t.contentRating ? [t.contentRating] : []);
+}
+
+/** A Plex filter: the matching movies, or every episode of the matching shows. */
+export async function resolveFilter(f: PlexFilterSource): Promise<ChannelItem[]> {
+  const matches = (await sectionAll(f.sectionKey)).filter((m) => matchesFilter(libraryTitle(m), f));
+  if (f.type === 'movie') return matches.filter(playable).map(toItem);
+  const out: ChannelItem[] = [];
+  for (const show of matches) out.push(...(await resolveShow(show.ratingKey)));
+  return out;
 }
 
 /** One movie or episode; a show or season expands to its episodes. */

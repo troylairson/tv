@@ -9,6 +9,7 @@ import path from 'node:path';
 import { hashString, type ChannelMode } from '@retro-tv/schedule';
 import { config as serverConfig } from './config';
 import { healthVersion, isChecking, isUnavailable } from './health';
+import { getSettings } from './settings';
 import { resolveSources } from './sources';
 import type { Channel, ChannelConfig, ChannelItem, SlotConfig, SourceRef } from './types';
 
@@ -107,15 +108,19 @@ const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, details
  * A list without the items health checks found unavailable. The same array comes back
  * until something changes, so schedules (keyed on the list) stay put.
  */
-const playableCache = new WeakMap<ChannelItem[], { version: number; items: ChannelItem[] }>();
+const playableCache = new WeakMap<ChannelItem[], { version: string; items: ChannelItem[] }>();
 function playable(list: ChannelItem[]): ChannelItem[] {
+  const sources = getSettings().videoSources;
+  const version = `${healthVersion()}:${sources}`;
   const hit = playableCache.get(list);
-  if (hit?.version === healthVersion()) return hit.items;
-  const kept = list.filter((i) => !isUnavailable(i.id));
+  if (hit?.version === version) return hit.items;
+  // Plex only / Archive only: the other kind is left out (a channel of nothing but it disappears).
+  const allowed = sources === 'both' ? list : list.filter((i) => i.source === 'local' || i.source === (sources === 'plex' ? 'plex' : 'ia'));
+  const kept = allowed.filter((i) => !isUnavailable(i.id));
   // Never empty a list on the checks' say-so: a channel of dead videos stays as it was.
-  const items = kept.length === list.length || !kept.length ? list : kept;
-  playableCache.set(list, { version: healthVersion(), items });
-  return items;
+  const items = kept.length === allowed.length || !kept.length ? allowed : kept;
+  playableCache.set(list, { version, items: items.length === list.length ? list : items });
+  return items.length === list.length ? list : items;
 }
 
 function toChannel(c: ChannelConfig): Channel | null {
@@ -274,7 +279,7 @@ export interface ChannelInput {
   bumpers?: unknown;
 }
 
-const SOURCE_KINDS = new Set(['plex-show', 'plex-collection', 'plex-library', 'plex-item', 'plex-sample', 'ia-search', 'ia-item']);
+const SOURCE_KINDS = new Set(['plex-show', 'plex-collection', 'plex-library', 'plex-item', 'plex-sample', 'ia-search', 'ia-item', 'plex-filter']);
 
 function validSources(value: unknown): SourceRef[] {
   if (!Array.isArray(value)) throw new ValidationError('sources must be a list');

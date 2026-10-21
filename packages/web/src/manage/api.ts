@@ -86,6 +86,22 @@ export interface DiscoverResult {
   thumb: string;
 }
 
+export interface PlexProposal {
+  id: string;
+  group: string;
+  name: string;
+  summary: string;
+  examples: string[];
+  mode: 'loop' | 'shuffle';
+  sources: SourceRef[];
+}
+
+export interface PlexLibraryProposals {
+  library: string;
+  type: 'movie' | 'show';
+  proposals: PlexProposal[];
+}
+
 export type DiscoverSort = 'popular' | 'gems' | 'newest' | 'oldest';
 
 export interface DiscoverFilters {
@@ -113,6 +129,7 @@ export const api = {
   plexSections: () => call<PlexSection[]>('/api/plex/sections'),
   plexBrowse: (key: string, q: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/items?q=${encodeURIComponent(q)}`),
   plexCollections: (key: string) => call<PlexBrowseItem[]>(`/api/plex/sections/${key}/collections`),
+  plexProposals: () => call<{ libraries: PlexLibraryProposals[] }>('/api/plex/proposals'),
   discoverShelves: () => call<{ shelves: DiscoverShelf[]; kinds: { id: string; name: string }[]; decades: string[] }>('/api/discover/shelves'),
   discover: (f: DiscoverFilters, page = 1) => {
     const p = new URLSearchParams({ kind: f.kind, decade: f.decade, vintage: f.vintage ? '1' : '0', sort: f.sort, page: String(page) });
@@ -143,6 +160,10 @@ export function sourceLabel(s: SourceRef): string {
       return `Internet Archive search · top ${s.items} items · updates nightly`;
     case 'ia-item':
       return 'Internet Archive item';
+    case 'plex-filter': {
+      const parts = [s.genres?.join(' or '), s.years && `${s.years[0]}–${s.years[1]}`, s.studios?.join(' or '), s.ratings?.join('/')].filter(Boolean);
+      return `Plex ${s.type === 'movie' ? 'movies' : 'shows'}${parts.length ? ` · ${parts.join(' · ')}` : ''} · updates as your library grows`;
+    }
   }
 }
 

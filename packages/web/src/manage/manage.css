@@ -204,3 +204,21 @@ body.manage #app { height: auto; overflow: visible; }
   .mg-brand span, .mg-version { display: none; }
   .mg-nav { margin-left: 8px; }
 }
+
+/* ── Video sources setting ── */
+.mg-sources-setting { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin: 16px 0; }
+.mg .mg-sources-setting label { display: flex; flex-direction: row; align-items: center; gap: 10px; color: var(--mg-fg); }
+
+/* ── Build from Plex ── */
+.mg-plexgen h2 { margin-top: 28px; }
+.mg-plexgen-group { margin-bottom: 12px; }
+.mg-plexgen-group h3 { margin: 0 0 8px; font-size: 14px; color: var(--mg-accent); text-transform: uppercase; letter-spacing: 0.06em; }
+.mg-plexgen-group ul { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px 18px; }
+.mg-plexgen-group li { min-width: 0; }
+.mg .mg-plexgen-group li label { display: flex; flex-direction: row; gap: 10px; align-items: flex-start; padding: 6px 4px; border-radius: 6px; cursor: pointer; color: var(--mg-fg); font-size: 15px; }
+.mg-plexgen-group li label:hover { background: rgba(255, 255, 255, 0.04); }
+.mg-plexgen-group li.have { opacity: 0.6; }
+.mg-plexgen-group input { margin-top: 4px; }
+.mg-plexgen-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; flex: 1; }
+.mg-plexgen-title .mg-badge { margin: 0 0 0 6px; vertical-align: 1px; }
+.mg-plexgen-examples { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }

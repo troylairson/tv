@@ -67,6 +67,8 @@ async function resolveSourceItems(source: SourceRef): Promise<ChannelItem[]> {
       return plex.resolveItem(source.ratingKey);
     case 'plex-sample':
       return plex.sampleItems(source.count);
+    case 'plex-filter':
+      return plex.resolveFilter(source);
     case 'ia-search':
       return iaSearchItems(source.query, source.items, source.filesPerItem, source.sort);
     case 'ia-item':

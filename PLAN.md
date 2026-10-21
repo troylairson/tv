@@ -525,6 +525,13 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       by `shortDescription` (HTML and entities, links, uploader chatter, licences dropped;
       cut at a sentence near 240 chars). Already-scheduled airings pick it up from the
       channel's current items; caches from before it get one background refresh.
+- [x] **Build channels from Plex** (`/manage/plex`, `server/src/plexgen.ts`): proposals
+      per library (era + genre, networks from `studio`, Kids' TV by rating, marathons,
+      collections, movies by genre / era / decade) as `plex-filter` sources that track
+      the library. **Video sources** house setting (both / Plex only / Archive only):
+      the other kind is filtered out of channels (empty ones hidden), the manager hides
+      what doesn't apply; commercials stay on the Archive. Not yet: automatic time
+      slots for generated channels.
 - [x] **Discover** in the manager (`/manage/discover`, `server/src/discover.ts`):
       shelves (off-air tapes, holidays ordered by the next one, genres), kind / decade /
       before-2000 filters with a junk filter, sorts (popular, hidden gems, newest,

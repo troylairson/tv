@@ -48,6 +48,7 @@ export type SourceRef =
   | { kind: 'plex-library'; sectionKey: string; type: 'movie' | 'show'; title: string }
   | { kind: 'plex-item'; ratingKey: string; title: string }
   | { kind: 'plex-sample'; count: number; title: string }
+  | PlexFilterSource
   | {
       kind: 'ia-search';
       query: string;
@@ -62,6 +63,25 @@ export type SourceRef =
       sort?: IaSort;
     }
   | { kind: 'ia-item'; identifier: string; title: string; minMinutes?: number; maxYear?: number };
+
+/**
+ * Everything in a Plex library matching a filter: shows (all their episodes) or movies.
+ * Re-evaluated on every refresh, so new additions to the library join the channel.
+ */
+export interface PlexFilterSource {
+  kind: 'plex-filter';
+  sectionKey: string;
+  type: 'movie' | 'show';
+  title: string;
+  /** Any of these genres (Plex's names, e.g. "Comedy"). */
+  genres?: string[];
+  /** First and last year, inclusive. */
+  years?: [number, number];
+  /** Any of these studios / networks ("NBC"). */
+  studios?: string[];
+  /** Any of these content ratings ("TV-Y", "G"). */
+  ratings?: string[];
+}
 
 export type IaSort = 'popular' | 'identifier' | 'date' | 'title' | 'gems' | 'newest';
 

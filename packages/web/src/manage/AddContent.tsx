@@ -1,5 +1,6 @@
 import type { SourceRef } from '@retro-tv/schedule';
 import { useEffect, useState } from 'preact/hooks';
+import { useVideoSources } from './house';
 import { api, sameSource, type IaResult, type PlexBrowseItem, type PlexSection } from './api';
 
 interface Props {
@@ -9,19 +10,25 @@ interface Props {
 }
 
 export function AddContent({ plexConfigured, added, onAdd }: Props) {
-  const [tab, setTab] = useState<'plex' | 'ia'>(plexConfigured ? 'plex' : 'ia');
-  useEffect(() => setTab(plexConfigured ? 'plex' : 'ia'), [plexConfigured]);
+  const sources = useVideoSources();
+  const preferred = sources === 'ia' || (!plexConfigured && sources !== 'plex') ? 'ia' : 'plex';
+  const [tab, setTab] = useState<'plex' | 'ia'>(preferred);
+  useEffect(() => setTab(preferred), [preferred]);
   const isAdded = (s: SourceRef) => added.some((a) => sameSource(a, s));
 
   return (
     <div class="mg-card">
       <div class="mg-tabs" role="tablist">
-        <button role="tab" class={tab === 'plex' ? 'active' : ''} onClick={() => setTab('plex')}>
-          Plex
-        </button>
-        <button role="tab" class={tab === 'ia' ? 'active' : ''} onClick={() => setTab('ia')}>
-          Internet Archive
-        </button>
+        {sources !== 'ia' && (
+          <button role="tab" class={tab === 'plex' ? 'active' : ''} onClick={() => setTab('plex')}>
+            Plex
+          </button>
+        )}
+        {sources !== 'plex' && (
+          <button role="tab" class={tab === 'ia' ? 'active' : ''} onClick={() => setTab('ia')}>
+            Internet Archive
+          </button>
+        )}
       </div>
       {tab === 'plex' &&
         (plexConfigured ? (

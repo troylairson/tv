@@ -2,18 +2,21 @@ import type { ChannelItem, SourceRef } from '@retro-tv/schedule';
 import { useEffect, useState } from 'preact/hooks';
 import { AddContent } from './AddContent';
 import { Discover } from './Discover';
+import { useVideoSources, VideoSourcesPicker } from './house';
+import { PlexBuilder } from './PlexBuilder';
 import { api, fmtDuration, sourceLabel, type ChannelFields, type ChannelStatus, type PackInfo, type PreviewBlock } from './api';
 import { Schedule, type DraftSlot } from './Schedule';
 import { Logo, logoSpec } from '../logos/Logo';
 import { HAND_LOGOS } from '../logos/hand';
 
-type Route = { page: 'list' } | { page: 'new' } | { page: 'discover' } | { page: 'edit'; id: string };
+type Route = { page: 'list' } | { page: 'new' } | { page: 'discover' } | { page: 'plex' } | { page: 'edit'; id: string };
 
 function parseRoute(): Route {
   const rest = location.pathname.replace(/^\/manage\/?/, '');
   if (!rest) return { page: 'list' };
   if (rest === 'new') return { page: 'new' };
   if (rest === 'discover') return { page: 'discover' };
+  if (rest === 'plex') return { page: 'plex' };
   return { page: 'edit', id: decodeURIComponent(rest) };
 }
 
@@ -26,6 +29,11 @@ function go(path: string) {
 export function Manager() {
   const [route, setRoute] = useState<Route>(parseRoute);
   const [version, setVersion] = useState<string | null>(null);
+  const [plexConfigured, setPlexConfigured] = useState(false);
+  const sources = useVideoSources();
+  useEffect(() => {
+    void api.channels().then((r) => setPlexConfigured(r.plexConfigured));
+  }, []);
   useEffect(() => {
     void fetch('/api/info')
       .then((r) => r.json())
@@ -54,10 +62,13 @@ export function Manager() {
         <nav class="mg-nav">
           {(
             [
-              ['/manage', 'Channels', route.page !== 'discover'],
-              ['/manage/discover', 'Discover', route.page === 'discover'],
+              ['/manage', 'Channels', route.page !== 'discover' && route.page !== 'plex', true],
+              ['/manage/plex', 'From Plex', route.page === 'plex', plexConfigured && sources !== 'ia'],
+              ['/manage/discover', 'Discover', route.page === 'discover', sources !== 'plex'],
             ] as const
-          ).map(([href, name, on]) => (
+          )
+            .filter(([, , , show]) => show)
+            .map(([href, name, on]) => (
             <a
               key={href}
               href={href}
@@ -82,6 +93,7 @@ export function Manager() {
         {route.page === 'list' && <ChannelList />}
         {route.page === 'new' && <Editor id={null} />}
         {route.page === 'discover' && <Discover onOpenChannel={(id) => go(`/manage/${encodeURIComponent(id)}`)} />}
+        {route.page === 'plex' && <PlexBuilder onDone={() => go('/manage')} />}
         {route.page === 'edit' && <Editor id={route.id} key={route.id} />}
       </main>
     </div>
@@ -89,6 +101,7 @@ export function Manager() {
 }
 
 function ChannelList() {
+  const sources = useVideoSources();
   const [channels, setChannels] = useState<ChannelStatus[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -148,7 +161,8 @@ function ChannelList() {
           </li>
         ))}
       </ul>
-      <ChannelIdeas />
+      <VideoSourcesPicker />
+      {sources !== 'plex' && <ChannelIdeas />}
     </section>
   );
 }

@@ -27,6 +27,7 @@ import * as plex from './plex';
 import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercials, regenerate } from './scheduler';
 import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
 import { checkItems, checkSoon, isUnavailable, lastHealthRun, loadHealth, startHealthChecks, unavailableError } from './health';
+import { proposals } from './plexgen';
 import { DECADES, discoverQuery, KINDS, shelvesFor, SORTS, type DiscoverSort } from './discover';
 import { shortDescription } from './titles';
 import { deleteLogo, LogoError, MAX_LOGO_BYTES, readLogo, saveLogo } from './logos';
@@ -99,6 +100,8 @@ app.put('/api/settings', async (c) => {
   const before = getSettings();
   const after = await updateSettings((await c.req.json().catch(() => ({}))) as Record<string, unknown>);
   if (before.commercialBreaks !== after.commercialBreaks) regenerate(getChannels().channels);
+  // Channels gain or lose items: their lineups notice and rebuild after what's on now.
+  else if (before.videoSources !== after.videoSources) for (const channel of getChannels().channels) ensureLineup(channel);
   return c.json(after);
 });
 
@@ -320,6 +323,8 @@ app.use('/api/plex/*', async (c, next) => {
 });
 
 app.get('/api/plex/status', async (c) => c.json(await plex.identity()));
+/** Channel ideas from the user's own libraries ("Build channels from my Plex"). */
+app.get('/api/plex/proposals', async (c) => c.json({ libraries: await proposals() }));
 app.get('/api/plex/sections', async (c) => c.json(await plex.sections()));
 app.get('/api/plex/sections/:key/items', async (c) => c.json(await plex.browseSection(c.req.param('key'), c.req.query('q') ?? '')));
 app.get('/api/plex/sections/:key/collections', async (c) => c.json(await plex.browseCollections(c.req.param('key'))));
