@@ -360,3 +360,13 @@ html, body, #app {
 .guide-now { position: absolute; top: 0; bottom: 0; width: 0.25vw; margin-left: -0.125vw; background: var(--now-line); box-shadow: 0 0 0.6vw var(--now-line); z-index: 2; pointer-events: none; }
 
 .guide-hint { margin-top: auto; font-size: 2.6vh; color: var(--dim); text-align: center; }
+
+/* "Ad 2 of 3 · 0:23" during commercial breaks. */
+.ad-counter {
+  position: absolute; left: var(--safe-x); bottom: var(--safe-y); z-index: 3;
+  display: flex; align-items: center; gap: 1vw; padding: 0.8vh 1.2vw;
+  font-size: 2.8vh; color: #fff; background: rgba(0, 0, 0, 0.6); border-left: 0.5vh solid var(--accent); border-radius: 0.6vh;
+  font-variant-numeric: tabular-nums;
+}
+.ad-counter b { color: var(--accent); font-weight: bold; }
+.ad-counter-time { min-width: 2.6em; }

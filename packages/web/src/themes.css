@@ -749,3 +749,4 @@
 .tv[data-theme='vcr'] .guide-cell-title.two { flex-direction: row; align-items: baseline; gap: 0.5em; line-height: 1; }
 .tv[data-theme='vcr'] .guide-cell-show { flex: none; max-width: 70%; font-size: 1em; }
 .tv[data-theme='vcr'] .guide-cell-episode { flex: 1 1 auto; min-width: 0; font-size: 0.7em; }
+.tv[data-theme='vcr'] .ad-counter { font-size: 4.2vh; background: rgba(0, 0, 0, 0.45); border-left-color: #fff; }

@@ -21,6 +21,7 @@ const PLEX_MODE_KEY = 'retro-tv:plex-mode';
 const THEME_KEY = 'retro-tv:theme';
 const STATIC_SOUND_KEY = 'retro-tv:static-sound';
 const LOGO_BUG_KEY = 'retro-tv:logo-bug';
+const AD_COUNTER_KEY = 'retro-tv:ad-counter';
 /** How long the "Coming up on…" card shows. */
 const BUMPER_MS = 8000;
 
@@ -37,6 +38,10 @@ function store(key: string, value?: string): string | null {
   return null;
 }
 
+const fmtCountdown = (ms: number) => {
+  const s = Math.max(0, Math.ceil(ms / 1000));
+  return `${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
+};
 const fmtTime = (ms: number) => new Date(ms).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 
 interface HouseSettings {
@@ -98,6 +103,7 @@ export function App() {
   const theme = findTheme(themeId);
   const [staticSound, setStaticSound] = useState(store(STATIC_SOUND_KEY) !== 'off');
   const [logoBug, setLogoBug] = useState(store(LOGO_BUG_KEY) !== 'off');
+  const [adCounter, setAdCounter] = useState(store(AD_COUNTER_KEY) !== 'off');
   useEffect(() => setStaticMuted(!staticSound), [staticSound]);
   const [digits, setDigits] = useState('');
   const [lastKey, setLastKey] = useState<KeyInfo | null>(null);
@@ -318,6 +324,15 @@ export function App() {
       },
     },
     {
+      label: 'Ad counter',
+      value: adCounter ? 'On' : 'Off',
+      note: '"Ad 1 of 3" and a countdown in the corner during commercial breaks. This TV only',
+      activate: () => {
+        store(AD_COUNTER_KEY, adCounter ? 'off' : 'on');
+        setAdCounter(!adCounter);
+      },
+    },
+    {
       label: 'Plex playback',
       value: plexMode === 'auto' ? 'Auto' : plexMode === 'transcode' ? 'Convert' : 'Direct',
       note: 'Auto: files the TV can play start straight away, others are converted by Plex. Falls back to the other way if one fails',
@@ -465,6 +480,9 @@ export function App() {
     if (video.current) video.current.muted = showBumper || !!tunerState.soundLocked;
   }, [showBumper, tunerState.soundLocked]);
   // A network-style watermark while a show plays (not over the banner, guide or menus).
+  const adBreak = tunerState.adBreak;
+  const showAdCounter =
+    adCounter && isBreak && adBreak && status === 'playing' && infoUntil <= t && !showBumper && !showGuide && !showSettings && !showDiag;
   const showBug = logoBug && hasLogo && channel && status === 'playing' && airing?.kind === 'show' && infoUntil <= t && !showGuide && !showSettings && !showDiag;
 
   return (
@@ -565,6 +583,14 @@ export function App() {
       {showBumper && channel && <Bumper channel={channel} shows={bumperShows} theme={theme} nowMs={t} />}
 
       {showBug && <Logo channel={channel} theme={theme.logo} class="logo-bug" />}
+      {showAdCounter && airing && (
+        <div class="ad-counter">
+          <b>
+            Ad {adBreak.index} of {adBreak.total}
+          </b>
+          <span class="ad-counter-time">{fmtCountdown(airing.endMs - now())}</span>
+        </div>
+      )}
 
       {(digits || (channel && osdUntil > t && !showBumper)) && (
         <div class="osd">

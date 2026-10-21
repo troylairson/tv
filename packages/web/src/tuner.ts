@@ -38,6 +38,8 @@ export interface TunerState {
   latencies: number[];
   driftSec?: number;
   stalls: number;
+  /** During a commercial break: which ad this is, of how many in the break. */
+  adBreak?: { index: number; total: number };
   /** The browser only allowed silent autoplay: sound waits for the first button press or tap. */
   soundLocked?: boolean;
 }
@@ -99,7 +101,7 @@ export class Tuner {
     const token = ++this.token;
     const started = performance.now();
     this.teardown();
-    this.set({ status: 'tuning', channel, airing: undefined, upcoming: [], playback: undefined, filler: undefined, error: undefined, driftSec: undefined, retryAt: undefined });
+    this.set({ status: 'tuning', channel, airing: undefined, upcoming: [], playback: undefined, filler: undefined, error: undefined, driftSec: undefined, retryAt: undefined, adBreak: undefined });
 
     let airings: Airing[];
     try {
@@ -120,7 +122,7 @@ export class Tuner {
       this.timers.push(setTimeout(() => token === this.token && void this.tune(channel), 30_000));
       return;
     }
-    this.set({ airing, upcoming: airings.filter((a) => a.startMs >= airing.endMs) });
+    this.set({ airing, upcoming: airings.filter((a) => a.startMs >= airing.endMs), adBreak: adBreakOf(airings, airing) });
     // The schedule, not the video's 'ended' event, decides when the next airing starts.
     this.timers.push(setTimeout(() => token === this.token && void this.tune(channel), airing.endMs - t + 50));
     if (airing.kind === 'ident' || airing.kind === 'offair') {
@@ -388,6 +390,19 @@ async function fetchAirings(channelId: string): Promise<Airing[]> {
   const res = await fetch(`/api/channels/${encodeURIComponent(channelId)}/airings?from=${t - 60_000}&to=${t + 4 * 3600_000}`);
   if (!res.ok) throw new Error(`HTTP ${res.status}`);
   return ((await res.json()) as { airings: Airing[] }).airings;
+}
+
+/** Where a commercial sits in its break: the run of back-to-back commercials around it. */
+function adBreakOf(airings: Airing[], airing: Airing): { index: number; total: number } | undefined {
+  if (airing.kind !== 'commercial') return undefined;
+  const sorted = airings.slice().sort((a, b) => a.startMs - b.startMs);
+  const at = sorted.findIndex((a) => a.startMs === airing.startMs);
+  if (at < 0) return undefined;
+  let first = at;
+  while (first > 0 && sorted[first - 1]!.kind === 'commercial' && sorted[first - 1]!.endMs === sorted[first]!.startMs) first--;
+  let last = at;
+  while (last < sorted.length - 1 && sorted[last + 1]!.kind === 'commercial' && sorted[last + 1]!.startMs === sorted[last]!.endMs) last++;
+  return { index: at - first + 1, total: last - first + 1 };
 }
 
 function describeMediaError(error: MediaError | null): string {
