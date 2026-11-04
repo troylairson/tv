@@ -540,6 +540,21 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       "Channel Surf" channel of rarely-watched tapes.
 - [x] **Paste an Internet Archive link** into the manager's IA search box
       (`archive.org/details/<id>`) to jump straight to that item and add it.
+- [ ] **Convert Internet Archive videos the TV can't play.** Some older uploads use
+      formats a TV's browser won't decode (e.g. MPEG-4 Part 2 in an .mp4, which iPhones
+      play but Google TV reports as "Format error"). The server already relays IA videos
+      (`/media/ia/…`); add ffmpeg to the Docker image and, for files whose codec isn't
+      browser-safe (sniffed from the file header, or after a TV reports a format error),
+      relay a live H.264/AAC conversion instead, starting at the scheduled offset.
+      Browser-safe files keep streaming straight through. Cost: CPU on the server while
+      an old-format video plays. (Came up comparing WaybackFin, a Jellyfin plugin that
+      gets this by letting Jellyfin transcode IA `.strm` items.)
+- [ ] **Play now (on demand).** Watch something right away instead of when it's
+      scheduled: from the guide (OK on a future show → "Watch from the start"), and a
+      browsable library on the TV of everything the channels draw on (by channel, show,
+      Plex library, IA collection) with resume, pause and seek. Playback outside the
+      schedule; leaving it returns to live channels. Decide: does it pause the "live"
+      channel or just tune back to wherever the channel is now?
 
 ## 7. Prior art worth borrowing from
 - **ErsatzTV**, **Tunarr** (successor to dizqueTV): Plex-backed custom channels
