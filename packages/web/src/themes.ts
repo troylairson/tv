@@ -29,6 +29,13 @@ export const THEMES: Theme[] = [
   { id: 'broadcast', name: 'Broadcast', logo: 'modern', guideMasthead: { title: () => "What's on" }, upNext: 'Up next' },
   { id: 'stationid', name: 'Station ID', logo: 'seventies', upNext: 'Coming up next' },
   {
+    id: 'cable85',
+    name: "Cable Box '85",
+    logo: 'retro',
+    guideMasthead: { badge: 'P100', title: () => 'CABLE CHANNEL GUIDE' },
+    upNext: 'STAY TUNED',
+  },
+  {
     id: 'console',
     name: 'Console',
     logo: 'seventies',

@@ -10,6 +10,7 @@ import { initStaticAudio, setStaticMuted, Static } from './Static';
 import { Tuner, type ChannelInfo, type PlexMode, type TunerState } from './tuner';
 import { Logo, logoSvg } from './logos/Logo';
 import { fullTitle } from './titles';
+import { Led } from './Led';
 import { findTheme, THEMES } from './themes';
 
 const params = new URLSearchParams(location.search);
@@ -491,6 +492,7 @@ export function App() {
       {poweredOn && ((status === 'standby' && !filler) || (status === 'interstitial' && airing?.kind === 'offair')) && <div class="bars" />}
       {status === 'interstitial' && airing?.kind === 'ident' && channel && (
         <div class="ident">
+          <Led value={channel.number} class="ident-led" />
           {nextShow?.item.thumb && <div class="ident-backdrop" style={{ backgroundImage: `url(${nextShow.item.thumb})` }} />}
           <div class="ident-flag">{theme.upNext}</div>
           <div class="ident-panel">
@@ -595,12 +597,14 @@ export function App() {
       {(digits || (channel && osdUntil > t && !showBumper)) && (
         <div class="osd">
           <div class="osd-number">{digits || channel?.number}</div>
+          <Led value={digits || channel?.number} class="osd-led" />
           {!digits && channel && (hasLogo ? <Logo channel={channel} theme={theme.logo} class="osd-logo" /> : <div class="osd-name">{channel.name}</div>)}
         </div>
       )}
 
       {channel && airing && infoUntil > t && airing.kind !== 'ident' && !showBumper && (
         <div class={`banner panel ${hasLogo ? 'has-logo' : ''}`}>
+          <Led value={channel.number} class="banner-led" />
           <div class="banner-badge">
             {hasLogo && <Logo channel={channel} theme={theme.logo} />}
             <span class="banner-badge-number">{channel.number}</span>
@@ -611,6 +615,9 @@ export function App() {
           {airing.kind === 'show' && airing.item.thumb && <div class="banner-art" style={{ backgroundImage: `url(${airing.item.thumb})` }} />}
           <div class="banner-body">
             <div class="banner-row">
+              <span class="banner-cg-ch">
+                CH {channel.number} · {channel.name}
+              </span>
               <span class="banner-label">
                 {isBreak ? 'Commercial break' : airing.kind === 'offair' ? 'Off the air' : 'Now playing'}
                 <span class="banner-label-ch"> on {channel.name}</span>

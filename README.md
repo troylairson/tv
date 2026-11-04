@@ -65,8 +65,8 @@ the "Coming up" bumper. The
 live channel keeps playing in the corner. ▲ from the top row reaches **Settings**:
 commercial breaks on/off and **audio language** for Plex files with several audio
 tracks (both apply to every TV in the house); CRT effect,
-**theme** (six looks: *Prevue '89*, *VCR*, *Streaming*, *Broadcast*, *Station ID*
-and *Console*; see [docs/mockups](docs/mockups)), **static sound** on/off, **logo bug** (the
+**theme** (seven looks: *Prevue '89*, *VCR*, *Streaming*, *Broadcast*, *Station ID*,
+*Cable Box '85* and *Console*; see [docs/mockups](docs/mockups)), **static sound** on/off, **logo bug** (the
 channel's logo in the corner while a show plays), **ad counter** ("Ad 2 of 3" and
 a countdown during commercial breaks) and Plex playback (*Auto*, the
 default, plays MP4/H.264 files straight from Plex and converts the rest; or force

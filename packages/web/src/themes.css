@@ -750,3 +750,211 @@
 .tv[data-theme='vcr'] .guide-cell-show { flex: none; max-width: 70%; font-size: 1em; }
 .tv[data-theme='vcr'] .guide-cell-episode { flex: 1 1 auto; min-width: 0; font-size: 0.7em; }
 .tv[data-theme='vcr'] .ad-counter { font-size: 4.2vh; background: rgba(0, 0, 0, 0.45); border-left-color: #fff; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * Cable Box '85: the cable box's red LED readout, and the character-generator
+ * look of the era's cable info channels: chunky pixel type with hard shadows,
+ * teletext colours on black, rainbow block bars, coloured remote buttons.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.tv[data-theme='cable85'] {
+  --cg-yellow: #ffef3a; --cg-cyan: #3af2ff; --cg-green: #4dff5c; --cg-magenta: #ff4df0; --cg-red: #ff3b30; --cg-blue: #2f5bff; --cg-white: #f4f4f4;
+  --rainbow: linear-gradient(90deg, var(--cg-red) 0 16.66%, var(--cg-yellow) 0 33.33%, var(--cg-green) 0 50%, var(--cg-cyan) 0 66.66%, var(--cg-blue) 0 83.33%, var(--cg-magenta) 0);
+  --cg-shadow: 0.35vh 0.35vh 0 #000, 0.7vh 0.7vh 0 rgba(0, 0, 0, 0.55);
+  --font: VT323, 'Courier New', monospace;
+  --font-display: VT323, 'Courier New', monospace;
+  --font-number: VT323, monospace;
+  --fg: var(--cg-white);
+  --dim: #b8c4d8;
+  --accent: var(--cg-yellow);
+  --focus-bg: var(--cg-yellow);
+  --focus-fg: #000;
+  --focus-edge: var(--cg-yellow);
+  --panel: rgba(0, 0, 8, 0.88);
+  --panel-soft: rgba(0, 0, 8, 0.88);
+  --edge: var(--cg-blue);
+  --border: 0.6vh;
+  --radius: 0;
+  --shadow: none;
+  --heading-spacing: 0.06em;
+  --heading-case: uppercase;
+  --osd-fg: var(--cg-white);
+  --osd-shadow: var(--cg-shadow);
+  --bg: #000;
+  --ident-bg: #000;
+  --guide-line: #000;
+  --guide-row: #000;
+  --guide-row-alt: #000;
+  --guide-row-focus: #000;
+  --guide-cell: #00001c;
+  --guide-break: #00000e;
+  --guide-offair: repeating-linear-gradient(45deg, #00001c 0 1vh, #0a0a30 1vh 2vh);
+  --guide-time-edge: var(--cg-cyan);
+  --now-line: var(--cg-red);
+  --live-mark: var(--cg-white);
+  --progress-track: rgba(255, 255, 255, 0.12);
+  --preview-left: calc(100vw - var(--safe-x) - var(--preview-w));
+  --preview-top: calc(var(--safe-y) + 6.85vh);
+  text-transform: uppercase;
+}
+.tv[data-theme='cable85'] * { font-weight: 400 !important; }
+.tv[data-theme='cable85'] .panel { color: var(--fg); text-shadow: var(--cg-shadow); border-top: 0.8vh solid var(--cg-blue); }
+.tv[data-theme='cable85'] .heading { color: var(--cg-yellow); }
+
+/* ── The cable box's LED readout ── */
+.tv[data-theme='cable85'] .led {
+  display: flex; align-items: center; gap: 1.6vh; padding: 1.2vh 1.8vh 1.2vh 1.4vh; border-radius: 0.9vh;
+  background: linear-gradient(#2a2420, #15110f); border: 0.2vh solid #4a3b2c;
+  box-shadow: inset 0 0.2vh 0 rgba(255, 255, 255, 0.08), 0 0.6vh 1.6vh rgba(0, 0, 0, 0.6);
+}
+.tv[data-theme='cable85'] .led-window { display: flex; gap: 0.7vh; padding: 0.9vh 1.2vh; border-radius: 0.5vh; background: #1a0605; box-shadow: inset 0 0 1.1vh #000; }
+.tv[data-theme='cable85'] .led-digit { width: 5.3vh; height: 8vh; transform: skewX(-6deg); }
+.tv[data-theme='cable85'] .led-digit .on { fill: #ff2a1a; filter: drop-shadow(0 0 0.4vh #ff3b1e); }
+.tv[data-theme='cable85'] .led-digit .off { fill: #3a0d08; }
+.tv[data-theme='cable85'] .led-brand { display: flex; flex-direction: column; gap: 0.5vh; font: 700 1.4vh Oswald, sans-serif; color: #bfae94; letter-spacing: 0.25em; text-shadow: none; }
+.tv[data-theme='cable85'] .led-brand i { display: block; width: 4.3vh; height: 0.7vh; border-radius: 0.2vh; background: linear-gradient(90deg, #b9a27a, #e8d6ad, #b9a27a); }
+.tv[data-theme='cable85'] .osd { text-shadow: none; }
+.tv[data-theme='cable85'] .osd-number, .tv[data-theme='cable85'] .osd-logo, .tv[data-theme='cable85'] .osd-name { display: none; }
+.tv[data-theme='cable85'] .osd .led { display: flex; }
+.tv[data-theme='cable85']:has(.osd) .banner-led { display: none; }
+.tv[data-theme='cable85'] .banner-led, .tv[data-theme='cable85'] .ident-led { position: fixed; top: var(--safe-y); right: var(--safe-x); z-index: 4; }
+
+/* ── Banner: a character-generator block, bottom left ── */
+.tv[data-theme='cable85'] .banner { right: auto; width: min(66vw, 1400px); display: block; padding: 2vh 1.8vw 2.2vh; background: rgba(0, 0, 8, 0.8); border: 0; border-top: 0.8vh solid var(--cg-blue); box-shadow: none; text-shadow: var(--cg-shadow); }
+.tv[data-theme='cable85'] .banner-badge, .tv[data-theme='cable85'] .banner-label, .tv[data-theme='cable85'] .banner-art, .tv[data-theme='cable85'] .banner-endlogo, .tv[data-theme='cable85'] .banner-upnext { display: none; }
+.tv[data-theme='cable85'] .banner-cg-ch { display: inline; color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .banner-body > .banner-row:first-child { font-size: 4.1vh; color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .banner-clock { color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .banner-title { font-size: 8.2vh; line-height: 0.95; margin: 0.6vh 0 0.2vh; color: var(--cg-white); }
+.tv[data-theme='cable85'] .banner-episode { font-size: 4.3vh; color: var(--cg-cyan); opacity: 1; }
+.tv[data-theme='cable85'] .banner-meta { font-size: 3.9vh; margin-top: 0.8vh; }
+.tv[data-theme='cable85'] .banner-meta > span:first-child { color: var(--cg-green); }
+.tv[data-theme='cable85'] .banner-next { color: var(--cg-magenta); }
+/* A rainbow bar; the part still to play is dimmed by the fill's shadow. */
+.tv[data-theme='cable85'] .progress { height: 1.3vh; border-radius: 0; margin-top: 1.4vh; background: var(--rainbow); overflow: hidden; }
+.tv[data-theme='cable85'] .progress-fill { background: transparent; box-shadow: 0 0 0 100vw rgba(0, 0, 8, 0.72); }
+.tv[data-theme='cable85'] .hint { background: rgba(0, 0, 8, 0.8); color: var(--cg-cyan); text-shadow: var(--cg-shadow); font-size: 3.4vh; border-left: 0.6vh solid var(--cg-cyan); }
+.tv[data-theme='cable85'] .ticker { display: none; }
+
+/* ── Guide: page P100 ── */
+.tv[data-theme='cable85'] .guide { text-shadow: var(--cg-shadow); gap: 1vh; padding-top: calc(var(--safe-y) - 1.5vh); }
+.tv[data-theme='cable85'] .guide-masthead { display: flex; flex-wrap: wrap; align-items: center; gap: 1.4vh 1.6vw; flex: none; font-size: 4.3vh; }
+.tv[data-theme='cable85'] .guide-masthead-badge { background: var(--cg-blue); color: var(--cg-white); padding: 0 1vw; text-shadow: none; }
+.tv[data-theme='cable85'] .guide-masthead-title { color: var(--cg-yellow); flex: 1; }
+.tv[data-theme='cable85'] .guide-masthead-clock { color: var(--cg-cyan); }
+.tv[data-theme='cable85'] .guide-masthead-rule {
+  order: 10; flex: 0 0 100%; height: 1.6vh;
+  background: repeating-linear-gradient(90deg, var(--cg-red) 0 2%, var(--cg-yellow) 0 4%, var(--cg-green) 0 6%, transparent 0 7.5%, var(--cg-cyan) 0 9.5%, var(--cg-blue) 0 11.5%, var(--cg-magenta) 0 13.5%, transparent 0 15%);
+}
+.tv[data-theme='cable85'] .guide-top { flex-direction: row-reverse; }
+.tv[data-theme='cable85'].guide-open .screen { border: 0.6vh solid var(--cg-white); outline: 0.6vh solid var(--cg-blue); }
+.tv[data-theme='cable85'] .guide-details-ch { font-size: 4.1vh; color: var(--cg-green); }
+.tv[data-theme='cable85'] .guide-details-title { font-size: 7.6vh; line-height: 0.9; color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .guide-details-episode { font-size: 4.3vh; color: var(--cg-cyan); opacity: 1; }
+.tv[data-theme='cable85'] .guide-details-meta { font-size: 4.1vh; }
+.tv[data-theme='cable85'] .guide-details-desc { font-size: 3.4vh; text-transform: none; line-height: 1.05; color: #c9c9c9; opacity: 1; text-shadow: 0.3vh 0.3vh 0 #000; }
+.tv[data-theme='cable85'] .guide-details-next, .tv[data-theme='cable85'] .guide-details-hint { font-size: 3.4vh; color: var(--dim); }
+.tv[data-theme='cable85'] .guide-details-chlogo { display: none; }
+.tv[data-theme='cable85'] .guide-grid { gap: 0.6vh; }
+.tv[data-theme='cable85'] .guide-header { background: none; }
+.tv[data-theme='cable85'] .guide-settings { margin: 0; border: 0; font-size: 3.7vh; color: var(--cg-white); background: none; }
+.tv[data-theme='cable85'] .guide-times { background: none; }
+.tv[data-theme='cable85'] .guide-time { font-size: 3.7vh; color: var(--cg-cyan); border-left: 0.4vh solid var(--cg-cyan); }
+.tv[data-theme='cable85'] .guide-day { display: none; }
+.tv[data-theme='cable85'] .guide-row { height: 5.5vh; }
+.tv[data-theme='cable85'] .guide-logo { display: none; }
+/* Each channel gets a solid colour block, teletext style. */
+.tv[data-theme='cable85'] .guide-channel { margin: 0 0.6vw 0 0; padding: 0 1vw; gap: 1vw; color: #000; text-shadow: none; border-radius: 0; background: var(--cg-red); }
+.tv[data-theme='cable85'] .guide-row:nth-child(6n + 2) .guide-channel { background: var(--cg-green); }
+.tv[data-theme='cable85'] .guide-row:nth-child(6n + 3) .guide-channel { background: var(--cg-yellow); }
+.tv[data-theme='cable85'] .guide-row:nth-child(6n + 4) .guide-channel { background: var(--cg-cyan); }
+.tv[data-theme='cable85'] .guide-row:nth-child(6n + 5) .guide-channel { background: var(--cg-magenta); }
+.tv[data-theme='cable85'] .guide-row:nth-child(6n) .guide-channel { background: var(--cg-blue); color: var(--cg-white); }
+.tv[data-theme='cable85'] .guide-row:nth-child(6n) .guide-channel-number { color: var(--cg-white); }
+.tv[data-theme='cable85'] .guide-channel-number { font-size: 4.5vh; color: #000; min-width: 1.4em; }
+.tv[data-theme='cable85'] .guide-channel-name, .tv[data-theme='cable85'] .guide-logo + .guide-channel-name { font-size: 3.4vh; white-space: nowrap; display: block; overflow: hidden; text-overflow: ellipsis; }
+.tv[data-theme='cable85'] .guide-row.current .guide-channel { box-shadow: inset 0 0 0 0.5vh var(--cg-white); }
+.tv[data-theme='cable85'] .guide-row.focused-row .guide-channel { box-shadow: inset 0 0 0 0.5vh #000; }
+.tv[data-theme='cable85'] .guide-cell { border: 0; border-left: 0.4vh solid #3a3a88; border-radius: 0; font-size: 3.7vh; }
+.tv[data-theme='cable85'] .guide-cell-episode { color: var(--cg-cyan); opacity: 1; }
+.tv[data-theme='cable85'] .guide-cell.focused { background: var(--cg-yellow); color: #000; text-shadow: none; border-left-color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .guide-cell.focused .guide-cell-episode { color: #222; }
+.tv[data-theme='cable85'] .guide-cell.focused .guide-cell-title::after,
+.tv[data-theme='cable85'] .guide-cell.focused .guide-cell-show::after { content: ''; display: inline-block; width: 0.5em; height: 0.8em; margin-left: 0.3em; vertical-align: -0.05em; background: #000; animation: vcr-blink 1s steps(1) infinite; }
+.tv[data-theme='cable85'] .guide-cell.focused .guide-cell-title.two::after { display: none; }
+.tv[data-theme='cable85'] .guide-now { width: 0.4vh; box-shadow: 0 0 0.8vh var(--cg-red); }
+/* The remote's four coloured buttons, as on a teletext page. */
+.tv[data-theme='cable85'] .guide-hint { font-size: 3.4vh; color: var(--cg-white); text-align: left; margin-top: 0.6vh; }
+.tv[data-theme='cable85'] .guide-hint::before { content: ''; display: inline-block; width: 13vh; height: 2.4vh; margin-right: 1.2vw; vertical-align: -0.2vh; background: linear-gradient(90deg, var(--cg-red) 0 22%, transparent 0 26%, var(--cg-green) 0 48%, transparent 0 52%, var(--cg-yellow) 0 74%, transparent 0 78%, var(--cg-blue) 0); }
+
+/* ── Up next: STAY TUNED ── */
+.tv[data-theme='cable85'] .ident { background: #000; text-shadow: var(--cg-shadow); }
+.tv[data-theme='cable85'] .ident::before, .tv[data-theme='cable85'] .ident::after { content: ''; position: absolute; left: 0; right: 0; height: 2.4vh; background: repeating-linear-gradient(90deg, var(--cg-red) 0 8.33%, var(--cg-yellow) 0 16.66%, var(--cg-green) 0 25%, var(--cg-cyan) 0 33.33%, var(--cg-blue) 0 41.66%, var(--cg-magenta) 0 50%); }
+.tv[data-theme='cable85'] .ident::before { top: 6.5vh; }
+.tv[data-theme='cable85'] .ident::after { bottom: 6.5vh; }
+.tv[data-theme='cable85'] .ident .led { display: flex; }
+.tv[data-theme='cable85'] .ident-panel { max-width: 88vw; padding: 0; text-align: left; }
+.tv[data-theme='cable85'] .ident-main { gap: 3.5vw; }
+.tv[data-theme='cable85'] .ident-art { display: block; width: 52vh; height: 39vh; border: 0.8vh solid var(--cg-white); outline: 0.8vh solid var(--cg-magenta); }
+.tv[data-theme='cable85'] .ident-text { align-items: flex-start; gap: 1vh; }
+.tv[data-theme='cable85'] .ident-logo, .tv[data-theme='cable85'] .ident-channel { display: none; }
+.tv[data-theme='cable85'] .ident-label {
+  font-size: 10vh; line-height: 0.85; text-shadow: none; filter: drop-shadow(0.35vh 0.35vh 0 #000);
+  background: linear-gradient(90deg, var(--cg-red) 0 11%, var(--cg-yellow) 0 22%, var(--cg-green) 0 33%, var(--cg-cyan) 0 44%, var(--cg-white) 0 50%, var(--cg-red) 0 61%, var(--cg-yellow) 0 72%, var(--cg-green) 0 83%, var(--cg-cyan) 0 94%, var(--cg-magenta) 0);
+  -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.tv[data-theme='cable85'] .ident-title { font-size: 11vh; line-height: 0.9; color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .ident-episode { font-size: 5vh; color: var(--cg-cyan); opacity: 1; }
+.tv[data-theme='cable85'] .ident-desc { font-size: 3.4vh; text-transform: none; line-height: 1.1; color: #c9c9c9; opacity: 1; }
+.tv[data-theme='cable85'] .ident-time { font-size: 5vh; color: var(--cg-green); }
+.tv[data-theme='cable85'] .ident-time-ch { display: inline; }
+.tv[data-theme='cable85'] .ident-count { display: block; position: absolute; right: var(--safe-x); bottom: 12vh; font-size: 4.3vh; color: var(--cg-magenta); }
+.tv[data-theme='cable85'] .ident-count::before { content: 'STARTS IN '; }
+.tv[data-theme='cable85'] .ident-count b { font-weight: 400; }
+.tv[data-theme='cable85'] .ident-count small { font-size: 1em; margin-left: 0.3em; }
+
+/* ── Coming up: a listings page ── */
+.tv[data-theme='cable85'] .bumper { background: #000; color: var(--cg-white); text-shadow: var(--cg-shadow); }
+.tv[data-theme='cable85'] .bumper::before { content: ''; position: absolute; left: 5vw; right: 5vw; top: 15.5vh; height: 1.6vh; background: var(--rainbow); }
+.tv[data-theme='cable85'] .bumper-head { left: 5vw; right: 5vw; top: 6vh; display: flex; align-items: baseline; gap: 1.6vw; font-size: 6vh; }
+.tv[data-theme='cable85'] .bumper-logo { display: none; }
+.tv[data-theme='cable85'] .bumper-badge { display: inline; background: var(--cg-blue); padding: 0 1vw; text-shadow: none; }
+.tv[data-theme='cable85'] .bumper-badge { font-size: 0; }
+.tv[data-theme='cable85'] .bumper-badge::after { content: 'P101'; font-size: 6vh; }
+.tv[data-theme='cable85'] .bumper-heading { color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .bumper-chname { color: var(--cg-green); }
+.tv[data-theme='cable85'] .bumper-clock { display: block; margin-left: auto; color: var(--cg-cyan); }
+.tv[data-theme='cable85'] .bumper-list { left: 5vw; right: 5vw; top: 22vh; display: flex; flex-direction: column; gap: 1.2vh; }
+.tv[data-theme='cable85'] .bumper-list li { height: 14vh; align-items: center; background: #00001c; font-size: 6.4vh; }
+.tv[data-theme='cable85'] .bumper-time { width: 19vw; height: 100%; display: flex; align-items: center; gap: 0.6vw; padding-left: 1.6vw; color: #000; text-shadow: none; background: var(--cg-cyan); }
+.tv[data-theme='cable85'] .bumper-list li:nth-child(2) .bumper-time { background: var(--cg-green); }
+.tv[data-theme='cable85'] .bumper-list li:nth-child(3) .bumper-time { background: var(--cg-magenta); }
+.tv[data-theme='cable85'] .bumper-list li:nth-child(4) .bumper-time { background: var(--cg-red); }
+.tv[data-theme='cable85'] .bumper-time small { display: inline; font-size: 0.6em; }
+.tv[data-theme='cable85'] .bumper-title { flex: 1; padding-left: 1.8vw; }
+.tv[data-theme='cable85'] .bumper-episode { font-size: 3.4vh; color: var(--cg-cyan); opacity: 1; }
+.tv[data-theme='cable85'] .bumper-desc { display: none; }
+.tv[data-theme='cable85'] .bumper-list li.next { background: var(--cg-yellow); color: #000; text-shadow: none; }
+.tv[data-theme='cable85'] .bumper-list li.next .bumper-time { background: #000; color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .bumper-list li.next .bumper-episode { color: #222; }
+.tv[data-theme='cable85'] .bumper-list li.next .bumper-title b::after { content: ''; display: inline-block; width: 0.5em; height: 0.8em; margin-left: 0.4em; vertical-align: -0.05em; background: #000; animation: vcr-blink 1s steps(1) infinite; }
+.tv[data-theme='cable85'] .bumper-ticker b { margin-right: 0.6em; font-weight: 400; }
+.tv[data-theme='cable85'] .bumper-ticker { display: block; position: absolute; left: 5vw; right: 5vw; bottom: 6vh; font-size: 4.3vh; color: var(--cg-magenta); }
+
+/* ── Menus, cards and corner bits ── */
+.tv[data-theme='cable85'] .settings { background: rgba(0, 0, 8, 0.94); }
+.tv[data-theme='cable85'] .settings h2 { font-size: 5.7vh; margin-bottom: 1vh; color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .settings li { padding: 0.6vh 1vw; margin-bottom: 0.2vh; border-radius: 0; }
+.tv[data-theme='cable85'] .settings li.focused { background: rgba(255, 239, 58, 0.14); border-color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .settings-row { font-size: 4.3vh; }
+.tv[data-theme='cable85'] .settings-value { font-size: 3.9vh; text-shadow: none; }
+.tv[data-theme='cable85'] .settings li:not(.focused) .settings-value { color: var(--cg-cyan); }
+.tv[data-theme='cable85'] .settings-note { font-size: 2.8vh; color: var(--dim); }
+.tv[data-theme='cable85'] .settings-hint { font-size: 3vh; color: var(--cg-green); }
+.tv[data-theme='cable85'] .card h1 { font-size: 7.4vh; color: var(--cg-yellow); }
+.tv[data-theme='cable85'] .card p { font-size: 4.3vh; }
+.tv[data-theme='cable85'] .card .dim { color: var(--cg-cyan); }
+.tv[data-theme='cable85'] .bug { border-radius: 0; background: rgba(0, 0, 8, 0.8); text-shadow: var(--cg-shadow); font-size: 3.9vh; }
+.tv[data-theme='cable85'] .ad-counter { font-size: 4.1vh; border-radius: 0; background: rgba(0, 0, 8, 0.8); border-left-color: var(--cg-yellow); text-shadow: var(--cg-shadow); }
+.tv[data-theme='cable85'] .ad-counter-time { color: var(--cg-cyan); }
+.tv[data-theme='cable85'] .sound-hint { font-size: 3.9vh; }

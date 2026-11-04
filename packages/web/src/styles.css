@@ -21,7 +21,7 @@
 .banner-chnum, .banner-play, .banner-art, .banner-upnext, .banner-endlogo, .banner-label-ch, .ticker,
 .ident-backdrop, .ident-flag, .ident-masthead, .ident-count, .ident-time-ch, .guide-masthead,
 .bumper-backdrop, .bumper-badge, .bumper-clock, .bumper-photo-wrap, .bumper-tag, .bumper-chip, .bumper-dots, .bumper-ticker,
-.bumper-logo-number, .bumper-art { display: none; }
+.bumper-logo-number, .bumper-art, .led, .banner-cg-ch { display: none; }
 
 /* ── "Coming up on…" bumper (end of a commercial break) ─────────────────── */
 
