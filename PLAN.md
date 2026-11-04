@@ -549,12 +549,32 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       Browser-safe files keep streaming straight through. Cost: CPU on the server while
       an old-format video plays. (Came up comparing WaybackFin, a Jellyfin plugin that
       gets this by letting Jellyfin transcode IA `.strm` items.)
-- [ ] **Play now (on demand).** Watch something right away instead of when it's
-      scheduled: from the guide (OK on a future show → "Watch from the start"), and a
-      browsable library on the TV of everything the channels draw on (by channel, show,
-      Plex library, IA collection) with resume, pause and seek. Playback outside the
-      schedule; leaving it returns to live channels. Decide: does it pause the "live"
-      channel or just tune back to wherever the channel is now?
+- [ ] **On Demand** (mock-ups: [docs/mockups/on-demand-*.png](docs/mockups)). Watch
+      anything the channels draw on, when you want, with pause / seek / resume.
+      - **Where:** channel **1 · On Demand** in the lineup (like 2000s cable boxes; type
+        1, or ▲▼ past the lowest channel), and from the guide: OK on a show that isn't
+        on yet opens *Watch now (from the start)* / *Watch channel N live* / *Remind me*.
+      - **Home:** a menu (Continue watching, Channels, Shows A–Z, Movies, Holidays, Plex
+        libraries, Search) and rows of tiles; each channel tile opens what it plays.
+      - **Show page:** art, description, seasons, episodes with watched ✓ and progress,
+        *Resume* and *Play from S1E1*. Movies get a single *Play* / *Resume*.
+      - **Player:** full screen; OK play/pause, ◀▶ ±30 s (hold to scan), ▼ episode list,
+        Back stops and returns to On Demand. Next episode plays automatically. Styled by
+        each theme (VCR: ▶ PLAY / ❚❚ PAUSE text; Cable Box '85: LED shows "OD").
+      - **Leaving:** back to live TV on the channel you came from, **where it is now** (the
+        channels never stop, like real TV); what you were watching is in *Continue
+        watching*.
+      - **Data:** server `GET /api/ondemand` builds the catalogue from resolved channel
+        items (grouped by `show` / IA collection / Plex show, with `episode`, durations,
+        descriptions, thumbs, title art) plus Plex libraries directly; playback reuses
+        the tuner's paths (IA relay, Plex direct/convert with audio language) without
+        the schedule. Progress saved per TV (local storage) every 10 s; watched at 90 %.
+      - **Options (later):** *with commercials* (1–2 vintage ads at natural breaks), a
+        reminder that pops up on whatever you're watching, search by title, house-wide
+        progress instead of per TV.
+      - **Phases:** (1) player + *Watch now* from the guide + resume; (2) channel 1 home,
+        show pages, Continue watching; (3) Plex libraries beyond the channels, search,
+        reminders.
 
 ## 7. Prior art worth borrowing from
 - **ErsatzTV**, **Tunarr** (successor to dizqueTV): Plex-backed custom channels
