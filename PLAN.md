@@ -549,7 +549,7 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       Browser-safe files keep streaming straight through. Cost: CPU on the server while
       an old-format video plays. (Came up comparing WaybackFin, a Jellyfin plugin that
       gets this by letting Jellyfin transcode IA `.strm` items.)
-- [x] **On Demand**, phases 1–2 built (`web/src/OnDemand.tsx`, `server/src/ondemand.ts`; mock-ups: [docs/mockups/on-demand-*.png](docs/mockups)). Watch
+- [x] **On Demand**, phases 1–3 built (`web/src/OnDemand.tsx`, `server/src/ondemand.ts`; mock-ups: [docs/mockups/on-demand-*.png](docs/mockups)). Watch
       anything the channels draw on, when you want, with pause / seek / resume.
       - **Where:** channel **1 · On Demand** in the lineup (like 2000s cable boxes; type
         1, or ▲▼ past the lowest channel), and from the guide: OK on a show that isn't
@@ -568,13 +568,16 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
         items (grouped by `show` / IA collection / Plex show, with `episode`, durations,
         descriptions, thumbs, title art) plus Plex libraries directly; playback reuses
         the tuner's paths (IA relay, Plex direct/convert with audio language) without
-        the schedule. Progress saved per TV (local storage) every 10 s; watched at 90 %.
-      - **Options (later):** *with commercials* (1–2 vintage ads at natural breaks), a
-        reminder that pops up on whatever you're watching, search by title, house-wide
-        progress instead of per TV.
+        the schedule. Progress is house-wide: the server keeps it
+        (`GET/PUT /api/ondemand/progress`, `ondemand-progress.json`, newest wins), each TV
+        caches it and sends changes every 10 s; watched at 90 %.
       - **Phases:** (1) player + *Watch now* from the guide + resume; (2) channel 1 home,
-        show pages, Continue watching — **done**. (3) still to do: Plex libraries beyond
-        the channels, search, reminders, *with commercials*, house-wide progress.
+        show pages, Continue watching; (3) Plex libraries beyond the channels
+        (`/api/ondemand/library/:key`, `plex:<ratingKey>` entries), search (letter grid
+        over the catalogue and libraries), reminders (guide popup, kept per TV, notice a
+        minute before), *On Demand ads* (pre-roll of 1–2 commercials when starting from
+        the beginning; can't be skipped), house-wide progress — **all done**.
+      - **Maybe later:** ads at natural mid-episode breaks, not just before.
         Built as: the guide has ⚙ Settings | ▶ On Demand in its header and a popup for
         future shows (`itemId` on guide blocks); the tuner's `playOnDemand` / `seek` /
         `stop` reuse the channel playback paths; `/api/ondemand` (catalogue, A–Z),

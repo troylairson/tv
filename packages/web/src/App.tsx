@@ -13,6 +13,8 @@ import { fullTitle } from './titles';
 import { Led } from './Led';
 import { OnDemand, type OdStart, type OdView } from './OnDemand';
 import { findTheme, THEMES } from './themes';
+import { dueReminder, removeReminder, type Reminder } from './reminders';
+import { syncProgress } from './ondemandStore';
 
 const params = new URLSearchParams(location.search);
 /** Set by the Android TV wrapper, which allows autoplay without a gesture. */
@@ -24,6 +26,7 @@ const THEME_KEY = 'retro-tv:theme';
 const STATIC_SOUND_KEY = 'retro-tv:static-sound';
 const LOGO_BUG_KEY = 'retro-tv:logo-bug';
 const AD_COUNTER_KEY = 'retro-tv:ad-counter';
+const OD_ADS_KEY = 'retro-tv:od-ads';
 /** How long the "Coming up on…" card shows. */
 const BUMPER_MS = 8000;
 
@@ -111,6 +114,8 @@ export function App() {
   const [staticSound, setStaticSound] = useState(store(STATIC_SOUND_KEY) !== 'off');
   const [logoBug, setLogoBug] = useState(store(LOGO_BUG_KEY) !== 'off');
   const [adCounter, setAdCounter] = useState(store(AD_COUNTER_KEY) !== 'off');
+  const [odAds, setOdAds] = useState(store(OD_ADS_KEY) === 'on');
+  const [reminder, setReminder] = useState<Reminder | undefined>(undefined);
   useEffect(() => setStaticMuted(!staticSound), [staticSound]);
   const [digits, setDigits] = useState('');
   const [lastKey, setLastKey] = useState<KeyInfo | null>(null);
@@ -119,9 +124,15 @@ export function App() {
 
   // Re-render every second for clocks and progress bars.
   useEffect(() => {
-    const t = setInterval(() => setTick((n) => n + 1), 1000);
+    const t = setInterval(() => {
+      setTick((n) => n + 1);
+      setReminder(dueReminder());
+    }, 1000);
     return () => clearInterval(t);
   }, []);
+
+  // On Demand progress from the house's other TVs.
+  useEffect(() => void syncProgress(), []);
 
   useEffect(() => {
     if (!video.current) return;
@@ -359,6 +370,15 @@ export function App() {
       },
     },
     {
+      label: 'On Demand ads',
+      value: odAds ? 'On' : 'Off',
+      note: 'A commercial or two before anything you start from the beginning in On Demand, like the real thing. This TV only',
+      activate: () => {
+        store(OD_ADS_KEY, odAds ? 'off' : 'on');
+        setOdAds(!odAds);
+      },
+    },
+    {
       label: 'Plex playback',
       value: plexMode === 'auto' ? 'Auto' : plexMode === 'transcode' ? 'Convert' : 'Direct',
       note: 'Auto: files the TV can play start straight away, others are converted by Plex. Falls back to the other way if one fails',
@@ -430,6 +450,17 @@ export function App() {
           return true;
       }
     }
+    // "Starting now" for a reminder: OK watches it, Back dismisses (unless a menu is up).
+    const due = reminderShown ? reminder : undefined;
+    if (due && !showGuide && !showSettings && (action.type === 'ok' || action.type === 'back')) {
+      removeReminder(due);
+      setReminder(dueReminder());
+      if (action.type === 'ok') {
+        const i = channels.findIndex((c) => c.number === due.channelNumber);
+        if (i >= 0) tuneTo(channels, i);
+      }
+      return true;
+    }
     if (showGuide) return guideAction.current?.(action) ?? true;
     if (odOpen) {
       if (odAction.current?.(action)) return true;
@@ -496,6 +527,15 @@ export function App() {
   const channel = channels[index];
   const { airing, status, filler } = tunerState;
   const t = Date.now();
+  // Already watching the reminded show: nothing to remind.
+  const watchingReminded = !!reminder && channel?.number === reminder.channelNumber && !odOpen && reminder.startMs <= t;
+  const reminderShown = !!reminder && !watchingReminded;
+  useEffect(() => {
+    if (reminder && watchingReminded) {
+      removeReminder(reminder);
+      setReminder(dueReminder());
+    }
+  }, [reminder, watchingReminded]);
   const nextShow = tunerState.upcoming.find((a) => a.kind === 'show');
   const progress = airing ? Math.min(1, Math.max(0, (now() - airing.startMs) / (airing.endMs - airing.startMs))) : 0;
   const isBreak = airing?.kind === 'commercial';
@@ -586,12 +626,26 @@ export function App() {
           state={tunerState}
           start={odStart}
           actionRef={odAction}
+          ads={odAds}
           onView={setOdView}
           onExit={exitOnDemand}
         />
       )}
 
       {tunerState.soundLocked && <div class="sound-hint panel">🔇 Press OK or tap for sound</div>}
+
+      {reminderShown && reminder && (
+        <div class="reminder panel">
+          <div class="reminder-head heading">⏰ {reminder.startMs > t ? `Starting in ${Math.max(1, Math.ceil((reminder.startMs - t) / 1000))} s` : 'Starting now'}</div>
+          <div class="reminder-title">
+            {reminder.show ?? reminder.title}
+            {reminder.episode && <span class="reminder-episode"> · {reminder.episode}</span>}
+          </div>
+          <div class="reminder-keys">
+            Channel {reminder.channelNumber} {reminder.channelName} · <b>OK</b> watch · <b>Back</b> dismiss
+          </div>
+        </div>
+      )}
 
       {poweredOn && !channels.length && (
         <div class="card panel">

@@ -5,6 +5,7 @@
  * their split titles, everything else is a movie (or a one-off).
  */
 import { getChannels } from './channels';
+import * as plex from './plex';
 import type { Channel, ChannelItem } from './types';
 
 /** Clips and ads aren't worth listing on their own. */
@@ -141,4 +142,50 @@ export function findItem(id: string): { key: string; item: ChannelItem } | null 
     if (item) return { key: keyOf(item), item };
   }
   return null;
+}
+
+// ── Plex libraries, beyond what the channels play ──────────────────────────
+
+/** Every show or movie in a Plex library, as On Demand entries ("plex:<ratingKey>"). */
+export async function plexLibraryEntries(sectionKey: string): Promise<OnDemandEntry[]> {
+  const list = await plex.browseSection(sectionKey);
+  return list
+    .filter((m) => m.type === 'show' || m.type === 'movie')
+    .map((m) => ({
+      key: `plex:${m.ratingKey}`,
+      title: m.title,
+      kind: m.type === 'show' ? ('show' as const) : ('movie' as const),
+      count: m.type === 'show' ? (m.count ?? 0) : 1,
+      thumb: m.thumb,
+      year: m.year,
+      channels: [],
+    }));
+}
+
+/** A Plex show (its episodes, by season) or movie, straight from Plex. */
+export async function plexEntryDetail(ratingKey: string): Promise<ReturnType<typeof entryDetail>> {
+  const items = await plex.resolveItem(ratingKey);
+  if (!items.length) return null;
+  const first = items[0]!;
+  const isShow = items.length > 1 || Boolean(first.show);
+  let fallback = 0;
+  const episodes: OnDemandEpisode[] = items.map((item) => {
+    const n = episodeNumbers(item.episode);
+    return { item, season: n?.season ?? 1, order: n?.order ?? 10_000 + fallback++ };
+  });
+  const seasons = [...new Set(episodes.map((e) => e.season))]
+    .sort((a, b) => (a === 0 ? 1 : b === 0 ? -1 : a - b))
+    .map((season) => ({ season, episodes: episodes.filter((e) => e.season === season).sort((a, b) => a.order - b.order) }));
+  return {
+    key: `plex:${ratingKey}`,
+    title: isShow ? (first.show ?? first.title) : first.title,
+    kind: isShow ? 'show' : 'movie',
+    count: items.length,
+    thumb: first.thumb,
+    logo: first.logo,
+    description: isShow ? items.find((i) => i.description)?.description : first.description,
+    year: yearOf(first.title),
+    channels: [],
+    seasons,
+  };
 }

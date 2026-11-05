@@ -75,14 +75,20 @@ only); diagnostics.
 
 **On Demand (channel 1):** everything your channels play, any time. Get there by
 typing **1**, pressing ▼ below your lowest channel, or the guide's **▶ On Demand**
-button (▶ from Settings). Browse **Continue watching**, **Channels** (each opens
-what it plays), **Shows A–Z** and **Movies**; a show's page has its seasons and
-episodes (✓ watched, a bar for part-watched) with *Resume* and *Play from the start*.
-In the guide, OK on a show that hasn't started offers **▶ Watch now** (from the
-start) or the channel live. While playing: OK pause, ◀▶ 30 s, ▼ episodes, Back
-stop. The next episode follows on its own. Back from On Demand returns to the
-channel you came from, wherever it is now (channels keep running, like real TV).
-Progress is kept per TV; 90 % counts as watched.
+button (▶ from Settings). Browse **Continue watching**, **Search**, **Channels**
+(each opens what it plays), **Shows A–Z**, **Movies** and, with Plex, every
+**Plex library** in full (not just what the channels use); a show's page has its
+seasons and episodes (✓ watched, a bar for part-watched) with *Resume* and *Play
+from the start*. **Search** is an on-screen letter grid (or the number keys) over
+all of it. In the guide, OK on a show that hasn't started offers **▶ Watch now**
+(from the start), **⏰ Remind me** or the channel live; a reminder puts a notice
+up a minute before it starts, on whatever you're watching (OK tunes, Back
+dismisses). While playing: OK pause, ◀▶ 30 s, ▼ episodes, Back stop. The next
+episode follows on its own. Back from On Demand returns to the channel you came
+from, wherever it is now (channels keep running, like real TV). Progress is
+shared by every TV in the house (start in one room, finish in another); 90 %
+counts as watched. Settings → *On Demand ads* (off by default) plays a commercial
+or two, with the ad counter, before anything started from the beginning.
 
 ## Managing channels
 

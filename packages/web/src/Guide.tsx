@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'preact/hooks';
 import { now } from './clock';
 import type { Action } from './keys';
 import { Logo } from './logos/Logo';
+import { addReminder, hasReminder, reminders, removeReminder } from './reminders';
 import { fullTitle } from './titles';
 import type { Theme } from './themes';
 import type { ChannelInfo } from './tuner';
@@ -168,11 +169,15 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
     setWindowStart(Math.max(earliest, Math.min(start, floorToSlot(t + MAX_AHEAD_MS))));
   }
 
-  const popupOptions = popup
+  const reminder = popup && { channelNumber: popup.number, channelName: popup.name, title: popup.block.title, show: popup.block.show, episode: popup.block.episode, startMs: popup.block.startMs };
+  const popupOptions = popup && reminder
     ? [
-        { label: '▶ Watch now', note: 'On Demand, from the start', act: () => onOnDemand({ itemId: popup.block.itemId }) },
-        { label: `Watch channel ${popup.number} live`, note: popup.name, act: () => onTune(popup.number) },
-        { label: 'Cancel', note: '', act: () => setPopup(null) },
+        ...(popup.block.itemId ? [{ label: '▶ Watch now', note: 'On Demand, from the start', act: () => onOnDemand({ itemId: popup.block.itemId }) }] : []),
+        hasReminder(reminder)
+          ? { label: '⏰ Cancel reminder', note: `set for ${fmtTime(popup.block.startMs)}`, act: () => removeReminder(reminder) }
+          : { label: '⏰ Remind me', note: 'a notice on screen when it starts', act: () => addReminder(reminder) },
+        { label: `Watch channel ${popup.number} now`, note: popup.name, act: () => onTune(popup.number) },
+        { label: 'Cancel', note: '', act: () => undefined },
       ]
     : [];
 
@@ -187,7 +192,7 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
           return true;
         case 'ok':
           popupOptions[popup.focus]?.act();
-          if (popup.focus !== 2) setPopup(null);
+          setPopup(null);
           return true;
         case 'back':
         case 'left':
@@ -235,7 +240,7 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
         if (row < 0) {
           if (headerCol === 0) onSettings();
           else onOnDemand(null);
-        } else if (focused?.kind === 'show' && focused.itemId && focused.startMs > t && rows[row]) {
+        } else if (focused?.kind === 'show' && focused.startMs > t && rows[row]) {
           setPopup({ block: focused, number: rows[row].number, name: rows[row].name, focus: 0 });
         } else if (rows[row]) onTune(rows[row].number);
         return true;
@@ -255,6 +260,7 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
   const visible = rows.slice(firstRow, firstRow + VISIBLE_ROWS);
   const pct = (ms: number) => ((Math.min(Math.max(ms, windowStart), windowEnd) - windowStart) / WINDOW_MS) * 100;
   const focusedRow = row >= 0 ? rows[row] : undefined;
+  const reminded = new Set(reminders().map((x) => `${x.channelNumber}@${x.startMs}`));
   const nextAfterFocused = focused && row >= 0 ? blockAt(row, focused.endMs) : undefined;
 
   return (
@@ -304,7 +310,9 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
               </div>
               {focused.description && <div class="guide-details-desc">{focused.description}</div>}
               {!focused.description && nextAfterFocused && nextAfterFocused !== focused && <div class="guide-details-next">Then: {fullTitle(nextAfterFocused)}</div>}
-              <div class="guide-details-hint">OK watch channel {focusedRow.number}</div>
+              <div class="guide-details-hint">
+                {focused.kind === 'show' && focused.startMs > t ? 'OK: watch now or remind me' : `OK watch channel ${focusedRow.number}`}
+              </div>
             </>
           ) : (
             <div class="guide-details-title">{error ?? 'Loading the guide…'}</div>
@@ -350,6 +358,7 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
                       style={{ left: `${pct(b.startMs)}%`, width: `${pct(b.endMs) - pct(b.startMs)}%` }}
                     >
                       {b.startMs < windowStart && <span class="guide-more">◀</span>}
+                      {b.startMs > t && reminded.has(`${r.number}@${b.startMs}`) && <span class="guide-remind">⏰</span>}
                       {b.show && b.episode ? (
                         <span class="guide-cell-title two">
                           <span class="guide-cell-show">{b.show}</span>

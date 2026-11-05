@@ -28,7 +28,8 @@ import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercia
 import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
 import { checkItems, checkSoon, isUnavailable, lastHealthRun, loadHealth, startHealthChecks, unavailableError } from './health';
 import { proposals } from './plexgen';
-import { catalogue, entryDetail, findItem } from './ondemand';
+import { catalogue, entryDetail, findItem, plexEntryDetail, plexLibraryEntries } from './ondemand';
+import { allProgress, loadProgress, recordProgress } from './odprogress';
 import { DECADES, discoverQuery, KINDS, shelvesFor, SORTS, type DiscoverSort } from './discover';
 import { shortDescription } from './titles';
 import { deleteLogo, LogoError, MAX_LOGO_BYTES, readLogo, saveLogo } from './logos';
@@ -272,13 +273,33 @@ app.get('/api/ia/search', async (c) => {
 
 // ── On Demand: everything the channels play, any time ───────────────────────
 
-app.get('/api/ondemand', (c) => {
+app.get('/api/ondemand', async (c) => {
   c.header('cache-control', 'no-store');
-  return c.json(catalogue());
+  // Plex libraries too (all of them, not just what's on channels), unless Archive-only.
+  const libraries =
+    plexConfigured() && getSettings().videoSources !== 'ia'
+      ? (await plex.sections().catch(() => [])).filter((s) => s.type === 'movie' || s.type === 'show')
+      : [];
+  return c.json({ ...catalogue(), libraries });
 });
-app.get('/api/ondemand/entry', (c) => {
-  const detail = entryDetail(c.req.query('key') ?? '');
+app.get('/api/ondemand/library/:key', async (c) => {
+  if (!plexConfigured()) return c.json({ error: 'Plex is not configured' }, 404);
+  return c.json({ entries: await plexLibraryEntries(c.req.param('key')) });
+});
+app.get('/api/ondemand/entry', async (c) => {
+  const key = c.req.query('key') ?? '';
+  const detail = key.startsWith('plex:') && plexConfigured() ? await plexEntryDetail(key.slice(5)) : entryDetail(key);
   return detail ? c.json(detail) : c.json({ error: 'Not found' }, 404);
+});
+/** Progress shared by every TV in the house. */
+app.get('/api/ondemand/progress', (c) => {
+  c.header('cache-control', 'no-store');
+  return c.json({ progress: allProgress() });
+});
+app.put('/api/ondemand/progress', async (c) => {
+  const body = (await c.req.json().catch(() => null)) as { progress?: unknown[] } | null;
+  const list = Array.isArray(body?.progress) ? body.progress.slice(0, 50) : [];
+  return c.json({ saved: list.filter((p) => recordProgress(p)).length });
 });
 app.get('/api/ondemand/item/:id', (c) => {
   const found = findItem(c.req.param('id'));
@@ -409,6 +430,7 @@ app.get('*', serveStatic({ root: webRoot, path: 'index.html' }));
 await loadSettings();
 await loadLineups();
 await loadHealth();
+await loadProgress();
 await initChannels();
 await startCommercialPool({
   onChange: () => regenerate(getChannels().channels),

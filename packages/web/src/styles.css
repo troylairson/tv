@@ -461,3 +461,28 @@ html, body, #app {
 .tv.od-player .card { z-index: 6; }
 /* The live preview sits above the guide; hide it while the Watch now choices are open. */
 .tv:has(.guide-popup) .screen, .tv:has(.guide-popup) .static, .tv:has(.guide-popup) .bars { visibility: hidden; }
+
+/* ── Reminders: "Starting now" from the guide's Remind me ─────────────── */
+
+.reminder { position: absolute; right: var(--safe-x); top: var(--safe-y); z-index: 8; max-width: 46vw; padding: 2vh 1.8vw; border: var(--border) solid var(--accent); border-radius: var(--radius); box-shadow: var(--shadow); }
+.reminder-head { font-size: 2.6vh; color: var(--accent); letter-spacing: var(--heading-spacing); text-transform: var(--heading-case); }
+.reminder-title { font-size: 4vh; font-weight: bold; font-family: var(--font-display); margin: 0.6vh 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.reminder-episode { font-size: 3vh; font-weight: normal; }
+.reminder-keys { font-size: 2.5vh; color: var(--dim); }
+.reminder-keys b { color: var(--fg, inherit); }
+.guide-remind { flex: none; font-size: 2.2vh; margin-left: 0.3vw; order: 9; }
+
+/* ── On Demand: search and ads ─────────────────────────────────────────── */
+
+.od-search { flex: none; margin-bottom: 2.4vh; }
+.od-query { display: flex; align-items: center; min-height: 6vh; padding: 0 1.2vw; margin-bottom: 1.4vh; font-size: 3.6vh; font-weight: bold; border-radius: var(--radius); background: rgba(255, 255, 255, 0.06); border: 0.3vh solid rgba(255, 255, 255, 0.15); white-space: pre; overflow: hidden; }
+.od-query.on { border-color: var(--accent); }
+.od-query-hint { font-size: 2.6vh; font-weight: normal; color: var(--dim); white-space: nowrap; }
+.od-caret { width: 0.3vw; height: 4vh; margin-left: 0.2vw; background: var(--accent); animation: od-blink 1s steps(1) infinite; }
+@keyframes od-blink { 50% { opacity: 0; } }
+.od-keys-grid { display: grid; gap: 0.8vh 0.5vw; }
+.od-key { display: flex; align-items: center; justify-content: center; height: 5.4vh; font-size: 3vh; font-weight: bold; border-radius: var(--radius); background: rgba(255, 255, 255, 0.06); border: 0.3vh solid transparent; }
+.od-key.wide { font-size: 2.4vh; }
+.od-key.focused { background: var(--focus-bg); color: var(--focus-fg); border-color: var(--focus-edge); }
+.tv.od-open .ad-counter.od-ad { display: flex; }
+.od-coming { position: absolute; right: var(--safe-x); bottom: var(--safe-y); padding: 0.8vh 1.2vw; font-size: 2.6vh; color: #fff; background: rgba(0, 0, 0, 0.6); border-radius: 0.6vh; text-transform: var(--heading-case); letter-spacing: var(--heading-spacing); }

@@ -958,3 +958,4 @@
 .tv[data-theme='cable85'] .ad-counter { font-size: 4.1vh; border-radius: 0; background: rgba(0, 0, 8, 0.8); border-left-color: var(--cg-yellow); text-shadow: var(--cg-shadow); }
 .tv[data-theme='cable85'] .ad-counter-time { color: var(--cg-cyan); }
 .tv[data-theme='cable85'] .sound-hint { font-size: 3.9vh; }
+.tv[data-theme='cable85'] .guide-popup li.focused, .tv[data-theme='cable85'] .guide-popup li.focused * { text-shadow: none; }

@@ -5,15 +5,21 @@ import type { Action } from './keys';
 import { Logo } from './logos/Logo';
 import {
   continueWatching,
+  flushProgress,
   fmtClock,
   fmtLeft,
   loadCatalogue,
   loadDetail,
   loadItem,
+  loadLibrary,
   progressOf,
   saveProgress,
+  searchEntries,
+  syncProgress,
   WATCHED,
+  type OdCatalogue,
   type OdChannel,
+  type OdLibrary,
   type OdDetail,
   type OdEntry,
   type Progress,
@@ -32,6 +38,8 @@ interface Props {
   state: TunerState;
   start: OdStart;
   actionRef: MutableRef<((action: Action) => boolean) | null>;
+  /** A commercial or two before anything started from the beginning. */
+  ads: boolean;
   onView: (view: OdView) => void;
   onExit: () => void;
 }
@@ -40,8 +48,15 @@ const COLS = 5;
 const VISIBLE_GRID_ROWS = 2;
 const SKIP_SEC = 30;
 const OSD_MS = 4000;
+/** The on-screen letter grid for search. */
+const KEYS = [...'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789', 'SPACE', 'DEL'];
+const KEY_COLS = 10;
 
-type Menu = { id: 'continue' | 'channels' | 'shows' | 'movies'; label: string } | { id: 'channel'; label: string; channel: OdChannel };
+type Menu =
+  | { id: 'continue' | 'search' | 'channels' | 'shows' | 'movies'; label: string }
+  | { id: 'channel'; label: string; channel: OdChannel }
+  | { id: 'library'; label: string; library: OdLibrary };
+type Preroll = { ads: ChannelItem[]; i: number; then: { item: ChannelItem; key: string } };
 type Tile =
   | { kind: 'entry'; entry: OdEntry }
   | { kind: 'channel'; channel: OdChannel }
@@ -52,13 +67,17 @@ type Tile =
  * movie, and watch it from the start or where you left off. Leaving goes back to
  * live TV on the channel you came from, wherever it is now.
  */
-export function OnDemand({ theme, channels, tuner, state, start, actionRef, onView, onExit }: Props) {
+export function OnDemand({ theme, channels, tuner, state, start, actionRef, ads, onView, onExit }: Props) {
   const [view, setView] = useState<OdView>(start?.itemId ? 'player' : start?.key ? 'show' : 'home');
-  const [data, setData] = useState<{ entries: OdEntry[]; channels: OdChannel[] } | null>(null);
+  const [data, setData] = useState<OdCatalogue | null>(null);
   const [error, setError] = useState<string | null>(null);
   // Home
   const [menuIndex, setMenuIndex] = useState(0);
-  const [pane, setPane] = useState<'menu' | 'grid'>('menu');
+  const [pane, setPane] = useState<'menu' | 'keys' | 'grid'>('menu');
+  const [libs, setLibs] = useState<Record<string, OdEntry[] | string>>({});
+  const [query, setQuery] = useState('');
+  const [keyIndex, setKeyIndex] = useState(0);
+  const [preroll, setPreroll] = useState<Preroll | null>(null);
   const [tileIndex, setTileIndex] = useState(0);
   const [channelMenu, setChannelMenu] = useState<OdChannel | null>(null);
   // Show
@@ -79,7 +98,18 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
     loadCatalogue()
       .then(setData)
       .catch((e: Error) => setError(`Couldn't load On Demand (${e.message})`));
+    // Picks up where another TV in the house left off.
+    void syncProgress().then(() => setCw(continueWatching()));
+    return () => void flushProgress();
   }, []);
+
+  function loadLib(lib: OdLibrary) {
+    if (libs[lib.key]) return;
+    setLibs((l) => ({ ...l, [lib.key]: 'loading' }));
+    loadLibrary(lib.key)
+      .then((entries) => setLibs((l) => ({ ...l, [lib.key]: entries })))
+      .catch((e: Error) => setLibs((l) => ({ ...l, [lib.key]: `Couldn't load ${lib.title} (${e.message})` })));
+  }
 
   // Opened on a show, or to play something right away (from the guide).
   useEffect(() => {
@@ -96,7 +126,7 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
     if (view !== 'player') return;
     const t = setInterval(() => {
       setTick((n) => n + 1);
-      if (playing && state.status === 'ondemand') record(playing.item, playing.key);
+      if (playing && !preroll && state.status === 'ondemand') record(playing.item, playing.key);
     }, 1000);
     return () => clearInterval(t);
   });
@@ -106,6 +136,7 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
     const video = document.querySelector<HTMLVideoElement>('video.screen');
     if (!video || view !== 'player') return;
     const onEnded = () => {
+      if (preroll) return nextAd(preroll);
       if (!playing) return;
       record(playing.item, playing.key, playing.item.durationSec);
       const next = nextEpisode(playing.item);
@@ -143,17 +174,50 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
       .catch((e: Error) => setError(`Couldn't load that (${e.message})`));
   }
 
+  // An ad that won't play is skipped.
+  useEffect(() => {
+    if (preroll && state.status === 'standby') nextAd(preroll);
+  }, [preroll, state.status]);
+
   function play(item: ChannelItem, key: string, from?: number) {
     const saved = progressOf(item.id);
     const offset = from ?? (saved && saved.pos / saved.dur < WATCHED ? Math.max(0, saved.pos - 5) : 0);
     setPlaying({ item, key });
     setView('player');
     setOsdUntil(Date.now() + OSD_MS);
+    setPreroll(null);
+    if (ads && offset === 0) {
+      // "We'll be right back": a commercial or two first, from the same pool as the channels.
+      tuner.stop();
+      void fetch(`/api/commercials/random?count=${Math.random() < 0.5 ? 1 : 2}`)
+        .then((r) => r.json() as Promise<{ commercials: ChannelItem[] }>)
+        .then(({ commercials }) => {
+          if (!commercials?.length) throw new Error('none');
+          setPreroll({ ads: commercials, i: 0, then: { item, key } });
+          void tuner.playOnDemand(commercials[0]!, 0);
+        })
+        .catch(() => void tuner.playOnDemand(item, 0));
+      return;
+    }
     void tuner.playOnDemand(item, offset);
   }
 
+  function nextAd(p: Preroll) {
+    const i = p.i + 1;
+    if (i < p.ads.length) {
+      setPreroll({ ...p, i });
+      void tuner.playOnDemand(p.ads[i]!, 0);
+    } else {
+      setPreroll(null);
+      setOsdUntil(Date.now() + OSD_MS);
+      void tuner.playOnDemand(p.then.item, 0);
+    }
+  }
+
   function leavePlayer() {
-    if (playing && state.status === 'ondemand') record(playing.item, playing.key);
+    if (playing && !preroll && state.status === 'ondemand') record(playing.item, playing.key);
+    setPreroll(null);
+    void flushProgress();
     tuner.stop();
     setCw(continueWatching());
     setPlaying(null);
@@ -172,15 +236,28 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
   // ── Home ──
   const menus: Menu[] = [
     ...(cw.length ? [{ id: 'continue' as const, label: 'Continue watching' }] : []),
+    { id: 'search', label: 'Search' },
     { id: 'channels', label: 'Channels' },
     { id: 'shows', label: 'Shows A–Z' },
     { id: 'movies', label: 'Movies' },
+    ...(data?.libraries ?? []).map((library) => ({ id: 'library' as const, label: `Plex · ${library.title}`, library })),
     ...(channelMenu ? [{ id: 'channel' as const, label: `${channelMenu.number} ${channelMenu.name}`, channel: channelMenu }] : []),
   ];
   const menu = menus[Math.min(menuIndex, menus.length - 1)]!;
   const byKey = new Map((data?.entries ?? []).map((e) => [e.key, e]));
+  const libState = menu.id === 'library' ? libs[menu.library.key] : undefined;
+  // Load a Plex library when its menu is chosen; search looks through all of them.
+  useEffect(() => {
+    if (menu.id === 'library') loadLib(menu.library);
+    if (menu.id === 'search') for (const lib of data?.libraries ?? []) loadLib(lib);
+  }, [menu.id, menu.label, data]);
+  const searchable = menu.id === 'search' ? [...(data?.entries ?? []), ...Object.values(libs).flatMap((l) => (Array.isArray(l) ? l : []))] : [];
   const tiles: Tile[] =
-    menu.id === 'continue'
+    menu.id === 'search'
+      ? searchEntries(searchable, query).map((entry) => ({ kind: 'entry', entry }))
+      : menu.id === 'library'
+        ? (Array.isArray(libState) ? libState : []).map((entry) => ({ kind: 'entry', entry }))
+        : menu.id === 'continue'
       ? cw.map((progress) => ({ kind: 'progress', progress }))
       : menu.id === 'channels'
         ? (data?.channels ?? []).map((channel) => ({ kind: 'channel', channel }))
@@ -238,6 +315,8 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
   actionRef.current = (action) => {
     if (view === 'player') {
       setOsdUntil(Date.now() + OSD_MS);
+      // No skipping the ads (Back still leaves).
+      if (preroll && action.type !== 'back') return true;
       switch (action.type) {
         case 'ok': {
           const video = document.querySelector<HTMLVideoElement>('video.screen');
@@ -303,11 +382,54 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
           return true;
       }
     }
-    // Home
+    // Home: the search letter grid
+    if (pane === 'keys') {
+      const col = keyIndex % KEY_COLS;
+      const type = (key: string) => {
+        setQuery(key === 'DEL' ? query.slice(0, -1) : key === 'SPACE' ? (query && !query.endsWith(' ') ? `${query} ` : query) : (query + key).slice(0, 30));
+        setTileIndex(0);
+      };
+      switch (action.type) {
+        case 'channelUp':
+          if (keyIndex >= KEY_COLS) setKeyIndex(keyIndex - KEY_COLS);
+          return true;
+        case 'channelDown':
+          if (keyIndex + KEY_COLS < KEYS.length) setKeyIndex(keyIndex + KEY_COLS);
+          else if (Math.floor(keyIndex / KEY_COLS) < Math.floor((KEYS.length - 1) / KEY_COLS)) setKeyIndex(KEYS.length - 1);
+          else if (tiles.length) {
+            setPane('grid');
+            setTileIndex(0);
+          }
+          return true;
+        case 'left':
+          if (col === 0) setPane('menu');
+          else setKeyIndex(keyIndex - 1);
+          return true;
+        case 'right':
+          if (col < KEY_COLS - 1 && keyIndex < KEYS.length - 1) setKeyIndex(keyIndex + 1);
+          return true;
+        case 'ok':
+          type(KEYS[keyIndex]!);
+          return true;
+        case 'digit':
+          type(String(action.digit));
+          return true;
+        case 'back':
+          if (query) setQuery(query.slice(0, -1));
+          else setPane('menu');
+          return true;
+        default:
+          return true;
+      }
+    }
     switch (action.type) {
       case 'channelUp':
         if (pane === 'menu') setMenuIndex(Math.max(0, menuIndex - 1));
         else if (tileIndex >= COLS) setTileIndex(tileIndex - COLS);
+        else if (menu.id === 'search') {
+          setPane('keys');
+          setKeyIndex(Math.min(KEYS.length - 1, KEY_COLS * Math.floor((KEYS.length - 1) / KEY_COLS) + (tileIndex % COLS) * 2));
+        }
         return true;
       case 'channelDown':
         if (pane === 'menu') {
@@ -320,25 +442,32 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
         else if (pane === 'grid') setTileIndex(tileIndex - 1);
         return true;
       case 'right':
-        if (pane === 'menu' && tiles.length) {
+        if (pane === 'menu' && menu.id === 'search') setPane('keys');
+        else if (pane === 'menu' && tiles.length) {
           setPane('grid');
           setTileIndex(0);
         } else if (pane === 'grid') setTileIndex(Math.min(tiles.length - 1, tileIndex + 1));
         return true;
       case 'ok':
-        if (pane === 'menu' && tiles.length) {
+        if (pane === 'menu' && menu.id === 'search') setPane('keys');
+        else if (pane === 'menu' && tiles.length) {
           setPane('grid');
           setTileIndex(0);
         } else if (pane === 'grid' && tiles[tileIndex]) openTile(tiles[tileIndex]!);
         return true;
       case 'back':
-        if (pane === 'grid') setPane('menu');
+        if (pane === 'grid') setPane(menu.id === 'search' ? 'keys' : 'menu');
         else if (menu.id === 'channel') {
           setChannelMenu(null);
           setMenuIndex(menus.findIndex((m) => m.id === 'channels'));
         } else onExit();
         return true;
       case 'digit':
+        if (menu.id === 'search') {
+          setPane('keys');
+          setQuery((query + action.digit).slice(0, 30));
+          return true;
+        }
         // A channel number leaves On Demand for that channel (handled by the TV).
         return false;
     }
@@ -346,7 +475,7 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
   };
 
   if (view === 'player') {
-    const item = playing?.item ?? state.onDemand?.item;
+    const item = preroll ? preroll.then.item : (playing?.item ?? state.onDemand?.item);
     const pos = tuner.position();
     const dur = item?.durationSec ?? 0;
     const showOsd = osdUntil > Date.now() || paused || state.status !== 'ondemand';
@@ -359,8 +488,19 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
             <p class="dim">Back to On Demand</p>
           </div>
         )}
-        {paused && <div class="od-paused heading">❚❚ Paused</div>}
-        {showOsd && item && (
+        {preroll && (
+          <>
+            <div class="ad-counter od-ad">
+              <b>
+                Ad {preroll.i + 1} of {preroll.ads.length}
+              </b>
+              <span class="ad-counter-time">{fmtClock((preroll.ads[preroll.i]?.durationSec ?? 0) - pos)}</span>
+            </div>
+            <div class="od-coming heading">{preroll.then.item.show ?? preroll.then.item.title} · after these messages</div>
+          </>
+        )}
+        {paused && !preroll && <div class="od-paused heading">❚❚ Paused</div>}
+        {showOsd && item && !preroll && (
           <>
             <div class="od-badge heading">On Demand</div>
             <div class="od-osd panel">
@@ -397,7 +537,12 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
               <div class="od-show-art" style={detail.thumb ? { backgroundImage: `url(${detail.thumb})` } : undefined} />
               <div class="od-show-title heading">{detail.title}</div>
               <div class="od-show-meta">
-                {[detail.kind === 'show' ? `${detail.count} episodes` : detail.year, `on channel${detail.channels.length > 1 ? 's' : ''} ${detail.channels.join(', ')}`].filter(Boolean).join(' · ')}
+                {[
+                  detail.kind === 'show' ? `${detail.count} episodes` : detail.year,
+                  detail.channels.length ? `on channel${detail.channels.length > 1 ? 's' : ''} ${detail.channels.join(', ')}` : detail.key.startsWith('plex:') ? 'from your Plex library' : '',
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
               </div>
               {detail.description && <div class="od-show-desc">{detail.description}</div>}
               <div class="od-buttons">
@@ -430,8 +575,10 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
   }
 
   // Home
-  const firstRow = Math.max(0, Math.floor(tileIndex / COLS) - (VISIBLE_GRID_ROWS - 1));
-  const shown = tiles.slice(firstRow * COLS, (firstRow + VISIBLE_GRID_ROWS + 1) * COLS);
+  const gridRows = menu.id === 'search' ? 1 : VISIBLE_GRID_ROWS;
+  const firstRow = Math.max(0, Math.floor(tileIndex / COLS) - (gridRows - 1));
+  const shown = tiles.slice(firstRow * COLS, (firstRow + gridRows + (menu.id === 'search' ? 0 : 1)) * COLS);
+  const libLoading = (menu.id === 'library' && libState === 'loading') || (menu.id === 'search' && Object.values(libs).includes('loading'));
   return (
     <div class="od od-page">
       <div class="od-head">
@@ -450,9 +597,28 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
         <div class="od-grid-wrap">
           {error && <div class="od-loading">{error}</div>}
           {!data && !error && <div class="od-loading heading">Loading…</div>}
-          {data && !tiles.length && <div class="od-loading">{menu.id === 'continue' ? 'Nothing in progress.' : 'Nothing here yet.'}</div>}
+          {menu.id === 'search' && (
+            <div class="od-search">
+              <div class={`od-query ${pane === 'keys' ? 'on' : ''}`}>
+                {query || <span class="od-query-hint">Type a title with the letters below (or the number keys)</span>}
+                {pane === 'keys' && <span class="od-caret" />}
+              </div>
+              <div class="od-keys-grid" style={{ gridTemplateColumns: `repeat(${KEY_COLS}, 1fr)` }}>
+                {KEYS.map((k, i) => (
+                  <span key={k} class={`od-key ${k.length > 1 ? 'wide' : ''} ${pane === 'keys' && i === keyIndex ? 'focused' : ''}`}>
+                    {k === 'SPACE' ? 'Space' : k === 'DEL' ? '⌫' : k}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+          {menu.id === 'library' && typeof libState === 'string' && libState !== 'loading' && <div class="od-loading">{libState}</div>}
+          {libLoading && !tiles.length && <div class="od-loading heading">Loading…</div>}
+          {data && !tiles.length && !libLoading && !(menu.id === 'search' && !query) && !(menu.id === 'library' && typeof libState === 'string') && (
+            <div class="od-loading">{menu.id === 'continue' ? 'Nothing in progress.' : menu.id === 'search' ? `Nothing called "${query.trim()}".` : 'Nothing here yet.'}</div>
+          )}
           <div class="od-section heading">
-            {menu.label} <span class="od-count">{tiles.length > COLS ? `${Math.min(tileIndex + 1, tiles.length)} of ${tiles.length}` : ''}</span>
+            {menu.id === 'search' ? (query ? 'Results' : '') : menu.label} <span class="od-count">{tiles.length > COLS ? `${Math.min(tileIndex + 1, tiles.length)} of ${tiles.length}` : ''}</span>
           </div>
           <div class="od-grid">
             {shown.map((tile, j) => {
@@ -462,7 +628,7 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, onVi
           </div>
         </div>
       </div>
-      <div class="od-hint panel">▲▼◀▶ browse · OK open · Back: live TV</div>
+      <div class="od-hint panel">{pane === 'keys' ? '◀▶▲▼ letters · OK type · Back delete · ▼ results' : '▲▼◀▶ browse · OK open · Back: live TV'}</div>
     </div>
   );
 }
