@@ -28,6 +28,7 @@ import { airingsFor, ensureLineup, guideBlocks, loadLineups, referencedCommercia
 import { getSettings, loadSettings, SettingsError, updateSettings } from './settings';
 import { checkItems, checkSoon, isUnavailable, lastHealthRun, loadHealth, startHealthChecks, unavailableError } from './health';
 import { proposals } from './plexgen';
+import { catalogue, entryDetail, findItem } from './ondemand';
 import { DECADES, discoverQuery, KINDS, shelvesFor, SORTS, type DiscoverSort } from './discover';
 import { shortDescription } from './titles';
 import { deleteLogo, LogoError, MAX_LOGO_BYTES, readLogo, saveLogo } from './logos';
@@ -267,6 +268,21 @@ app.get('/api/ia/search', async (c) => {
     total: numFound,
     results: docs.map((d) => ({ ...d, thumb: ia.thumbUrl(d.identifier) })),
   });
+});
+
+// ── On Demand: everything the channels play, any time ───────────────────────
+
+app.get('/api/ondemand', (c) => {
+  c.header('cache-control', 'no-store');
+  return c.json(catalogue());
+});
+app.get('/api/ondemand/entry', (c) => {
+  const detail = entryDetail(c.req.query('key') ?? '');
+  return detail ? c.json(detail) : c.json({ error: 'Not found' }, 404);
+});
+app.get('/api/ondemand/item/:id', (c) => {
+  const found = findItem(c.req.param('id'));
+  return found ? c.json(found) : c.json({ error: 'Not found' }, 404);
 });
 
 // ── Discover: browsing the Internet Archive for things to put on ─────────────

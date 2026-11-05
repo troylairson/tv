@@ -11,6 +11,7 @@ import { Tuner, type ChannelInfo, type PlexMode, type TunerState } from './tuner
 import { Logo, logoSvg } from './logos/Logo';
 import { fullTitle } from './titles';
 import { Led } from './Led';
+import { OnDemand, type OdStart, type OdView } from './OnDemand';
 import { findTheme, THEMES } from './themes';
 
 const params = new URLSearchParams(location.search);
@@ -92,6 +93,11 @@ export function App() {
   /** The channel being watched, by id, so it survives the list changing under us. */
   const currentId = useRef<string | null>(null);
   const guideAction = useRef<((action: Action) => boolean) | null>(null);
+  // On Demand ("channel 1"): browse and play anything from the channels, outside the schedule.
+  const [odOpen, setOdOpen] = useState(false);
+  const [odStart, setOdStart] = useState<OdStart>(null);
+  const [odView, setOdView] = useState<OdView>('home');
+  const odAction = useRef<((action: Action) => boolean) | null>(null);
   const [settingsFocus, setSettingsFocus] = useState(0);
   const [house, setHouse] = useState<HouseSettings | null>(null);
   const [pool, setPool] = useState<PoolStatus | null>(null);
@@ -198,6 +204,7 @@ export function App() {
   function tuneTo(list: ChannelInfo[], i: number) {
     const channel = list[i];
     if (!channel || !tuner.current) return;
+    setOdOpen(false);
     setIndex(i);
     currentId.current = channel.id;
     store(LAST_CHANNEL_KEY, String(channel.number));
@@ -206,6 +213,24 @@ export function App() {
     setTunedAt(t);
     setInfoUntil(t + 5000);
     void tuner.current.tune(channel);
+  }
+
+  function openOnDemand(start: OdStart = null) {
+    tuner.current?.stop();
+    setShowGuide(false);
+    setShowSettings(false);
+    setShowDiag(false);
+    setInfoUntil(0);
+    setOsdUntil(0);
+    setOdStart(start);
+    setOdView(start?.itemId ? 'player' : start?.key ? 'show' : 'home');
+    setOdOpen(true);
+  }
+
+  /** Back to live TV on the channel we came from, wherever it is now. */
+  function exitOnDemand() {
+    setOdOpen(false);
+    tuneTo(channels, index);
   }
 
   function openGuide() {
@@ -406,12 +431,19 @@ export function App() {
       }
     }
     if (showGuide) return guideAction.current?.(action) ?? true;
+    if (odOpen) {
+      if (odAction.current?.(action)) return true;
+      // A channel number typed in On Demand tunes that channel.
+      if (action.type !== 'digit') return true;
+    }
     switch (action.type) {
       case 'channelUp':
         tuneTo(channels, (index + 1) % channels.length);
         return true;
       case 'channelDown':
-        tuneTo(channels, (index - 1 + channels.length) % channels.length);
+        // Below the lowest channel is channel 1, On Demand, like a 2000s cable box.
+        if (index === 0) openOnDemand();
+        else tuneTo(channels, index - 1);
         return true;
       case 'ok':
         openGuide();
@@ -455,6 +487,7 @@ export function App() {
     const t = setTimeout(() => {
       const i = channels.findIndex((c) => c.number === Number(digits));
       if (i >= 0) tuneTo(channels, i);
+      else if (Number(digits) === 1) openOnDemand();
       setDigits('');
     }, 1500);
     return () => clearTimeout(t);
@@ -487,7 +520,7 @@ export function App() {
   const showBug = logoBug && hasLogo && channel && status === 'playing' && airing?.kind === 'show' && infoUntil <= t && !showGuide && !showSettings && !showDiag;
 
   return (
-    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''} ${channel && airing && infoUntil > t && airing.kind !== 'ident' && !showBumper ? 'banner-open' : ''}`} data-theme={theme.id}>
+    <div class={`tv ${crt ? 'crt' : ''} ${showGuide ? 'guide-open' : ''} ${odOpen ? `od-open od-${odView}` : ''} ${channel && airing && infoUntil > t && airing.kind !== 'ident' && !showBumper ? 'banner-open' : ''}`} data-theme={theme.id}>
       <video ref={video} class="screen" playsInline />
       {poweredOn && ((status === 'standby' && !filler) || (status === 'interstitial' && airing?.kind === 'offair')) && <div class="bars" />}
       {status === 'interstitial' && airing?.kind === 'ident' && channel && (
@@ -544,7 +577,19 @@ export function App() {
           </p>
         </div>
       )}
-      <Static visible={poweredOn && (status === 'tuning' || status === 'idle')} />
+      <Static visible={poweredOn && (status === 'tuning' || status === 'idle') && !(odOpen && odView !== 'player')} />
+      {odOpen && tuner.current && (
+        <OnDemand
+          theme={theme}
+          channels={channels}
+          tuner={tuner.current}
+          state={tunerState}
+          start={odStart}
+          actionRef={odAction}
+          onView={setOdView}
+          onExit={exitOnDemand}
+        />
+      )}
 
       {tunerState.soundLocked && <div class="sound-hint panel">🔇 Press OK or tap for sound</div>}
 
@@ -676,6 +721,7 @@ export function App() {
           theme={theme}
           actionRef={guideAction}
           onTune={tuneToNumber}
+          onOnDemand={(start) => openOnDemand(start)}
           onSettings={openSettings}
           onClose={() => setShowGuide(false)}
         />

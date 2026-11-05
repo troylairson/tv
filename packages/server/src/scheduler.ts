@@ -165,6 +165,8 @@ export interface GuideBlock {
   show?: string;
   episode?: string;
   logo?: string;
+  /** The item airing, so the guide can offer to play it now. */
+  itemId?: string;
 }
 
 /** The channel's programmes for a guide row: shows only, each spanning up to the next show. */
@@ -186,6 +188,7 @@ export function guideBlocks(channel: Channel, fromMs: number, toMs: number): Gui
         show: a.item.show,
         episode: a.item.episode,
         logo: a.item.logo,
+        itemId: a.item.id,
       });
     } else if (a.kind === 'offair') {
       if (last?.kind === 'offair' && last.endMs === a.startMs) last.endMs = a.endMs;

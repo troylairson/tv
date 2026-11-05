@@ -549,7 +549,7 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
       Browser-safe files keep streaming straight through. Cost: CPU on the server while
       an old-format video plays. (Came up comparing WaybackFin, a Jellyfin plugin that
       gets this by letting Jellyfin transcode IA `.strm` items.)
-- [ ] **On Demand** (mock-ups: [docs/mockups/on-demand-*.png](docs/mockups)). Watch
+- [x] **On Demand**, phases 1–2 built (`web/src/OnDemand.tsx`, `server/src/ondemand.ts`; mock-ups: [docs/mockups/on-demand-*.png](docs/mockups)). Watch
       anything the channels draw on, when you want, with pause / seek / resume.
       - **Where:** channel **1 · On Demand** in the lineup (like 2000s cable boxes; type
         1, or ▲▼ past the lowest channel), and from the guide: OK on a show that isn't
@@ -573,8 +573,12 @@ Airing       { channelId, start, end, mediaId, offsetSec, isFiller }   // materi
         reminder that pops up on whatever you're watching, search by title, house-wide
         progress instead of per TV.
       - **Phases:** (1) player + *Watch now* from the guide + resume; (2) channel 1 home,
-        show pages, Continue watching; (3) Plex libraries beyond the channels, search,
-        reminders.
+        show pages, Continue watching — **done**. (3) still to do: Plex libraries beyond
+        the channels, search, reminders, *with commercials*, house-wide progress.
+        Built as: the guide has ⚙ Settings | ▶ On Demand in its header and a popup for
+        future shows (`itemId` on guide blocks); the tuner's `playOnDemand` / `seek` /
+        `stop` reuse the channel playback paths; `/api/ondemand` (catalogue, A–Z),
+        `/api/ondemand/entry?key=` (seasons in order), `/api/ondemand/item/:id`.
 
 ## 7. Prior art worth borrowing from
 - **ErsatzTV**, **Tunarr** (successor to dizqueTV): Plex-backed custom channels

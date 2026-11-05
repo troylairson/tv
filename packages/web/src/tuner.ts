@@ -24,7 +24,7 @@ export interface TunerState {
    * standby: the scheduled airing won't play, so we're filling time until the next one.
    * interstitial: a "coming up next" card or off-air screen (nothing to play).
    */
-  status: 'idle' | 'tuning' | 'playing' | 'blocked' | 'standby' | 'interstitial';
+  status: 'idle' | 'tuning' | 'playing' | 'blocked' | 'standby' | 'interstitial' | 'ondemand';
   channel?: ChannelInfo;
   airing?: Airing;
   /** Airings after the current one (for "Next:" and the guide). */
@@ -38,6 +38,8 @@ export interface TunerState {
   latencies: number[];
   driftSec?: number;
   stalls: number;
+  /** On Demand: what's playing outside the schedule, and where it started. */
+  onDemand?: { item: ChannelItem; offsetSec: number };
   /** During a commercial break: which ad this is, of how many in the break. */
   adBreak?: { index: number; total: number };
   /** The browser only allowed silent autoplay: sound waits for the first button press or tap. */
@@ -101,7 +103,7 @@ export class Tuner {
     const token = ++this.token;
     const started = performance.now();
     this.teardown();
-    this.set({ status: 'tuning', channel, airing: undefined, upcoming: [], playback: undefined, filler: undefined, error: undefined, driftSec: undefined, retryAt: undefined, adBreak: undefined });
+    this.set({ status: 'tuning', channel, airing: undefined, upcoming: [], playback: undefined, filler: undefined, error: undefined, driftSec: undefined, retryAt: undefined, adBreak: undefined, onDemand: undefined });
 
     let airings: Airing[];
     try {
@@ -190,7 +192,71 @@ export class Tuner {
 
   /** Re-tune the current channel (e.g. after the Plex mode changed or autoplay was unblocked). */
   retune(): void {
-    if (this.state.channel) void this.tune(this.state.channel);
+    if (this.state.onDemand) void this.playOnDemand(this.state.onDemand.item, this.position());
+    else if (this.state.channel) void this.tune(this.state.channel);
+  }
+
+  /**
+   * On Demand: play one item from `offsetSec`, outside the schedule (no timers, no
+   * standby filler). Plex falls back to the other mode like a channel does.
+   */
+  async playOnDemand(item: ChannelItem, offsetSec = 0): Promise<void> {
+    const token = ++this.token;
+    this.teardown();
+    const start = Math.max(0, Math.min(offsetSec, item.durationSec - 5));
+    this.set({ status: 'tuning', channel: undefined, airing: undefined, upcoming: [], playback: undefined, filler: undefined, error: undefined, driftSec: undefined, retryAt: undefined, adBreak: undefined, onDemand: { item, offsetSec: start } });
+    const modes = this.attemptModes(item);
+    const tried = new Set<string>();
+    const errors: string[] = [];
+    while (modes.length) {
+      const mode = modes.shift();
+      try {
+        const playback = await this.resolve(item, start, mode);
+        if (token !== this.token) return;
+        this.set({ playback });
+        await this.load(playback, null, token, start);
+        if (token !== this.token) return;
+        this.set({ status: 'ondemand' });
+        report('ondemand', { title: item.title, source: item.source, offsetSec: Math.round(start), type: playback.type });
+        return;
+      } catch (err) {
+        if (token !== this.token) return;
+        if (err instanceof Blocked) {
+          this.set({ status: 'blocked' });
+          return;
+        }
+        errors.push(`${mode ?? 'default'}: ${(err as Error).message}`);
+        this.unload();
+        if (mode) tried.add(mode);
+        if (item.source === 'plex' && !modes.length) {
+          const other = (['direct', 'transcode'] as const).find((m) => !tried.has(m));
+          if (other && tried.size < 2) modes.push(other);
+        }
+      }
+    }
+    report('error', { title: item.title, source: item.source, itemId: item.id, error: errors.join(' · '), onDemand: true });
+    this.set({ status: 'standby', error: errors.join(' · ') });
+  }
+
+  /** Seconds into the On Demand item. */
+  position(): number {
+    return (this.state.playback?.baseOffsetSec ?? 0) + (this.video.currentTime || 0);
+  }
+
+  /** Jump within the On Demand item: plain files seek; converted streams restart at the new spot. */
+  seek(toSec: number): void {
+    const od = this.state.onDemand;
+    if (!od) return;
+    const target = Math.max(0, Math.min(toSec, od.item.durationSec - 3));
+    if (this.state.playback?.type === 'file') this.video.currentTime = target;
+    else void this.playOnDemand(od.item, target);
+  }
+
+  /** Stop whatever is playing (leaving On Demand before tuning a channel again). */
+  stop(): void {
+    this.token++;
+    this.teardown();
+    this.set({ status: 'idle', onDemand: undefined, playback: undefined, error: undefined });
   }
 
   /** A button press or tap happened, so sound is allowed now. True if that press was what was needed. */
@@ -285,8 +351,8 @@ export class Tuner {
     };
   }
 
-  /** Load and start playing. `airing` null means play from the start (filler). */
-  private async load(playback: Playback, airing: Airing | null, token: number): Promise<void> {
+  /** Load and start playing. `airing` null means play from `startAtSec` (filler, On Demand). */
+  private async load(playback: Playback, airing: Airing | null, token: number, startAtSec = 0): Promise<void> {
     const video = this.video;
     // hls.js is big; only Plex transcodes need it, so load it on demand.
     const HlsLib = playback.type === 'hls' ? (await import('hls.js')).default : null;
@@ -313,6 +379,8 @@ export class Tuner {
         if (playback.type === 'file' && airing) {
           const target = (now() - airing.startMs) / 1000;
           video.currentTime = Math.max(0, Math.min(target, (video.duration || Infinity) - 1));
+        } else if (playback.type === 'file' && startAtSec > 0) {
+          video.currentTime = Math.min(startAtSec, (video.duration || Infinity) - 1);
         }
         video.play().catch((err: Error) => {
           if (err.name !== 'NotAllowedError' || video.muted) return fail(err.name === 'NotAllowedError' ? new Blocked() : err);

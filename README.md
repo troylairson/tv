@@ -73,6 +73,17 @@ default, plays MP4/H.264 files straight from Plex and converts the rest; or forc
 *Convert* / *Direct*) (this TV
 only); diagnostics.
 
+**On Demand (channel 1):** everything your channels play, any time. Get there by
+typing **1**, pressing ▼ below your lowest channel, or the guide's **▶ On Demand**
+button (▶ from Settings). Browse **Continue watching**, **Channels** (each opens
+what it plays), **Shows A–Z** and **Movies**; a show's page has its seasons and
+episodes (✓ watched, a bar for part-watched) with *Resume* and *Play from the start*.
+In the guide, OK on a show that hasn't started offers **▶ Watch now** (from the
+start) or the channel live. While playing: OK pause, ◀▶ 30 s, ▼ episodes, Back
+stop. The next episode follows on its own. Back from On Demand returns to the
+channel you came from, wherever it is now (channels keep running, like real TV).
+Progress is kept per TV; 90 % counts as watched.
+
 ## Managing channels
 
 Open **`http://<laptop-ip>:8420/manage`** on a phone or laptop (on the TV:

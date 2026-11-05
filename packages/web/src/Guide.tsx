@@ -17,6 +17,7 @@ interface GuideBlock {
   show?: string;
   episode?: string;
   logo?: string;
+  itemId?: string;
 }
 
 /** Title art that has loaded (or failed), remembered so moving around the grid doesn't flicker. */
@@ -85,6 +86,8 @@ export interface GuideProps {
   actionRef: MutableRef<((action: Action) => boolean) | null>;
   onTune: (channelNumber: number) => void;
   onSettings: () => void;
+  /** Open On Demand, optionally playing an item from the guide right away. */
+  onOnDemand: (start: { itemId?: string } | null) => void;
   onClose: () => void;
 }
 
@@ -93,7 +96,11 @@ export interface GuideProps {
  * the video), details of the highlighted programme sit beside it, and the grid
  * of channels × half-hours fills the bottom.
  */
-export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSettings, onClose }: GuideProps) {
+export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSettings, onOnDemand, onClose }: GuideProps) {
+  /** In the header row (-1): 0 Settings, 1 On Demand. */
+  const [headerCol, setHeaderCol] = useState(0);
+  /** OK on a show that hasn't started: watch it now, or the channel live. */
+  const [popup, setPopup] = useState<{ block: GuideBlock; number: number; name: string; focus: number } | null>(null);
   const [rows, setRows] = useState<GuideRow[]>([]);
   const [fetched, setFetched] = useState<{ from: number; to: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -161,7 +168,35 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
     setWindowStart(Math.max(earliest, Math.min(start, floorToSlot(t + MAX_AHEAD_MS))));
   }
 
+  const popupOptions = popup
+    ? [
+        { label: '▶ Watch now', note: 'On Demand, from the start', act: () => onOnDemand({ itemId: popup.block.itemId }) },
+        { label: `Watch channel ${popup.number} live`, note: popup.name, act: () => onTune(popup.number) },
+        { label: 'Cancel', note: '', act: () => setPopup(null) },
+      ]
+    : [];
+
   actionRef.current = (action) => {
+    if (popup) {
+      switch (action.type) {
+        case 'channelUp':
+          setPopup({ ...popup, focus: Math.max(0, popup.focus - 1) });
+          return true;
+        case 'channelDown':
+          setPopup({ ...popup, focus: Math.min(popupOptions.length - 1, popup.focus + 1) });
+          return true;
+        case 'ok':
+          popupOptions[popup.focus]?.act();
+          if (popup.focus !== 2) setPopup(null);
+          return true;
+        case 'back':
+        case 'left':
+          setPopup(null);
+          return true;
+        default:
+          return true;
+      }
+    }
     switch (action.type) {
       case 'channelUp': // ▲: up a row, or onto the Settings button
         setRow(Math.max(-1, row - 1));
@@ -170,7 +205,11 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
         setRow(Math.min(rows.length - 1, row + 1));
         return true;
       case 'left': {
-        if (row < 0 || !focused) return true;
+        if (row < 0) {
+          setHeaderCol(0);
+          return true;
+        }
+        if (!focused) return true;
         const prev = blockAt(row, focused.startMs - 1);
         if (prev && prev !== focused && prev.endMs > t) {
           setFocusMs(Math.max(prev.startMs, t));
@@ -179,7 +218,11 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
         return true;
       }
       case 'right': {
-        if (row < 0 || !focused) return true;
+        if (row < 0) {
+          setHeaderCol(1);
+          return true;
+        }
+        if (!focused) return true;
         if (focused.endMs > t + MAX_AHEAD_MS) return true;
         const next = blockAt(row, focused.endMs);
         if (next && next !== focused) {
@@ -189,8 +232,12 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
         return true;
       }
       case 'ok':
-        if (row < 0) onSettings();
-        else if (rows[row]) onTune(rows[row].number);
+        if (row < 0) {
+          if (headerCol === 0) onSettings();
+          else onOnDemand(null);
+        } else if (focused?.kind === 'show' && focused.itemId && focused.startMs > t && rows[row]) {
+          setPopup({ block: focused, number: rows[row].number, name: rows[row].name, focus: 0 });
+        } else if (rows[row]) onTune(rows[row].number);
         return true;
       case 'digit': {
         const i = rows.findIndex((r) => String(r.number).startsWith(String(action.digit)));
@@ -226,11 +273,17 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
         {/* The live video sits in this space (positioned by App's .guide-open styles). */}
         <div class="guide-preview" />
         <div class="guide-details">
-          {row < 0 ? (
+          {row < 0 && headerCol === 1 ? (
+            <>
+              <div class="guide-details-ch heading">Channel 1 · On Demand</div>
+              <div class="guide-details-title">Anything from your channels, any time</div>
+              <div class="guide-details-meta">Press OK to open (or ▼ past the lowest channel)</div>
+            </>
+          ) : row < 0 ? (
             <>
               <div class="guide-details-ch heading">Settings</div>
               <div class="guide-details-title">Commercial breaks, CRT effect, Plex playback</div>
-              <div class="guide-details-meta">Press OK to open</div>
+              <div class="guide-details-meta">Press OK to open · ▶ for On Demand</div>
             </>
           ) : focused && focusedRow ? (
             <>
@@ -261,7 +314,10 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
 
       <div class="guide-grid">
         <div class="guide-header">
-          <div class={`guide-settings ${row < 0 ? 'focused' : ''}`}>⚙ Settings</div>
+          <div class="guide-header-buttons">
+            <div class={`guide-settings ${row < 0 && headerCol === 0 ? 'focused' : ''}`}>⚙ Settings</div>
+            <div class={`guide-settings guide-ondemand ${row < 0 && headerCol === 1 ? 'focused' : ''}`}>▶ On Demand</div>
+          </div>
           <div class="guide-times">
             {[0, 1, 2].map((i) => (
               <div key={i} class="guide-time" style={{ left: `${(i / 3) * 100}%` }}>
@@ -312,6 +368,22 @@ export function Guide({ currentNumber, channels, theme, actionRef, onTune, onSet
         })}
         <div class="guide-hint">▲▼ channels · ◀▶ programmes · OK watch · Back close</div>
       </div>
+        {popup && (
+          <div class="guide-popup panel">
+            <div class="guide-popup-head heading">
+              {[popup.block.show ?? popup.block.title, fmtTime(popup.block.startMs)].join(' · ')}
+            </div>
+            {popup.block.episode && <div class="guide-popup-title">{popup.block.episode}</div>}
+            <ul>
+              {popupOptions.map((o, i) => (
+                <li key={o.label} class={i === popup.focus ? 'focused' : ''}>
+                  <span>{o.label}</span>
+                  {o.note && <small>{o.note}</small>}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
     </div>
   );
 }

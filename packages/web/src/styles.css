@@ -370,3 +370,94 @@ html, body, #app {
 }
 .ad-counter b { color: var(--accent); font-weight: bold; }
 .ad-counter-time { min-width: 2.6em; }
+
+/* ── Guide: header buttons and the "Watch now" choices ────────────────── */
+
+.guide-header-buttons { width: var(--label-w); flex: none; display: flex; gap: 0.4vw; margin-right: 0.5vw; }
+.guide-header-buttons .guide-settings { width: auto; flex: 1; margin-right: 0; font-size: 2.6vh; white-space: nowrap; }
+.guide-popup {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 6;
+  width: min(52vw, 900px); padding: 3vh 2.6vw; background: var(--panel); border: var(--border) solid var(--edge); border-radius: var(--radius); box-shadow: var(--shadow), 0 0 0 100vmax rgba(0, 0, 0, 0.45);
+}
+.guide-popup-head { font-size: 2.8vh; color: var(--accent); letter-spacing: var(--heading-spacing); text-transform: var(--heading-case); }
+.guide-popup-title { font-size: 4.3vh; font-weight: bold; font-family: var(--font-display); margin: 0.6vh 0 1.6vh; }
+.guide-popup ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 1vh; }
+.guide-popup li { display: flex; align-items: baseline; gap: 1.2vw; padding: 1.6vh 1.4vw; border-radius: var(--radius); background: rgba(255, 255, 255, 0.06); border: 0.3vh solid transparent; font-size: 3.6vh; font-weight: bold; }
+.guide-popup li small { font-size: 2.6vh; font-weight: normal; opacity: 0.8; }
+.guide-popup li.focused { background: var(--focus-bg); color: var(--focus-fg); border-color: var(--focus-edge); }
+
+/* ── On Demand (channel 1) ─────────────────────────────────────────────── */
+
+.od { position: absolute; inset: 0; z-index: 5; font-family: var(--font); color: var(--fg); }
+.od-page { background: var(--bg); padding: var(--safe-y) var(--safe-x) 0; display: flex; flex-direction: column; overflow: hidden; }
+.tv.od-open .logo-bug, .tv.od-open .hint, .tv.od-open .ad-counter, .tv.od-open .bumper, .tv.od-open .ident, .tv.od-open .banner, .tv.od-open .ticker { display: none; }
+.tv.od-home .screen, .tv.od-show .screen { visibility: hidden; }
+.od-backdrop { position: absolute; inset: 0; background: center / cover no-repeat; opacity: 0.16; }
+.od-loading { padding: 4vh 0; font-size: 3.6vh; color: var(--dim); }
+.od-hint { position: absolute; left: 0; right: 0; bottom: 0; padding: 1.6vh var(--safe-x); font-size: 2.6vh; color: var(--dim); background: var(--panel); }
+
+.od-head { display: flex; align-items: center; gap: 1.6vw; flex: none; margin-bottom: 3vh; }
+.od-head-number { font-family: var(--font-number); font-size: 6vh; line-height: 1; padding: 0.4vh 1.2vw; border-radius: var(--radius); background: var(--focus-bg); color: var(--focus-fg); }
+.od-head-title { font-size: 6.4vh; font-family: var(--font-display); font-weight: bold; text-transform: var(--heading-case); letter-spacing: var(--heading-spacing); }
+.od-head-sub { font-size: 3vh; color: var(--dim); }
+
+.od-home { flex: 1; min-height: 0; display: flex; gap: 2.4vw; }
+.od-menu { width: 19vw; flex: none; display: flex; flex-direction: column; gap: 0.8vh; }
+.od-menu-item { padding: 1.6vh 1.2vw; font-size: 3.4vh; font-weight: bold; color: var(--dim); border-radius: var(--radius); border: 0.3vh solid transparent; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-transform: var(--heading-case); }
+.od-menu-item.on { color: var(--accent); border-color: var(--accent); }
+.od-menu-item.focused { background: var(--focus-bg); color: var(--focus-fg); border-color: var(--focus-edge); }
+.od-grid-wrap { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.od-section { font-size: 3.2vh; color: var(--accent); letter-spacing: var(--heading-spacing); text-transform: var(--heading-case); margin-bottom: 1.6vh; display: flex; justify-content: space-between; }
+.od-count { color: var(--dim); font-size: 2.6vh; letter-spacing: normal; text-transform: none; }
+.od-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 2.6vh 1.4vw; align-content: start; }
+
+.od-tile { min-width: 0; }
+.od-tile-art { position: relative; aspect-ratio: 16 / 10; border-radius: var(--radius); background: var(--panel) center / cover no-repeat; border: 0.3vh solid rgba(255, 255, 255, 0.12); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.od-tile.focused .od-tile-art { border: 0.6vh solid var(--focus-bg); box-shadow: 0 0 2vh rgba(0, 0, 0, 0.5); transform: scale(1.04); }
+.od-tile-channel .od-tile-art { padding: 1.4vh 1vw; background: var(--panel); }
+.od-tile-channel .od-tile-art .logo { width: 100%; height: 100%; }
+.od-tile-num { font-family: var(--font-number); font-size: 7vh; color: var(--accent); }
+.od-tile-title { margin-top: 1vh; font-size: 2.8vh; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.od-tile.focused .od-tile-title { color: var(--accent); }
+.od-tile-chnum { color: var(--accent); }
+.od-tile-sub { font-size: 2.3vh; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.od-tile-progress { position: absolute; left: 0.8vw; right: 0.8vw; bottom: 1vh; height: 0.9vh; border-radius: 0.5vh; background: rgba(0, 0, 0, 0.55); overflow: hidden; }
+.od-tile-progress i, .od-progress i, .od-episode-bar i { display: block; height: 100%; background: var(--accent); }
+
+.od-show { position: relative; flex: 1; min-height: 0; display: flex; gap: 3vw; padding-bottom: 8vh; }
+.od-show-side { width: 36vw; flex: none; display: flex; flex-direction: column; gap: 1.2vh; }
+.od-show-art { aspect-ratio: 16 / 10; border-radius: var(--radius); background: var(--panel) center / cover no-repeat; border: var(--border) solid var(--edge); }
+.od-show-title { font-size: 6vh; line-height: 1; font-family: var(--font-display); font-weight: bold; margin-top: 1vh; }
+.od-show-meta { font-size: 2.6vh; color: var(--accent); letter-spacing: var(--heading-spacing); text-transform: var(--heading-case); }
+.od-show-desc { font-size: 2.6vh; line-height: 1.3; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; text-transform: none; }
+.od-buttons { display: flex; flex-wrap: wrap; gap: 1vw; margin-top: 1vh; }
+.od-button { padding: 1.4vh 1.4vw; font-size: 3vh; font-weight: bold; border-radius: var(--radius); background: rgba(255, 255, 255, 0.08); border: 0.3vh solid transparent; text-transform: var(--heading-case); }
+.od-button.focused { background: var(--focus-bg); color: var(--focus-fg); border-color: var(--focus-edge); }
+.od-show-main { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1.6vh; }
+.od-seasons { display: flex; flex-wrap: wrap; gap: 0.6vw; }
+.od-season { padding: 0.8vh 1.1vw; font-size: 2.6vh; font-weight: bold; color: var(--dim); border-radius: var(--radius); border: 0.3vh solid rgba(255, 255, 255, 0.15); }
+.od-season.on { color: var(--focus-fg); background: var(--accent); border-color: var(--accent); }
+.od-episodes { display: flex; flex-direction: column; gap: 0.8vh; }
+.od-episode { display: flex; align-items: center; gap: 1.2vw; height: 6.6vh; padding: 0 1.2vw; border-radius: var(--radius); background: rgba(255, 255, 255, 0.06); border: 0.3vh solid transparent; font-size: 2.9vh; }
+.od-episode.focused { background: var(--focus-bg); color: var(--focus-fg); border-color: var(--focus-edge); }
+.od-episode-num { width: 7vw; flex: none; font-weight: bold; }
+.od-episode-title { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-weight: bold; }
+.od-episode-done { font-size: 3vh; }
+.od-episode-bar { width: 8vw; height: 0.9vh; border-radius: 0.5vh; background: rgba(0, 0, 0, 0.35); overflow: hidden; flex: none; }
+.od-episode-len { width: 9vw; flex: none; text-align: right; font-size: 2.5vh; opacity: 0.85; }
+.od-episode-desc { margin-top: 1vh; font-size: 2.5vh; color: var(--dim); line-height: 1.3; text-transform: none; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+.od-player { pointer-events: none; }
+.od-badge { position: absolute; left: var(--safe-x); top: var(--safe-y); padding: 0.8vh 1.2vw; font-size: 2.8vh; border-radius: var(--radius); background: var(--focus-bg); color: var(--focus-fg); letter-spacing: var(--heading-spacing); text-transform: var(--heading-case); }
+.od-paused { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); font-size: 10vh; font-family: var(--font-display); font-weight: bold; color: var(--accent); text-shadow: var(--osd-shadow); text-transform: var(--heading-case); }
+.od-osd { position: absolute; left: var(--safe-x); right: var(--safe-x); bottom: var(--safe-y); padding: 2.4vh 2vw; background: var(--panel); border: var(--border) solid var(--edge); border-radius: var(--radius); box-shadow: var(--shadow); }
+.od-osd-row { display: flex; justify-content: space-between; align-items: baseline; gap: 2vw; }
+.od-osd-title { font-size: 5vh; font-weight: bold; font-family: var(--font-display); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.od-osd-time { font-size: 3.4vh; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.od-osd-episode { font-size: 3vh; margin-top: 0.4vh; }
+.od-progress { height: 1.2vh; margin-top: 1.8vh; border-radius: 0.6vh; background: var(--progress-track, rgba(255, 255, 255, 0.15)); overflow: hidden; }
+.od-keys { display: flex; gap: 2.4vw; margin-top: 1.6vh; font-size: 2.6vh; color: var(--dim); }
+.od-keys-end { margin-left: auto; }
+.tv.od-player .card { z-index: 6; }
+/* The live preview sits above the guide; hide it while the Watch now choices are open. */
+.tv:has(.guide-popup) .screen, .tv:has(.guide-popup) .static, .tv:has(.guide-popup) .bars { visibility: hidden; }
