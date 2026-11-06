@@ -136,3 +136,11 @@ describe('title tidying', () => {
     expect(cleanShowName('Victorious')).toBe('Victorious');
   });
 });
+
+describe('dated recordings in parts', () => {
+  it('moves a leading date to the end and names discs as parts', () => {
+    expect(prettifyTitle('1997-4-13 ECW Barely Legal', { filename: true })).toBe('ECW Barely Legal (Apr 13, 1997)');
+    expect(prettifyTitle('2000-12-3 ECW Massacre on 34th Street .cd1', { filename: true })).toBe('ECW Massacre on 34th Street (Dec 3, 2000) (part 1)');
+    expect(prettifyTitle('1999 5-16 ECW Hardcore Heaven .cd2', { filename: true })).toBe('ECW Hardcore Heaven (May 16, 1999) (part 2)');
+  });
+});

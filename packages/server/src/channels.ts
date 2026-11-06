@@ -9,6 +9,7 @@ import path from 'node:path';
 import { hashString, type ChannelMode } from '@retro-tv/schedule';
 import { config as serverConfig } from './config';
 import { healthVersion, isChecking, isUnavailable } from './health';
+import { AUTO_ADD_PACKS, getPack } from './packs';
 import { getSettings } from './settings';
 import { resolveSources } from './sources';
 import type { Channel, ChannelConfig, ChannelItem, SlotConfig, SourceRef } from './types';
@@ -96,12 +97,15 @@ async function writeJson(file: string, data: unknown) {
   await fs.rename(tmp, file);
 }
 
-const saveConfigs = () => writeJson(configFile(), { channels: configs });
+/** Packs already added to this lineup once (see AUTO_ADD_PACKS), so a deleted one stays deleted. */
+let autoAdded: string[] = [];
+const saveConfigs = () => writeJson(configFile(), { channels: configs, autoAdded });
 /**
- * What resolved items carry beyond the basics: 1 descriptions, 2 show/episode split, 3 more splits and Plex title art, 4 cleaner show names.
+ * What resolved items carry beyond the basics: 1 descriptions, 2 show/episode split, 3 more splits and Plex title art, 4 cleaner show names,
+ * 5 mirrored titles turned round, dated recordings and discs tidied.
  * An older cache stays playable and gets one full refresh in the background to catch up.
  */
-const ITEM_DETAILS = 4;
+const ITEM_DETAILS = 5;
 const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, details: ITEM_DETAILS, resolved: Object.fromEntries(resolved) });
 
 /**
@@ -443,7 +447,9 @@ export async function initChannels(): Promise<void> {
   }
 
   try {
-    configs = (JSON.parse(await fs.readFile(configFile(), 'utf8')) as { channels: ChannelConfig[] }).channels;
+    const saved = JSON.parse(await fs.readFile(configFile(), 'utf8')) as { channels: ChannelConfig[]; autoAdded?: string[] };
+    configs = saved.channels;
+    autoAdded = saved.autoAdded ?? [];
   } catch {
     // First run, or upgrading from the fixed lineup: start from the defaults.
     configs = DEFAULT_CHANNELS.map((c) => ({ ...c, anchorMs: LEGACY_ANCHOR_MS, excluded: [] }));
@@ -463,6 +469,20 @@ export async function initChannels(): Promise<void> {
       migrated = true;
       console.log(`${c.name}: replaced the original search with a cleaner one`);
     }
+  }
+  // New packs that every lineup gets once, on the next free number.
+  for (const id of AUTO_ADD_PACKS) {
+    if (autoAdded.includes(id)) continue;
+    autoAdded.push(id);
+    migrated = true;
+    const pack = getPack(id);
+    if (!pack || configs.some((c) => c.packId === id)) continue;
+    const used = new Set(configs.map((c) => c.number));
+    let number = 2;
+    while (used.has(number)) number++;
+    const base: ChannelConfig = { id: `pack-${id}`, number, name: pack.name, mode: 'loop', breaks: true, anchorMs: Date.now(), sources: [], excluded: [] };
+    configs.push({ ...applyInput(base, { name: pack.name, mode: pack.mode, breaks: pack.breaks, sources: pack.sources, slots: pack.slots }), packId: id });
+    console.log(`added channel ${number} ${pack.name}`);
   }
   if (migrated) await saveConfigs();
 

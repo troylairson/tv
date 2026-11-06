@@ -1,3 +1,4 @@
+import { isMirrored, unmirror } from './mirror';
 import { prettifyTitle, shortDescription, splitTitle } from './titles';
 import type { ChannelItem } from './types';
 
@@ -125,9 +126,15 @@ function fallbackName(identifier: string, itemTitle: string, path: string): stri
 export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles = Infinity): ChannelItem[] {
   if (meta.is_dark || !meta.files || meta.metadata?.mediatype !== 'movies') return [];
   const rawTitle = meta.metadata?.title;
-  const title = (Array.isArray(rawTitle) ? rawTitle[0] : rawTitle) ?? identifier;
-  const files = pickPlayableFiles(meta.files).slice(0, maxFiles);
-  const description = shortDescription(meta.metadata?.description, title);
+  const rawDescription = meta.metadata?.description;
+  let title = (Array.isArray(rawTitle) ? rawTitle[0] : rawTitle) ?? identifier;
+  let files = pickPlayableFiles(meta.files).slice(0, maxFiles);
+  // Titles written backwards ("1997-4-13 lageL yleraB WCE"): turned the right way round.
+  const plainDescription = typeof rawDescription === 'string' && !rawDescription.includes('<') ? rawDescription : undefined;
+  const mirroredItem = isMirrored([title, plainDescription, ...files.map((f) => f.stem)]);
+  title = unmirror(title, { mirroredItem });
+  files = files.map((f) => ({ ...f, stem: unmirror(f.stem, { mirroredItem }) }));
+  const description = shortDescription(plainDescription ? unmirror(plainDescription, { mirroredItem }) : rawDescription, title);
   // An item holding several episodes is usually the series, so its title names the show.
   const series = files.length > 1 && !isGenericName(title) ? prettifyTitle(title) : undefined;
   let part = 0;

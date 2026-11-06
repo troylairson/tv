@@ -139,6 +139,10 @@ guide → Settings → *Manage channels* shows the address and a QR code).
   - **Retro Pro Wrestling**: 1979–1999 wrestling TV (~690 h); *Saturday Night's Main
     Event* Saturdays 11:30 pm, NWA supercards Sunday nights, *Rock 'n' Wrestling* cartoon
     Saturday mornings.
+  - **ECW PPV**: ECW's pay-per-views 1997–2001 in order (~76 h), added to every lineup
+    once (delete it like any channel). The upload's titles are written backwards
+    ("lageL yleraB WCE"); the server spots mirrored titles and descriptions on any
+    Archive item and turns them round (`server/src/mirror.ts`).
   - **Atomic Age Theater**: black-and-white sci-fi to 1965 (~120 h); the 1936 *Flash
     Gordon* serial Saturdays at noon.
   - **Saturday Morning Cartoons**: Fleischer, early Looney Tunes, Felix, Woody (~45 h).

@@ -27,6 +27,7 @@ import newsreelTheater from './packs/newsreel-theater.json';
 import spaceRace from './packs/space-race.json';
 import fightNight from './packs/fight-night.json';
 import holidayHearth from './packs/holiday-hearth.json';
+import ecwPpv from './packs/ecw-ppv.json';
 import type { ChannelMode, SlotConfig, SourceRef } from './types';
 
 export interface ChannelPack {
@@ -66,6 +67,10 @@ export const PACKS = [
   spaceRace,
   fightNight,
   holidayHearth,
+  ecwPpv,
 ] as ChannelPack[];
+
+/** Packs added to every lineup once (they can be deleted like any channel afterwards). */
+export const AUTO_ADD_PACKS = ['ecw-ppv'];
 
 export const getPack = (id: string) => PACKS.find((p) => p.id === id);

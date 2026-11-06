@@ -1,0 +1,10 @@
+{
+  "id": "ecw-ppv",
+  "name": "ECW PPV",
+  "description": "Extreme Championship Wrestling's pay-per-views, 1997 to 2001, in order: Barely Legal, Hardcore Heaven, Heatwave, November to Remember, Living Dangerously, Anarchy Rulz, Massacre on 34th Street and Guilty as Charged. Multi-tape shows play their parts back to back.",
+  "curated": "2026-11-06: one Internet Archive upload of 28 videos (about 76 hours) whose titles are written backwards; the server reads them the right way round.",
+  "mode": "loop",
+  "breaks": true,
+  "sources": [{ "kind": "ia-item", "identifier": "2000-3-12-ylsuoregna-d-gnivi-l-wce", "title": "ECW pay-per-views 1997–2001" }],
+  "slots": []
+}
