@@ -42,6 +42,7 @@ export const THEMES: Theme[] = [
     guideMasthead: { badge: 'TV LOG', title: (ms) => `${weekday(ms)} ${dayPart(ms)}` },
     upNext: 'Coming up next',
   },
+  { id: 'drafting', name: 'Drafting Table', logo: 'modern', upNext: 'Coming up' },
 ];
 
 /** Themes from before there were six. */

@@ -623,7 +623,7 @@ export function OnDemand({ theme, channels, tuner, state, start, actionRef, ads,
           <div class="od-grid">
             {shown.map((tile, j) => {
               const i = firstRow * COLS + j;
-              return <TileView key={i} tile={tile} focused={pane === 'grid' && i === tileIndex} theme={theme} channels={channels} />;
+              return <TileView key={i} n={i + 1} tile={tile} focused={pane === 'grid' && i === tileIndex} theme={theme} channels={channels} />;
             })}
           </div>
         </div>
@@ -643,13 +643,14 @@ function resumePoint(d: OdDetail): { item: ChannelItem; progress: Progress } | n
   return best;
 }
 
-function TileView({ tile, focused, theme, channels }: { tile: Tile; focused: boolean; theme: Theme; channels: ChannelInfo[] }) {
+/** `n`: the tile's place in the list (the Drafting Table theme captions it "fig. n"). */
+function TileView({ n, tile, focused, theme, channels }: { n: number; tile: Tile; focused: boolean; theme: Theme; channels: ChannelInfo[] }) {
   if (tile.kind === 'channel') {
     const info = channels.find((c) => c.id === tile.channel.id);
     return (
       <div class={`od-tile od-tile-channel ${focused ? 'focused' : ''}`}>
         <div class="od-tile-art">{info ? <Logo channel={info} theme={theme.logo} /> : <span class="od-tile-num">{tile.channel.number}</span>}</div>
-        <div class="od-tile-title">
+        <div class="od-tile-title" data-fig={n}>
           <span class="od-tile-chnum">{tile.channel.number}</span> {tile.channel.name}
         </div>
         <div class="od-tile-sub">{tile.channel.keys.length} shows and movies</div>
@@ -665,7 +666,7 @@ function TileView({ tile, focused, theme, channels }: { tile: Tile; focused: boo
             <i style={{ width: `${Math.min(100, (p.pos / p.dur) * 100)}%` }} />
           </div>
         </div>
-        <div class="od-tile-title">{p.show ?? p.title}</div>
+        <div class="od-tile-title" data-fig={n}>{p.show ?? p.title}</div>
         <div class="od-tile-sub">{[p.episode?.split(' · ')[0], fmtLeft(p.dur - p.pos)].filter(Boolean).join(' · ')}</div>
       </div>
     );
@@ -674,7 +675,7 @@ function TileView({ tile, focused, theme, channels }: { tile: Tile; focused: boo
   return (
     <div class={`od-tile ${focused ? 'focused' : ''}`}>
       <div class="od-tile-art" style={e.thumb ? { backgroundImage: `url(${e.thumb})` } : undefined} />
-      <div class="od-tile-title">{e.title}</div>
+      <div class="od-tile-title" data-fig={n}>{e.title}</div>
       <div class="od-tile-sub">{e.kind === 'show' ? `${e.count} episode${e.count === 1 ? '' : 's'}` : (e.year ?? 'Movie')}</div>
     </div>
   );

@@ -187,6 +187,7 @@ html, body, #app {
 .ident-art { flex: none; width: 40vh; height: 28vh; background: center / cover no-repeat; display: none; }
 .ident-text { display: flex; flex-direction: column; align-items: center; gap: 1.6vh; min-width: 0; }
 .ident-logo .logo { width: 36vh; height: 21vh; }
+.ident-channel.has-logo { display: none; }
 .ident-channel { font-size: 4.3vh; font-weight: bold; color: var(--fg); letter-spacing: 0.1em; font-family: var(--font-display); }
 .ident-number { color: var(--accent); font-size: 6.4vh; vertical-align: middle; margin-right: 1vw; }
 .ident-label { font-size: 4.3vh; }

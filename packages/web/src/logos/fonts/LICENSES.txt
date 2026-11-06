@@ -5,6 +5,16 @@ Copyright 2016 The Alfa Slab One Project Authors (http://www.jmsole.cl | info@jm
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 
+==== jost ====
+Copyright 2020 The Jost Project Authors (https://github.com/indestructible-type)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
+==== architectsdaughter ====
+Copyright 2010 The Architects Daughter Project Authors (https://github.com/kymberlyhw/ArchitectsDaughter)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
 ==== bungee ====
 Copyright 2023 The Bungee Project Authors (https://github.com/djrrb/Bungee)
 

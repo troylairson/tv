@@ -1,5 +1,5 @@
 /*
- * The six looks (Settings → Theme), from the design board in docs/mockups.
+ * The looks (Settings → Theme), from the design board in docs/mockups.
  * Each block sets the theme variables used by styles.css, then rearranges the
  * shared markup: which parts of the banner, guide and "Coming up next" card
  * show, and how they're shaped. Kept cheap for a Chromecast: no live blurs,
@@ -959,3 +959,305 @@
 .tv[data-theme='cable85'] .ad-counter-time { color: var(--cg-cyan); }
 .tv[data-theme='cable85'] .sound-hint { font-size: 3.9vh; }
 .tv[data-theme='cable85'] .guide-popup li.focused, .tv[data-theme='cable85'] .guide-popup li.focused * { text-shadow: none; }
+
+/* ════════════════════════════════════════════════════════════════════════════
+ * Drafting Table: a technical drawing on vellum. Ink lines that run past the
+ * corners, compass circles, a ruler for the time scale, section hatching for
+ * what's chosen, a red-pencil centre line for now, and the drafter's lettering
+ * for notes. Mock-ups: docs/mockups/drafting-table*.png.
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+.tv[data-theme='drafting'] {
+  --ink: #1d2126;
+  --ink-2: #4a4f56;
+  --red: #b8432f;
+  --paper-color: #f1ede3;
+  --blueline: rgba(86, 140, 186, 0.26);
+  /* Drafting paper: a faint grid in non-photo blue, heavier every fifth line. */
+  --paper:
+    linear-gradient(var(--blueline) 0.1vh, transparent 0.1vh) 0 0 / 22.2vh 22.2vh,
+    linear-gradient(90deg, var(--blueline) 0.1vh, transparent 0.1vh) 0 0 / 22.2vh 22.2vh,
+    linear-gradient(rgba(86, 140, 186, 0.1) 0.1vh, transparent 0.1vh) 0 0 / 4.44vh 4.44vh,
+    linear-gradient(90deg, rgba(86, 140, 186, 0.1) 0.1vh, transparent 0.1vh) 0 0 / 4.44vh 4.44vh,
+    var(--paper-color);
+  /* Section hatching, in red pencil. */
+  --hatch: repeating-linear-gradient(-45deg, rgba(184, 67, 47, 0.5) 0 0.14vh, transparent 0.14vh 1.05vh);
+  /* An inked box: lines on the edge that run on past each corner. */
+  --box: url('./drafting/box.svg') 10 / 1.4vh / 1.4vh stretch;
+  --box-heavy: url('./drafting/box-heavy.svg') 10 / 1.4vh / 1.4vh stretch;
+  --hand: 'Architects Daughter', 'Segoe Print', cursive;
+  --font: Jost, 'Futura', 'Century Gothic', sans-serif;
+  --font-display: Jost, 'Futura', 'Century Gothic', sans-serif;
+  --font-number: Jost, sans-serif;
+  --fg: var(--ink);
+  --dim: var(--ink-2);
+  --accent: var(--ink);
+  --focus-bg: #f3dcd3;
+  --focus-fg: var(--ink);
+  --focus-edge: var(--red);
+  --panel: var(--paper-color);
+  --panel-soft: rgba(241, 237, 227, 0.97);
+  --edge: var(--ink);
+  --border: 0;
+  --radius: 0;
+  --shadow: none;
+  --heading-spacing: 0.18em;
+  --heading-case: uppercase;
+  --osd-fg: var(--ink);
+  --osd-shadow: none;
+  --progress-track: transparent;
+  --bg: var(--paper);
+  --ident-bg: var(--paper);
+  --guide-line: transparent;
+  --guide-row: transparent;
+  --guide-row-alt: transparent;
+  --guide-row-focus: transparent;
+  --guide-cell: transparent;
+  --guide-break: transparent;
+  --guide-offair: repeating-linear-gradient(-45deg, rgba(29, 33, 38, 0.18) 0 0.12vh, transparent 0.12vh 0.9vh);
+  --guide-time-edge: var(--ink);
+  --now-line: var(--red);
+  --live-mark: var(--red);
+  --power: var(--red);
+  --label-w: 19vw;
+  --preview-top: calc(var(--safe-y) + 3.6vh);
+  font-weight: 400;
+}
+.tv[data-theme='drafting'] .heading { font-weight: 500; }
+
+/* Every floating panel: a sheet of paper with the drawing's border on it. */
+.tv[data-theme='drafting'] .panel {
+  background: var(--paper); color: var(--ink);
+  border: 0 solid transparent; border-image: var(--box);
+  box-shadow: 0 0 0 2.2vh var(--paper-color), 0 1.4vh 4vh 2.2vh rgba(0, 0, 0, 0.35);
+}
+
+/* ── Channel number: a compass circle with its centre lines ── */
+.tv[data-theme='drafting'] .osd { width: 16vh; height: 16vh; background: url('./drafting/compass.svg') center / contain no-repeat; display: flex; align-items: center; justify-content: center; text-align: center; }
+.tv[data-theme='drafting'] .osd-number { font-size: 6.6vh; font-weight: 300; }
+.tv[data-theme='drafting'] .osd-logo, .tv[data-theme='drafting'] .osd-name { display: none; }
+
+.tv[data-theme='drafting'] .hint { background: var(--paper-color); color: var(--ink-2); border-radius: 0; font-size: 2.4vh; letter-spacing: 0.14em; text-transform: uppercase; border-left: 0.3vh solid var(--red); }
+.tv[data-theme='drafting'] .ticker { display: none; }
+
+/* ── Banner: a title block laid over the picture ── */
+.tv[data-theme='drafting'] .banner { left: calc(var(--safe-x) + 2.2vh); right: calc(var(--safe-x) + 2.2vh); bottom: calc(var(--safe-y) + 2.2vh); padding: 0; gap: 0; align-items: stretch; min-height: 22vh; }
+.tv[data-theme='drafting'] .banner-badge,
+.tv[data-theme='drafting'] .banner.has-logo .banner-badge { width: 15vh; min-width: 15vh; padding: 2vh 1vw; gap: 1.4vh; background: none; color: var(--ink); border-right: 0.15vh solid var(--ink); border-radius: 0; }
+.tv[data-theme='drafting'] .banner-badge .logo { display: none; }
+.tv[data-theme='drafting'] .banner-badge-number,
+.tv[data-theme='drafting'] .banner.has-logo .banner-badge-number {
+  display: flex; align-items: center; justify-content: center; width: 9vh; height: 9vh; border: 0.16vh solid var(--ink); border-radius: 50%;
+  font: 300 4.3vh var(--font-number);
+}
+.tv[data-theme='drafting'] .banner-badge-name { display: block; font-size: 1.5vh; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink); white-space: normal; text-align: center; line-height: 1.3; }
+.tv[data-theme='drafting'] .banner-body { padding: 2.2vh 2.4vw 2.4vh; }
+.tv[data-theme='drafting'] .banner-label { font-size: 1.6vh; font-weight: 500; color: var(--ink-2); }
+.tv[data-theme='drafting'] .banner-clock { font: 400 2.4vh var(--hand); color: var(--ink-2); }
+.tv[data-theme='drafting'] .banner-title { font-size: 6vh; font-weight: 300; letter-spacing: 0.06em; text-transform: uppercase; line-height: 1.05; margin: 0.6vh 0 0.4vh; }
+.tv[data-theme='drafting'] .banner-episode { font-size: 2.7vh; font-weight: 400; color: var(--red); opacity: 1; }
+.tv[data-theme='drafting'] .banner-meta { font-size: 2.2vh; color: var(--ink-2); margin-top: 3.4vh; order: 10; }
+.tv[data-theme='drafting'] .banner-body { display: flex; flex-direction: column; }
+.tv[data-theme='drafting'] .banner-next { display: none; }
+/* The running time as a dimension line: extension lines, arrowheads, the playhead marked "now". */
+.tv[data-theme='drafting'] .progress {
+  order: 9; position: relative; overflow: visible; height: 2.6vh; margin-top: 2.6vh; border-radius: 0;
+  background:
+    url('./drafting/arrow-left.svg') left center / 1.7vh 1.1vh no-repeat,
+    url('./drafting/arrow-right.svg') right center / 1.7vh 1.1vh no-repeat,
+    linear-gradient(var(--ink), var(--ink)) center / 100% 0.14vh no-repeat,
+    linear-gradient(var(--ink), var(--ink)) left center / 0.14vh 100% no-repeat,
+    linear-gradient(var(--ink), var(--ink)) right center / 0.14vh 100% no-repeat;
+}
+.tv[data-theme='drafting'] .progress-fill { position: relative; height: 100%; background: none; border-right: 0.22vh solid var(--red); }
+.tv[data-theme='drafting'] .progress-fill::after { content: 'now'; position: absolute; right: 0; bottom: 100%; transform: translateX(50%); font: 400 2.3vh var(--hand); color: var(--red); margin-bottom: 0.2vh; }
+/* What's next, in the title block's right-hand cell. */
+.tv[data-theme='drafting'] .banner-upnext {
+  display: flex; flex-direction: column; justify-content: center; gap: 0.8vh; width: 24vw; flex: none; padding: 2vh 1.8vw;
+  border-left: 0.15vh solid var(--ink); font-size: 1.5vh; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2);
+}
+.tv[data-theme='drafting'] .banner-upnext b { font-size: 3vh; font-weight: 400; letter-spacing: 0.01em; text-transform: none; color: var(--ink); line-height: 1.15; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.tv[data-theme='drafting'] .banner-endlogo { display: none; }
+
+/* ── Guide: drafting paper, a ruler for the times ── */
+.tv[data-theme='drafting'] .guide { gap: 2.4vh; }
+.tv[data-theme='drafting'].guide-open .screen { border: 0 solid transparent; border-image: var(--box); border-radius: 0; overflow: visible; }
+.tv[data-theme='drafting'] .guide-top { position: relative; margin-top: 3.6vh; height: var(--preview-h); }
+.tv[data-theme='drafting'] .guide-preview { position: relative; }
+.tv[data-theme='drafting'] .guide-preview::before { content: 'fig. 1 — live'; position: absolute; left: 0; top: -4.4vh; font: 400 2.3vh var(--hand); color: var(--ink-2); }
+.tv[data-theme='drafting'] .guide-details { gap: 1vh; padding-left: 1vw; }
+.tv[data-theme='drafting'] .guide-details-ch { font-size: 1.8vh; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }
+.tv[data-theme='drafting'] .guide-details-chlogo { display: none; }
+.tv[data-theme='drafting'] .guide-details-title { font-size: 6.4vh; font-weight: 300; letter-spacing: 0.04em; text-transform: uppercase; line-height: 1.05; }
+.tv[data-theme='drafting'] .guide-details-art { filter: none; }
+.tv[data-theme='drafting'] .guide-details-episode { font-size: 2.8vh; font-weight: 400; color: var(--red); opacity: 1; }
+.tv[data-theme='drafting'] .guide-details-meta { font-size: 2.4vh; }
+.tv[data-theme='drafting'] .guide-details-desc { font-size: 2.3vh; line-height: 1.4; color: var(--ink-2); opacity: 1; }
+.tv[data-theme='drafting'] .guide-details-next { font-size: 2.3vh; }
+.tv[data-theme='drafting'] .guide-details-hint { font: 400 2.3vh var(--hand); color: var(--red); }
+.tv[data-theme='drafting'] .guide-grid { gap: 0; }
+.tv[data-theme='drafting'] .guide-header { height: 6vh; margin-bottom: 1.4vh; }
+.tv[data-theme='drafting'] .guide-header-buttons { gap: 1.4vw; }
+.tv[data-theme='drafting'] .guide-settings { background: none; border: 0; border-radius: 0; color: var(--ink-2); font-size: 1.8vh; font-weight: 500; letter-spacing: 0.16em; text-transform: uppercase; justify-content: flex-start; }
+.tv[data-theme='drafting'] .tv .guide-settings.focused,
+.tv[data-theme='drafting'] .guide-settings.focused { background: var(--hatch); color: var(--ink); box-shadow: inset 0 -0.3vh 0 var(--red); }
+/* The time scale is a ruler: a tick every 5 minutes, longer each quarter hour. */
+.tv[data-theme='drafting'] .guide-times {
+  background:
+    repeating-linear-gradient(90deg, var(--ink) 0 0.13vh, transparent 0.13vh calc(100% / 18)) left bottom / 100% 0.9vh no-repeat,
+    repeating-linear-gradient(90deg, var(--ink) 0 0.13vh, transparent 0.13vh calc(100% / 6)) left bottom / 100% 1.6vh no-repeat,
+    linear-gradient(var(--ink), var(--ink)) left bottom / 100% 0.16vh no-repeat;
+  border-radius: 0;
+}
+.tv[data-theme='drafting'] .guide-time { align-items: flex-start; padding-left: 0.5vw; font-size: 2.6vh; font-weight: 400; color: var(--ink); border-left: 0.16vh solid var(--ink); }
+.tv[data-theme='drafting'] .guide-day { align-items: flex-start; font: 400 2.2vh var(--hand); color: var(--ink-2); }
+.tv[data-theme='drafting'] .guide-row { height: 6.4vh; border-top: 0.1vh solid rgba(29, 33, 38, 0.3); }
+.tv[data-theme='drafting'] .guide-row:first-of-type { border-top: 0; }
+.tv[data-theme='drafting'] .guide-channel { margin-right: 0.5vw; padding: 0; gap: 0.9vw; background: none; border-radius: 0; }
+.tv[data-theme='drafting'] .guide-logo { display: none; }
+/* Channels are numbered like the parts of a drawing: a circle and a short leader. */
+.tv[data-theme='drafting'] .guide-channel-number {
+  flex: none; min-width: 0; width: 4.6vh; height: 4.6vh; display: flex; align-items: center; justify-content: center;
+  border: 0.15vh solid var(--ink); border-radius: 50%; font: 400 2.2vh var(--font-number); color: var(--ink); position: relative; margin-right: 2vw;
+}
+.tv[data-theme='drafting'] .guide-channel-number::after { content: ''; position: absolute; left: calc(100% + 0.5vw); top: 50%; width: 1.4vw; border-top: 0.12vh solid var(--ink-2); }
+.tv[data-theme='drafting'] .guide-channel-name,
+.tv[data-theme='drafting'] .guide-logo + .guide-channel-name { font-size: 1.6vh; font-weight: 500; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; display: block; }
+.tv[data-theme='drafting'] .guide-row.current .guide-channel { box-shadow: none; }
+.tv[data-theme='drafting'] .guide-row.current .guide-channel-number { box-shadow: inset 0 0 0 0.35vh var(--paper-color), inset 0 0 0 0.5vh var(--ink); }
+.tv[data-theme='drafting'] .guide-row.focused-row .guide-channel-number { color: var(--red); border-color: var(--red); border-width: 0.22vh; }
+.tv[data-theme='drafting'] .guide-cells { overflow: visible; }
+.tv[data-theme='drafting'] .guide-cell { top: 0.9vh; bottom: 0.9vh; background: none; border: 0; border-left: 0.14vh solid var(--ink); border-radius: 0; font-size: 2.5vh; color: var(--ink); overflow: hidden; }
+.tv[data-theme='drafting'] .guide-cell-episode { color: var(--ink-2); opacity: 1; }
+.tv[data-theme='drafting'] .guide-cell.break { color: var(--ink-2); font-style: italic; }
+.tv[data-theme='drafting'] .guide-cell.offair { background: var(--guide-offair); }
+.tv[data-theme='drafting'] .guide-cell.slot:not(.focused) { box-shadow: inset 0.3vh 0 0 var(--red); }
+/* The chosen programme: boxed, and section-hatched in red. */
+.tv[data-theme='drafting'] .guide-cell.focused { background: var(--hatch); color: var(--ink); border: 0 solid transparent; border-image: var(--box-heavy); overflow: visible; z-index: 3; }
+.tv[data-theme='drafting'] .guide-cell.focused .guide-cell-title { overflow: hidden; }
+.tv[data-theme='drafting'] .guide-cell.focused .guide-cell-title > *,
+.tv[data-theme='drafting'] .guide-cell.focused .guide-cell-title:not(.two) { background: var(--paper-color); padding: 0 0.4vw; margin-left: -0.4vw; align-self: flex-start; max-width: calc(100% + 0.4vw); font-weight: 500; }
+/* Now: a centre line in red pencil, long dash and short. */
+.tv[data-theme='drafting'] .guide-now { width: 0.2vh; margin-left: -0.1vh; top: -2vh; box-shadow: none; background: repeating-linear-gradient(to bottom, var(--red) 0 2.4vh, transparent 2.4vh 3.1vh, var(--red) 3.1vh 3.5vh, transparent 3.5vh 4.2vh); }
+.tv[data-theme='drafting'] .guide-remind { color: var(--red); }
+.tv[data-theme='drafting'] .guide-hint { font-size: 1.8vh; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-2); text-align: left; }
+.tv[data-theme='drafting'] .guide-popup li { background: none; border: 0.15vh solid rgba(29, 33, 38, 0.25); border-radius: 0; font-weight: 500; font-size: 3vh; }
+.tv[data-theme='drafting'] .guide-popup li.focused { background: var(--hatch), var(--paper-color); color: var(--ink); border: 0 solid transparent; border-image: var(--box-heavy); }
+.tv[data-theme='drafting'] .guide-popup li.focused > * { background: var(--paper-color); padding: 0 0.4vw; }
+
+/* ── Coming up next (between shows): the channel number as a compass construction ── */
+.tv[data-theme='drafting'] .ident { background: var(--paper); color: var(--ink); justify-content: flex-start; }
+.tv[data-theme='drafting'] .ident::before { content: ''; position: absolute; left: 4vw; top: 50%; width: 82vh; height: 82vh; transform: translateY(-50%); background: url('./drafting/construction.svg') center / contain no-repeat; }
+.tv[data-theme='drafting'] .ident-backdrop, .tv[data-theme='drafting'] .ident-art { display: none; }
+.tv[data-theme='drafting'] .ident-panel { position: static; padding: 0; max-width: none; margin-left: 58vw; margin-right: var(--safe-x); text-align: left; }
+.tv[data-theme='drafting'] .ident-text { align-items: flex-start; gap: 1.2vh; }
+.tv[data-theme='drafting'] .ident-logo { display: none; }
+.tv[data-theme='drafting'] .ident-channel, .tv[data-theme='drafting'] .ident-channel.has-logo {
+  position: absolute; left: calc(4vw + 41vh); top: 50%; transform: translate(-50%, -50%);
+  display: flex; flex-direction: column; align-items: center; gap: 1vh; color: var(--ink); letter-spacing: 0.36em; font-size: 2.6vh; font-weight: 500; text-transform: uppercase; text-align: center;
+}
+.tv[data-theme='drafting'] .ident-number { font-size: 21vh; font-weight: 300; line-height: 0.9; color: var(--ink); margin: 0; letter-spacing: 0.02em; }
+.tv[data-theme='drafting'] .ident-label { font-size: 1.9vh; color: var(--ink); align-self: stretch; padding-bottom: 1.4vh; margin-bottom: 1.4vh; border-bottom: 0.16vh solid var(--ink); }
+.tv[data-theme='drafting'] .ident-title { font-size: 5.4vh; font-weight: 400; line-height: 1.1; }
+.tv[data-theme='drafting'] .ident-episode { font-size: 2.8vh; font-weight: 400; color: var(--red); opacity: 1; }
+.tv[data-theme='drafting'] .ident-desc { font-size: 2.3vh; color: var(--ink-2); opacity: 1; max-width: none; }
+.tv[data-theme='drafting'] .ident-time { font-size: 2.6vh; color: var(--ink); margin-top: 1vh; }
+.tv[data-theme='drafting'] .ident-count { display: block; position: absolute; right: var(--safe-x); bottom: var(--safe-y); font: 400 2.6vh var(--hand); color: var(--ink-2); }
+.tv[data-theme='drafting'] .ident-count::before { content: 'starts in '; }
+.tv[data-theme='drafting'] .ident-count b { font-weight: 400; }
+.tv[data-theme='drafting'] .ident-count small { font-size: 1em; margin-left: 0.3em; }
+
+/* ── Coming up (end of a break): a schedule, ruled ── */
+.tv[data-theme='drafting'] .bumper { background: var(--paper); color: var(--ink); }
+.tv[data-theme='drafting'] .bumper-backdrop, .tv[data-theme='drafting'] .bumper-logo, .tv[data-theme='drafting'] .bumper-art, .tv[data-theme='drafting'] .bumper-photo-wrap { display: none; }
+.tv[data-theme='drafting'] .bumper-head { left: 8vw; right: 8vw; top: 10vh; display: flex; align-items: baseline; gap: 1.4vw; padding-bottom: 2vh; border-bottom: 0.16vh solid var(--ink); }
+.tv[data-theme='drafting'] .bumper-heading { font-size: 2.2vh; font-weight: 500; letter-spacing: 0.18em; text-transform: uppercase; }
+.tv[data-theme='drafting'] .bumper-chname { font-size: 5vh; font-weight: 300; letter-spacing: 0.08em; text-transform: uppercase; order: -1; }
+.tv[data-theme='drafting'] .bumper-clock { display: block; margin-left: auto; font: 400 2.6vh var(--hand); color: var(--ink-2); }
+.tv[data-theme='drafting'] .bumper-list { left: 8vw; right: 8vw; top: 22vh; }
+.tv[data-theme='drafting'] .bumper-list li { align-items: baseline; padding: 2.6vh 0; border-bottom: 0.1vh solid rgba(29, 33, 38, 0.35); }
+.tv[data-theme='drafting'] .bumper-time { width: 14vw; flex: none; font-size: 3.6vh; font-weight: 300; }
+.tv[data-theme='drafting'] .bumper-time small { display: inline; font-size: 0.45em; margin-left: 0.4em; color: var(--ink-2); }
+.tv[data-theme='drafting'] .bumper-title b { font-size: 3.6vh; font-weight: 400; }
+.tv[data-theme='drafting'] .bumper-list li.next .bumper-title b { font-size: 4.4vh; font-weight: 500; }
+.tv[data-theme='drafting'] .bumper-list li.next .bumper-title b::before { content: '→ '; color: var(--red); }
+.tv[data-theme='drafting'] .bumper-episode { font-size: 2.3vh; color: var(--ink-2); opacity: 1; margin-top: 0.4vh; }
+.tv[data-theme='drafting'] .bumper-list li.next .bumper-episode { color: var(--red); }
+.tv[data-theme='drafting'] .bumper-desc { font-size: 2.3vh; color: var(--ink-2); opacity: 1; margin-top: 0.8vh; }
+.tv[data-theme='drafting'] .bumper-chip { display: inline-block; font: 400 2.4vh var(--hand); color: var(--red); margin-bottom: 0.6vh; }
+.tv[data-theme='drafting'] .bumper-ticker { display: block; position: absolute; right: 8vw; bottom: var(--safe-y); font: 400 2.6vh var(--hand); color: var(--ink-2); }
+.tv[data-theme='drafting'] .bumper-ticker b { font-weight: 400; margin-right: 0.4em; }
+
+/* ── Menus, cards and corner bits ── */
+.tv[data-theme='drafting'] .settings { box-shadow: 0 0 0 2.2vh var(--paper-color), 0 0 0 100vmax rgba(20, 22, 26, 0.55); }
+.tv[data-theme='drafting'] .settings h2 { font-size: 3vh; font-weight: 500; padding-bottom: 1.6vh; border-bottom: 0.16vh solid var(--ink); }
+.tv[data-theme='drafting'] .settings li { border: 0; border-bottom: 0.1vh solid rgba(29, 33, 38, 0.2); margin: 0; padding: 1.4vh 1.2vw; }
+.tv[data-theme='drafting'] .settings li.focused { background: var(--hatch); border-bottom-color: transparent; box-shadow: inset 0.4vh 0 0 var(--red); }
+.tv[data-theme='drafting'] .settings li.focused .settings-row > span:first-child,
+.tv[data-theme='drafting'] .settings li.focused .settings-note { background: var(--paper-color); padding: 0 0.4vw; margin-left: -0.4vw; }
+.tv[data-theme='drafting'] .settings li.focused .settings-note { display: inline-block; }
+.tv[data-theme='drafting'] .settings-row { font-size: 3.2vh; font-weight: 400; }
+.tv[data-theme='drafting'] .settings-value { background: var(--paper-color); color: var(--ink); font-size: 2.8vh; border-radius: 0; }
+.tv[data-theme='drafting'] .settings li.focused .settings-value { color: var(--red); box-shadow: inset 0 -0.25vh 0 var(--red); }
+.tv[data-theme='drafting'] .settings li:not(.focused) .settings-value { color: var(--ink); background: none; }
+.tv[data-theme='drafting'] .settings-note { font-size: 2.1vh; }
+.tv[data-theme='drafting'] .settings-hint { font-size: 2vh; letter-spacing: 0.12em; text-transform: uppercase; }
+.tv[data-theme='drafting'] .card h1 { font-size: 4.8vh; font-weight: 300; }
+.tv[data-theme='drafting'] .card p { font-size: 3vh; }
+.tv[data-theme='drafting'] .card .dim { font-family: var(--hand); color: var(--red); }
+.tv[data-theme='drafting'] .bug, .tv[data-theme='drafting'] .ad-counter { background: var(--paper-color); color: var(--ink); border: 0; border-left: 0.4vh solid var(--red); border-radius: 0; }
+.tv[data-theme='drafting'] .ad-counter b { color: var(--red); font-weight: 500; }
+.tv[data-theme='drafting'] .logo-bug { filter: none; }
+.tv[data-theme='drafting'] .reminder { box-shadow: 0 0 0 1.6vh var(--paper-color), 0 1vh 3vh 1.6vh rgba(0, 0, 0, 0.35); }
+.tv[data-theme='drafting'] .reminder-head { color: var(--red); }
+
+/* ── On Demand: plates of figures ── */
+.tv[data-theme='drafting'] .od-page { background: var(--paper); }
+.tv[data-theme='drafting'] .od-head { padding-bottom: 2.4vh; margin-bottom: 4vh; border-bottom: 0.16vh solid var(--ink); }
+.tv[data-theme='drafting'] .od-head-number { width: 8vh; height: 8vh; display: flex; align-items: center; justify-content: center; padding: 0; background: none; color: var(--ink); border: 0.16vh solid var(--ink); border-radius: 50%; font: 300 4vh var(--font-number); }
+.tv[data-theme='drafting'] .od-head-title { font-size: 5.4vh; font-weight: 300; letter-spacing: 0.12em; }
+.tv[data-theme='drafting'] .od-head-sub { font: 400 2.4vh var(--hand); }
+.tv[data-theme='drafting'] .od-menu { gap: 1.6vh; }
+.tv[data-theme='drafting'] .od-menu-item { position: relative; overflow: visible; padding: 1vh 0 1vh 1.8vw; border: 0; border-radius: 0; font-size: 2.4vh; font-weight: 400; letter-spacing: 0.16em; color: var(--ink-2); }
+/* The chosen one gets a red dot and a leader line out to its figures. */
+.tv[data-theme='drafting'] .od-menu-item.focused, .tv[data-theme='drafting'] .od-menu-item.on { background: none; color: var(--ink); font-weight: 500; border: 0; }
+.tv[data-theme='drafting'] .od-menu-item.focused::before, .tv[data-theme='drafting'] .od-menu-item.on::before { content: ''; position: absolute; left: 0; top: 50%; width: 1vh; height: 1vh; margin-top: -0.5vh; border-radius: 50%; background: var(--red); }
+.tv[data-theme='drafting'] .od-menu-item.focused::after { content: ''; position: absolute; right: -2.4vw; top: 50%; width: 3vw; border-top: 0.15vh solid var(--red); }
+.tv[data-theme='drafting'] .od-menu-item.on { color: var(--red); }
+.tv[data-theme='drafting'] .od-section { font-size: 1.9vh; font-weight: 500; color: var(--ink); }
+.tv[data-theme='drafting'] .od-count { font: 400 2.2vh var(--hand); letter-spacing: 0; }
+.tv[data-theme='drafting'] .od-grid { gap: 4vh 2.6vw; }
+.tv[data-theme='drafting'] .od-tile-art { border: 0.12vh solid var(--ink); border-radius: 0; background-color: var(--paper-color); filter: grayscale(0.3) sepia(0.12); }
+.tv[data-theme='drafting'] .od-tile.focused .od-tile-art { transform: none; box-shadow: none; filter: none; border: 0 solid transparent; border-image: var(--box-heavy); }
+.tv[data-theme='drafting'] .od-tile.focused .od-tile-art::after { content: ''; position: absolute; left: 0; right: 0; bottom: -2.4vh; height: 1.1vh; background: var(--hatch); }
+.tv[data-theme='drafting'] .od-tile-title { margin-top: 1.6vh; font-size: 2.4vh; font-weight: 400; }
+.tv[data-theme='drafting'] .od-tile-title::before { content: 'fig. ' attr(data-fig); margin-right: 0.6vw; font: 400 2vh var(--hand); color: var(--ink-2); }
+.tv[data-theme='drafting'] .od-tile.focused .od-tile-title::before { color: var(--red); }
+.tv[data-theme='drafting'] .od-tile.focused .od-tile-title { color: var(--ink); font-weight: 500; margin-top: 3.4vh; }
+.tv[data-theme='drafting'] .od-tile-sub { font-size: 1.9vh; }
+.tv[data-theme='drafting'] .od-tile-chnum { color: var(--red); }
+.tv[data-theme='drafting'] .od-tile-num { color: var(--ink); font-weight: 300; }
+.tv[data-theme='drafting'] .od-tile-channel .od-tile-title::before { content: none; }
+.tv[data-theme='drafting'] .guide-more { font-size: 1.6vh; color: var(--ink-2); opacity: 0.7; }
+.tv[data-theme='drafting'] .od-hint { background: var(--paper-color); border-top: 0.16vh solid var(--ink); font-size: 1.8vh; letter-spacing: 0.16em; text-transform: uppercase; }
+.tv[data-theme='drafting'] .od-button { background: none; border: 0.15vh solid rgba(29, 33, 38, 0.3); border-radius: 0; font-size: 2.5vh; font-weight: 400; letter-spacing: 0.12em; }
+.tv[data-theme='drafting'] .od-button.focused, .tv[data-theme='drafting'] .od-key.focused, .tv[data-theme='drafting'] .od-episode.focused {
+  background: var(--hatch), var(--paper-color); color: var(--ink); border: 0 solid transparent; border-image: var(--box-heavy);
+}
+.tv[data-theme='drafting'] .od-episode { background: none; border: 0; border-bottom: 0.1vh solid rgba(29, 33, 38, 0.25); border-radius: 0; }
+.tv[data-theme='drafting'] .od-episode.focused > span { background: var(--paper-color); padding: 0 0.3vw; }
+.tv[data-theme='drafting'] .od-season { border-radius: 0; color: var(--ink-2); border-color: rgba(29, 33, 38, 0.3); font-weight: 500; }
+.tv[data-theme='drafting'] .od-season.on { background: none; color: var(--red); border-color: var(--red); }
+.tv[data-theme='drafting'] .od-show-art { border: 0.12vh solid var(--ink); border-radius: 0; }
+.tv[data-theme='drafting'] .od-show-title { font-weight: 300; letter-spacing: 0.04em; text-transform: uppercase; }
+.tv[data-theme='drafting'] .od-show-meta { color: var(--red); font-size: 1.9vh; font-weight: 500; }
+.tv[data-theme='drafting'] .od-backdrop { opacity: 0.06; filter: grayscale(1); }
+.tv[data-theme='drafting'] .od-key { background: none; border: 0.12vh solid rgba(29, 33, 38, 0.3); border-radius: 0; font-weight: 400; }
+.tv[data-theme='drafting'] .od-query { background: none; border: 0; border-bottom: 0.16vh solid var(--ink); border-radius: 0; font-weight: 400; }
+.tv[data-theme='drafting'] .od-query-hint { font-family: var(--hand); }
+.tv[data-theme='drafting'] .od-badge { background: var(--paper-color); color: var(--ink); border-left: 0.4vh solid var(--red); }
+.tv[data-theme='drafting'] .od-paused { color: var(--paper-color); text-shadow: 0 0 2vh rgba(0, 0, 0, 0.6); font-weight: 300; }
+.tv[data-theme='drafting'] .od-osd-time, .tv[data-theme='drafting'] .od-osd-episode { color: var(--red); }
+.tv[data-theme='drafting'] .od-progress { background: rgba(29, 33, 38, 0.15); border-radius: 0; height: 0.5vh; }
+.tv[data-theme='drafting'] .od-progress i, .tv[data-theme='drafting'] .od-tile-progress i, .tv[data-theme='drafting'] .od-episode-bar i { background: var(--red); }
+.tv[data-theme='drafting'] .od-coming { background: var(--paper-color); color: var(--ink); }

@@ -77,3 +77,16 @@
   font-display: swap;
   src: url('./fonts/vt323.woff2') format('woff2');
 }
+/* The Drafting Table theme's type: Jost (variable, 300–600) and Architects Daughter for notes. */
+@font-face {
+  font-family: 'Jost';
+  font-weight: 300 600;
+  font-display: swap;
+  src: url('./fonts/jost.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Architects Daughter';
+  font-weight: 400;
+  font-display: swap;
+  src: url('./fonts/architects-daughter.woff2') format('woff2');
+}

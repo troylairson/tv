@@ -579,15 +579,15 @@ export function App() {
             <div class="ident-main">
               {nextShow?.item.thumb && <div class="ident-art" style={{ backgroundImage: `url(${nextShow.item.thumb})` }} />}
               <div class="ident-text">
-                {hasLogo ? (
+                {hasLogo && (
                   <div class="ident-logo">
                     <Logo channel={channel} theme={theme.logo} />
                   </div>
-                ) : (
-                  <div class="ident-channel">
-                    <span class="ident-number">{channel.number}</span> {channel.name}
-                  </div>
                 )}
+                {/* With a logo most themes show just the logo; Drafting Table always draws the number. */}
+                <div class={`ident-channel ${hasLogo ? 'has-logo' : ''}`}>
+                  <span class="ident-number">{channel.number}</span> {channel.name}
+                </div>
                 <div class="ident-label heading">{nextShow ? theme.upNext : 'Thanks for watching'}</div>
                 <div class="ident-title">{nextShow ? (nextShow.item.show ?? nextShow.item.title) : channel.name}</div>
                 {nextShow?.item.episode && <div class="ident-episode">{nextShow.item.episode}</div>}
