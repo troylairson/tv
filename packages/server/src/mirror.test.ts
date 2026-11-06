@@ -30,3 +30,12 @@ describe('unmirror', () => {
     expect(isMirrored(['Bonanza', 'Bonanza S01E01 A Rose for Lotta', 'Bonanza S01E02 Death on Sun Mountain'])).toBe(false);
   });
 });
+
+describe('backwards initials', () => {
+  it('puts reversed network and promotion initials right', () => {
+    expect(unmirror('WCE on NNT (RE-C-DUB) (540p)')).toBe('ECW on TNN (RE-C-DUB) (540p)');
+    expect(unmirror('Fan-made restoration of WCE Wrestling on NNT, piecing together the episodes')).toBe('Fan-made restoration of ECW Wrestling on TNN, piecing together the episodes');
+    expect(unmirror('1997-4-13 lageL yleraB WCE')).toBe('1997-4-13 ECW Barely Legal');
+    for (const t of ['ABC Primetime', 'WWF Superstars', 'The CIA Files', 'NBA Finals 1986']) expect(unmirror(t)).toBe(t);
+  });
+});

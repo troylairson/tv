@@ -144,3 +144,10 @@ describe('dated recordings in parts', () => {
     expect(prettifyTitle('1999 5-16 ECW Hardcore Heaven .cd2', { filename: true })).toBe('ECW Hardcore Heaven (May 16, 1999) (part 2)');
   });
 });
+
+describe('dates ending in a year', () => {
+  it('leaves the year of a written-out date alone', () => {
+    expect(prettifyTitle('01 - 27th August 1999', { filename: true })).toBe('01 - 27th August 1999');
+    expect(prettifyTitle('Some Movie 1999', { filename: true })).toBe('Some Movie (1999)');
+  });
+});

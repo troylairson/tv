@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { fileStem, identifierFromLink, isGenericName, itemsFromMetadata, parseLength, pickPlayableFiles, type IaFile } from './ia';
+import { dropExtras, fileStem, identifierFromLink, isGenericName, itemsFromMetadata, parseLength, pickPlayableFiles, type IaFile } from './ia';
 
 // Trimmed from real archive.org metadata responses.
 const getSmart: IaFile[] = [
@@ -122,5 +122,14 @@ describe('episode order', () => {
       'One Step Beyond S01E02 Night of April 14th',
       '▶ One Step Beyond S01E22 The Riddle',
     ]);
+  });
+});
+
+describe('dropExtras', () => {
+  it('drops bonus clips among full-length episodes, but not a run of shorts', () => {
+    const f = (min: number) => ({ durationSec: min * 60 });
+    expect(dropExtras([f(45), f(3), f(46), f(1), f(44)]).map((x) => x.durationSec / 60)).toEqual([45, 46, 44]);
+    expect(dropExtras([f(7), f(3), f(6), f(2)])).toHaveLength(4);
+    expect(dropExtras([f(90), f(2)])).toHaveLength(2);
   });
 });

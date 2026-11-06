@@ -102,10 +102,10 @@ let autoAdded: string[] = [];
 const saveConfigs = () => writeJson(configFile(), { channels: configs, autoAdded });
 /**
  * What resolved items carry beyond the basics: 1 descriptions, 2 show/episode split, 3 more splits and Plex title art, 4 cleaner show names,
- * 5 mirrored titles turned round, dated recordings and discs tidied.
+ * 5 mirrored titles turned round, dated recordings and discs tidied, 6 backwards initials, bonus clips dropped.
  * An older cache stays playable and gets one full refresh in the background to catch up.
  */
-const ITEM_DETAILS = 5;
+const ITEM_DETAILS = 6;
 const saveCache = () => writeJson(cacheFile(), { version: CACHE_VERSION, details: ITEM_DETAILS, resolved: Object.fromEntries(resolved) });
 
 /**

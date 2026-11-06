@@ -21,6 +21,20 @@ const COMMON = new Set(
   ).split(' '),
 );
 
+/**
+ * Network and promotion initials. Uploaders sometimes write them backwards on their own
+ * ("WCE on NNT" for ECW on TNN), likely to keep clear of takedown searches.
+ */
+const ACRONYMS = new Set(
+  'ECW WWF WWE WCW NWA AWA AJPW NJPW UWF USWA WCCW GWF SMW IWA ROH TNA TNN TNT TBS USA ESPN ABC NBC CBS FOX MTV HBO PBS BBC ITV CNN AMC'.split(' '),
+);
+const reversedAcronym = (w: string) => /^[A-Z]{3,4}$/.test(w) && !ACRONYMS.has(w) && ACRONYMS.has([...w].reverse().join(''));
+
+/** "WCE on NNT" → "ECW on TNN": backwards initials put right, the rest left as is. */
+export function fixAcronyms(text: string): string {
+  return text.replace(/\b[A-Z]{3,4}\b/g, (w) => (reversedAcronym(w) ? [...w].reverse().join('') : w));
+}
+
 /** Ends in a capital after lowercase letters: "lageL", "yleraB". Almost never English. */
 const MIRRORED_CAPS = /^[a-z]{2,}[A-Z]$/;
 
@@ -28,7 +42,8 @@ function wordScore(word: string): number {
   const w = word.replace(/[^\p{L}]/gu, '');
   if (!w) return 0;
   let s = 0;
-  if (COMMON.has(w.toLowerCase())) s += 2;
+  if (COMMON.has(w.toLowerCase()) || ACRONYMS.has(w)) s += 2;
+  if (reversedAcronym(w)) s -= 2;
   if (/^[A-Z][a-z]+$/.test(w)) s += 1;
   if (MIRRORED_CAPS.test(w)) s -= 2;
   return s;
@@ -63,6 +78,8 @@ function split(text: string): { prefix: string; core: string; suffix: string } {
 
 interface Reading {
   text: string;
+  /** The text as written, with backwards initials put right. */
+  asWritten?: string;
   /** How much better it reads than as written. */
   gain: number;
 }
@@ -71,7 +88,9 @@ interface Reading {
 export function backwardsReading(text: string): Reading {
   const { prefix, core, suffix } = split(text);
   if (!core) return { text, gain: 0 };
-  const asIs = englishScore(core);
+  // As written, but with any backwards initials put right: what's returned if it isn't mirrored.
+  const fixed = fixAcronyms(core);
+  const asIs = englishScore(fixed);
   const byWord = (flip: (s: string) => string) =>
     core
       .split(/(\s+)/)
@@ -80,13 +99,14 @@ export function backwardsReading(text: string): Reading {
   // Whole first: on a tie, reading the whole thing backwards is the likelier mirror.
   const candidates = [reverse(core), byWord(reverse), byWord(reverseKeepCase)];
   const best = candidates.reduce((a, b) => (englishScore(b) > englishScore(a) ? b : a));
-  return { text: `${prefix}${best}${suffix}`, gain: englishScore(best) - asIs };
+  const gain = englishScore(best) - asIs;
+  return { text: `${prefix}${best}${suffix}`, gain, asWritten: `${prefix}${fixed}${suffix}` };
 }
 
 /** `text` turned the right way round, if it's clearly mirrored. */
 export function unmirror(text: string, { mirroredItem = false } = {}): string {
   const r = backwardsReading(text);
-  return r.gain >= (mirroredItem ? 0 : 3) ? r.text : text;
+  return r.gain >= (mirroredItem ? 0 : 3) ? r.text : (r.asWritten ?? text);
 }
 
 /** Whether an item's texts (title, file names, description) are mirrored on the whole. */

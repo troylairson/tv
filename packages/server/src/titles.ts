@@ -4,6 +4,7 @@ const VIDEO_EXT = /\.(mp4|m4v|mkv|avi|mov|webm|mpe?g|ogv|wmv|ts)$/i;
 const JUNK =
   /\b(480p|576p|720p|1080p|2160p|4k|uhd|x264|x265|h ?264|h ?265|hevc|avc|xvid|divx|dvdrip|bdrip|brrip|bluray|web-?dl|webrip|hdtv|hdrip|aac|ac3|dts|mp3|remux|proper|repack|internal)\b/gi;
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const MONTH_BEFORE = /\b(?:jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|june?|july?|aug(?:ust)?|sept?(?:ember)?|oct(?:ober)?|nov(?:ember)?|dec(?:ember)?)\.?,?$/i;
 const SMALL_WORDS = new Set(['of', 'and', 'in', 'on', 'at', 'to', 'for', 'a', 'an', 'or', 'with', 'from', 'by']);
 
 /** True when a title looks like a file name rather than a human-written title. */
@@ -64,8 +65,8 @@ export function prettifyTitle(raw: string, { filename = false } = {}): string {
   t = t.replace(/^((?:19|20)\d{2})[-. ](\d{1,2})[-. ](\d{1,2}) +(\D.*)$/, (all, y: string, m: string, d: string, rest: string) =>
     Number(m) >= 1 && Number(m) <= 12 && Number(d) >= 1 && Number(d) <= 31 ? `${rest} (${MONTHS[Number(m) - 1]} ${Number(d)}, ${y})` : all,
   );
-  // A trailing release year reads better in parentheses.
-  t = t.replace(/ ((?:19|20)\d{2})$/, ' ($1)');
+  // A trailing release year reads better in parentheses (not a date's: "27th August 1999").
+  t = t.replace(/ ((?:19|20)\d{2})$/, (all, y: string, at: number) => (MONTH_BEFORE.test(t.slice(0, at)) ? all : ` (${y})`));
   t += disc;
   t = t.replace(/[\s\-–]+$/, '');
   if (wasAllLower) t = t.replace(/\b[a-z]/g, (c) => c.toUpperCase());

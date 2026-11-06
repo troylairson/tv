@@ -1,4 +1,4 @@
-import { isMirrored, unmirror } from './mirror';
+import { fixAcronyms, isMirrored, unmirror } from './mirror';
 import { prettifyTitle, shortDescription, splitTitle } from './titles';
 import type { ChannelItem } from './types';
 
@@ -123,18 +123,29 @@ function fallbackName(identifier: string, itemTitle: string, path: string): stri
   return folder ?? identifier;
 }
 
+/**
+ * A few-minute "bonus" clip among full-length episodes (two of them in a run of 45-minute
+ * shows, say) isn't programming: drop files under 5 minutes when the typical one is 20+.
+ */
+export function dropExtras<T extends { durationSec: number }>(files: T[]): T[] {
+  if (files.length < 3) return files;
+  const sorted = files.map((f) => f.durationSec).sort((a, b) => a - b);
+  const median = sorted[Math.floor(sorted.length / 2)]!;
+  return median >= 20 * 60 ? files.filter((f) => f.durationSec >= 5 * 60) : files;
+}
+
 export function itemsFromMetadata(identifier: string, meta: IaMetadata, maxFiles = Infinity): ChannelItem[] {
   if (meta.is_dark || !meta.files || meta.metadata?.mediatype !== 'movies') return [];
   const rawTitle = meta.metadata?.title;
   const rawDescription = meta.metadata?.description;
   let title = (Array.isArray(rawTitle) ? rawTitle[0] : rawTitle) ?? identifier;
-  let files = pickPlayableFiles(meta.files).slice(0, maxFiles);
+  let files = dropExtras(pickPlayableFiles(meta.files)).slice(0, maxFiles);
   // Titles written backwards ("1997-4-13 lageL yleraB WCE"): turned the right way round.
   const plainDescription = typeof rawDescription === 'string' && !rawDescription.includes('<') ? rawDescription : undefined;
   const mirroredItem = isMirrored([title, plainDescription, ...files.map((f) => f.stem)]);
   title = unmirror(title, { mirroredItem });
   files = files.map((f) => ({ ...f, stem: unmirror(f.stem, { mirroredItem }) }));
-  const description = shortDescription(plainDescription ? unmirror(plainDescription, { mirroredItem }) : rawDescription, title);
+  const description = shortDescription(plainDescription ? unmirror(plainDescription, { mirroredItem }) : typeof rawDescription === 'string' ? fixAcronyms(rawDescription) : rawDescription, title);
   // An item holding several episodes is usually the series, so its title names the show.
   const series = files.length > 1 && !isGenericName(title) ? prettifyTitle(title) : undefined;
   let part = 0;

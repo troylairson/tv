@@ -142,7 +142,9 @@ guide → Settings → *Manage channels* shows the address and a QR code).
   - **ECW PPV**: ECW's pay-per-views 1997–2001 in order (~76 h), added to every lineup
     once (delete it like any channel). The upload's titles are written backwards
     ("lageL yleraB WCE"); the server spots mirrored titles and descriptions on any
-    Archive item and turns them round (`server/src/mirror.ts`).
+    Archive item and turns them round (`server/src/mirror.ts`), along with backwards
+    network and promotion initials on their own ("WCE on NNT" → "ECW on TNN"). Short
+    bonus clips among full-length episodes are left out of channels.
   - **Atomic Age Theater**: black-and-white sci-fi to 1965 (~120 h); the 1936 *Flash
     Gordon* serial Saturdays at noon.
   - **Saturday Morning Cartoons**: Fleischer, early Looney Tunes, Felix, Woody (~45 h).
