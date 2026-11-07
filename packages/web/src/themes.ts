@@ -43,6 +43,7 @@ export const THEMES: Theme[] = [
     upNext: 'Coming up next',
   },
   { id: 'drafting', name: 'Drafting Table', logo: 'modern', upNext: 'Coming up' },
+  { id: 'cartoon', name: 'Cartoon', logo: 'modern', upNext: 'Coming up' },
 ];
 
 /** Themes from before there were six. */

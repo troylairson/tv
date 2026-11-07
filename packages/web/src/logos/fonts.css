@@ -90,3 +90,10 @@
   font-display: swap;
   src: url('./fonts/architects-daughter.woff2') format('woff2');
 }
+/* The Cartoon theme's lettering: Shantell Sans (variable: weight 300–800, informality and bounce axes). */
+@font-face {
+  font-family: 'Shantell Sans';
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('./fonts/shantell-sans.woff2') format('woff2');
+}

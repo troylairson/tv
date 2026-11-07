@@ -15,6 +15,11 @@ Copyright 2010 The Architects Daughter Project Authors (https://github.com/kymbe
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 
+==== shantellsans ====
+Copyright 2022 The Shantell Sans Project Authors (https://github.com/arrowtype/shantell-sans)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+
 ==== bungee ====
 Copyright 2023 The Bungee Project Authors (https://github.com/djrrb/Bungee)
 
