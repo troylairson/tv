@@ -15,8 +15,8 @@ Copyright 2010 The Architects Daughter Project Authors (https://github.com/kymbe
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 
-==== shantellsans ====
-Copyright 2022 The Shantell Sans Project Authors (https://github.com/arrowtype/shantell-sans)
+==== kalam ====
+Copyright (c) 2014 Indian Type Foundry (info@indiantypefoundry.com)
 
 This Font Software is licensed under the SIL Open Font License, Version 1.1.
 

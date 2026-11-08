@@ -1281,9 +1281,9 @@
   --c-frame: url('./cartoon/frame.svg') 30 / 2.8vh stretch;
   --c-focus: url('./cartoon/focus.svg') 30 fill / 2.6vh stretch;
   --c-ring: url('./cartoon/ring.svg') 30 / 3vh stretch;
-  --font: 'Shantell Sans', 'Comic Neue', sans-serif;
-  --font-display: 'Shantell Sans', 'Comic Neue', sans-serif;
-  --font-number: 'Shantell Sans', sans-serif;
+  --font: Kalam, 'Comic Neue', sans-serif;
+  --font-display: Kalam, 'Comic Neue', sans-serif;
+  --font-number: Kalam, sans-serif;
   --fg: var(--ink);
   --dim: var(--ink-2);
   --accent: var(--ink);
@@ -1315,12 +1315,11 @@
   --live-mark: var(--orange);
   --power: var(--orange);
   --label-w: 19vw;
-  font-variation-settings: 'INFM' 55, 'BNCE' 20;
 }
-.tv[data-theme='cartoon'] .heading { font-weight: 600; font-variation-settings: 'INFM' 65, 'BNCE' 25; }
-/* Show names, titles and channel names: semi-bold lettering. */
+.tv[data-theme='cartoon'] .heading { font-weight: 700; }
+/* Show names, titles and channel names: the bold weight. */
 .tv[data-theme='cartoon'] :is(.banner-title, .guide-details-title, .guide-cell-title, .guide-cell-show, .guide-channel-name, .ident-title, .bumper-title b, .od-tile-title, .od-show-title, .od-head-title, .od-osd-title, .reminder-title, .banner-upnext b, .settings-row) {
-  font-weight: 600; font-variation-settings: 'INFM' 65, 'BNCE' 25;
+  font-weight: 700;
 }
 
 /* Every floating panel is a cartoon panel. */
@@ -1328,7 +1327,7 @@
 
 /* ── The channel number: a camera lens ── */
 .tv[data-theme='cartoon'] .osd { width: 15vh; height: 15vh; display: flex; align-items: center; justify-content: center; background: url('./cartoon/lens.svg') center / contain no-repeat; }
-.tv[data-theme='cartoon'] .osd-number { font-size: 5.8vh; font-weight: 800; }
+.tv[data-theme='cartoon'] .osd-number { font-size: 5.8vh; font-weight: 700; }
 .tv[data-theme='cartoon'] .osd::after { content: ''; position: absolute; right: -3vh; bottom: -2vh; width: 3.6vh; height: 3.6vh; background: url('./cartoon/scribble.svg') center / contain no-repeat; }
 .tv[data-theme='cartoon'] .osd-logo, .tv[data-theme='cartoon'] .osd-name { display: none; }
 .tv[data-theme='cartoon'] .hint, .tv[data-theme='cartoon'] .bug, .tv[data-theme='cartoon'] .ad-counter {
@@ -1346,13 +1345,13 @@
 .tv[data-theme='cartoon'] .banner-badge-number,
 .tv[data-theme='cartoon'] .banner.has-logo .banner-badge-number {
   display: flex; align-items: center; justify-content: center; width: 12vh; height: 12vh;
-  background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 800 4.6vh var(--font-number);
+  background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 700 4.6vh var(--font-number);
 }
-.tv[data-theme='cartoon'] .banner-badge-name { font-size: 1.8vh; font-weight: 600; max-width: 13vw; }
+.tv[data-theme='cartoon'] .banner-badge-name { font-size: 1.8vh; font-weight: 700; max-width: 13vw; }
 .tv[data-theme='cartoon'] .banner-label { font-size: 2vh; font-weight: 400; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .banner-clock { font-size: 2vh; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .banner-title { font-size: 6.2vh; line-height: 1.1; margin: 0.2vh 0; }
-.tv[data-theme='cartoon'] .banner-episode { font-size: 2.6vh; font-weight: 500; opacity: 1; }
+.tv[data-theme='cartoon'] .banner-episode { font-size: 2.6vh; font-weight: 400; opacity: 1; }
 .tv[data-theme='cartoon'] .banner-meta { font-size: 2vh; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .banner-next { display: none; }
 /* Progress: a drawn pill, filling orange. */
@@ -1370,28 +1369,28 @@
 .tv[data-theme='cartoon'] .guide-preview { position: relative; }
 .tv[data-theme='cartoon'] .guide-preview::before { content: ''; position: absolute; left: -2.2vh; top: -2.2vh; width: 3.6vh; height: 3.6vh; transform: rotate(-90deg); background: url('./cartoon/scribble.svg') center / contain no-repeat; z-index: 3; }
 .tv[data-theme='cartoon'] .guide-details { gap: 0.8vh; padding-left: 1vw; }
-.tv[data-theme='cartoon'] .guide-details-ch { font-size: 2.3vh; font-weight: 600; color: var(--ink); }
+.tv[data-theme='cartoon'] .guide-details-ch { font-size: 2.3vh; font-weight: 700; color: var(--ink); }
 .tv[data-theme='cartoon'] .guide-details-title { font-size: 6.4vh; line-height: 1.1; }
 .tv[data-theme='cartoon'] .guide-details-art { filter: none; }
-.tv[data-theme='cartoon'] .guide-details-episode { font-size: 2.8vh; font-weight: 500; opacity: 1; }
+.tv[data-theme='cartoon'] .guide-details-episode { font-size: 2.8vh; font-weight: 400; opacity: 1; }
 .tv[data-theme='cartoon'] .guide-details-meta { font-size: 2.3vh; }
 .tv[data-theme='cartoon'] .guide-details-desc { font-size: 2.2vh; line-height: 1.4; color: var(--ink-2); opacity: 1; }
 .tv[data-theme='cartoon'] .guide-details-next { font-size: 2.2vh; }
-.tv[data-theme='cartoon'] .guide-details-hint { font-size: 2.2vh; color: var(--orange); font-weight: 600; }
+.tv[data-theme='cartoon'] .guide-details-hint { font-size: 2.2vh; color: var(--orange); font-weight: 700; }
 .tv[data-theme='cartoon'] .guide-grid { gap: 0.6vh; }
 .tv[data-theme='cartoon'] .guide-header { height: 5vh; margin-bottom: 0.6vh; }
 .tv[data-theme='cartoon'] .guide-header-buttons { gap: 0.6vw; }
-.tv[data-theme='cartoon'] .guide-settings { background: none; border: 0 solid transparent; border-image: url('./cartoon/card.svg') 30 fill / 1.6vh stretch; border-radius: 0; color: var(--ink); font-size: 1.8vh; font-weight: 600; white-space: nowrap; }
+.tv[data-theme='cartoon'] .guide-settings { background: none; border: 0 solid transparent; border-image: url('./cartoon/card.svg') 30 fill / 1.6vh stretch; border-radius: 0; color: var(--ink); font-size: 1.8vh; font-weight: 700; white-space: nowrap; }
 .tv[data-theme='cartoon'] .guide-settings.focused { border-image: url('./cartoon/focus.svg') 30 fill / 2vh stretch; color: var(--ink); background: none; }
 .tv[data-theme='cartoon'] .guide-times { background: none; }
-.tv[data-theme='cartoon'] .guide-time { font-size: 2.5vh; font-weight: 600; color: var(--ink); border-left: 0; padding-left: 0.2vw; }
+.tv[data-theme='cartoon'] .guide-time { font-size: 2.5vh; font-weight: 700; color: var(--ink); border-left: 0; padding-left: 0.2vw; }
 .tv[data-theme='cartoon'] .guide-day { font-size: 2vh; }
 .tv[data-theme='cartoon'] .guide-row { height: 6.6vh; }
 .tv[data-theme='cartoon'] .guide-channel { margin-right: 0.5vw; padding: 0; gap: 0.8vw; background: none; border-radius: 0; }
 .tv[data-theme='cartoon'] .guide-logo { display: none; }
 .tv[data-theme='cartoon'] .guide-channel-number {
   flex: none; min-width: 0; width: 5.2vh; height: 5.2vh; display: flex; align-items: center; justify-content: center;
-  background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 800 2vh var(--font-number);
+  background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 700 2vh var(--font-number);
 }
 .tv[data-theme='cartoon'] .guide-channel-name,
 .tv[data-theme='cartoon'] .guide-logo + .guide-channel-name { font-size: 2vh; white-space: nowrap; display: block; }
@@ -1411,7 +1410,7 @@
 .tv[data-theme='cartoon'] .guide-now { width: 0.8vh; margin-left: -0.4vh; top: -1.4vh; border-radius: 0.4vh; background: var(--orange); border: 0.25vh solid var(--ink); box-shadow: none; }
 .tv[data-theme='cartoon'] .guide-remind { color: var(--orange); }
 .tv[data-theme='cartoon'] .guide-hint { font-size: 1.9vh; color: var(--ink-2); text-align: left; }
-.tv[data-theme='cartoon'] .guide-popup li { background: none; border: 0 solid transparent; border-image: var(--c-card); border-radius: 0; font-size: 3vh; font-weight: 600; }
+.tv[data-theme='cartoon'] .guide-popup li { background: none; border: 0 solid transparent; border-image: var(--c-card); border-radius: 0; font-size: 3vh; font-weight: 700; }
 .tv[data-theme='cartoon'] .guide-popup li.focused { border-image: var(--c-focus); color: var(--ink); background: none; }
 
 /* ── Between shows: a giant lens ── */
@@ -1419,11 +1418,11 @@
 .tv[data-theme='cartoon'] .ident-backdrop, .tv[data-theme='cartoon'] .ident-art, .tv[data-theme='cartoon'] .ident-logo { display: none; }
 .tv[data-theme='cartoon'] .ident-channel, .tv[data-theme='cartoon'] .ident-channel.has-logo {
   position: absolute; left: 8vw; top: 50%; width: 66vh; transform: translateY(-50%);
-  display: flex; flex-direction: column; align-items: center; gap: 3vh; color: var(--ink); font-size: 3.7vh; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  display: flex; flex-direction: column; align-items: center; gap: 3vh; color: var(--ink); font-size: 3.7vh; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;
 }
 .tv[data-theme='cartoon'] .ident-number {
   display: flex; align-items: center; justify-content: center; width: 66vh; height: 66vh; margin: 0;
-  background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 800 23vh var(--font-number); letter-spacing: -0.02em;
+  background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 700 23vh var(--font-number); letter-spacing: -0.02em;
 }
 .tv[data-theme='cartoon'] .ident-channel::before { content: ''; position: absolute; right: -2vh; top: 7vh; width: 8vh; height: 8vh; background: url('./cartoon/scribble.svg') center / contain no-repeat; }
 .tv[data-theme='cartoon'] .ident-panel { position: static; padding: 0; max-width: none; margin-left: 50vw; margin-right: 5.5vw; text-align: left; flex: 1; }
@@ -1431,12 +1430,12 @@
 .tv[data-theme='cartoon'] .ident-text { align-items: flex-start; gap: 1.2vh; }
 .tv[data-theme='cartoon'] .ident-label { font-size: 2.6vh; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .ident-title { font-size: 6.8vh; line-height: 1.08; }
-.tv[data-theme='cartoon'] .ident-episode { font-size: 2.8vh; font-weight: 500; opacity: 1; }
+.tv[data-theme='cartoon'] .ident-episode { font-size: 2.8vh; font-weight: 400; opacity: 1; }
 .tv[data-theme='cartoon'] .ident-desc { font-size: 2.3vh; color: var(--ink-2); opacity: 1; max-width: none; }
-.tv[data-theme='cartoon'] .ident-time { margin-top: 2vh; padding: 1.2vh 2vw; font-size: 2.8vh; font-weight: 600; color: var(--ink); border: 0 solid transparent; border-image: var(--c-focus); }
+.tv[data-theme='cartoon'] .ident-time { margin-top: 2vh; padding: 1.2vh 2vw; font-size: 2.8vh; font-weight: 700; color: var(--ink); border: 0 solid transparent; border-image: var(--c-focus); }
 .tv[data-theme='cartoon'] .ident-count { display: block; position: absolute; right: 5.5vw; bottom: var(--safe-y); font-size: 2.4vh; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .ident-count::before { content: 'starts in '; }
-.tv[data-theme='cartoon'] .ident-count b { font-weight: 600; }
+.tv[data-theme='cartoon'] .ident-count b { font-weight: 700; }
 .tv[data-theme='cartoon'] .ident-count small { font-size: 1em; margin-left: 0.3em; }
 
 /* ── Coming up (end of a break): a stack of cards ── */
@@ -1444,21 +1443,21 @@
 .tv[data-theme='cartoon'] .bumper-backdrop, .tv[data-theme='cartoon'] .bumper-art, .tv[data-theme='cartoon'] .bumper-photo-wrap, .tv[data-theme='cartoon'] .bumper-logo .logo { display: none; }
 .tv[data-theme='cartoon'] .bumper-head { left: 7vw; right: 7vw; top: 8vh; display: flex; align-items: center; gap: 1.6vw; }
 .tv[data-theme='cartoon'] .bumper-logo { display: block; }
-.tv[data-theme='cartoon'] .bumper-logo-number { display: flex; align-items: center; justify-content: center; width: 11vh; height: 11vh; background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 800 4.2vh var(--font-number); }
+.tv[data-theme='cartoon'] .bumper-logo-number { display: flex; align-items: center; justify-content: center; width: 11vh; height: 11vh; background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 700 4.2vh var(--font-number); }
 .tv[data-theme='cartoon'] .bumper-heading { font-size: 2.6vh; color: var(--ink-2); }
-.tv[data-theme='cartoon'] .bumper-chname { font-size: 5.4vh; font-weight: 600; order: -1; display: none; }
-.tv[data-theme='cartoon'] .bumper-heading .bumper-k { display: block; font-size: 5.4vh; font-weight: 600; color: var(--ink); }
+.tv[data-theme='cartoon'] .bumper-chname { font-size: 5.4vh; font-weight: 700; order: -1; display: none; }
+.tv[data-theme='cartoon'] .bumper-heading .bumper-k { display: block; font-size: 5.4vh; font-weight: 700; color: var(--ink); }
 .tv[data-theme='cartoon'] .bumper-clock { display: block; margin-left: auto; font-size: 2.6vh; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .bumper-list { left: 7vw; right: 7vw; top: 25vh; display: flex; flex-direction: column; gap: 1.6vh; }
 .tv[data-theme='cartoon'] .bumper-list li { align-items: center; min-height: 11vh; padding: 1.6vh 2.4vw; border: 0 solid transparent; border-image: var(--c-card); }
 .tv[data-theme='cartoon'] .bumper-list li.next { min-height: 17vh; border-image: var(--c-focus); }
-.tv[data-theme='cartoon'] .bumper-time { width: 13vw; flex: none; font-size: 3.6vh; font-weight: 600; }
+.tv[data-theme='cartoon'] .bumper-time { width: 13vw; flex: none; font-size: 3.6vh; font-weight: 700; }
 .tv[data-theme='cartoon'] .bumper-time small { display: inline; font-size: 0.5em; margin-left: 0.3em; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .bumper-title b { font-size: 3.4vh; }
 .tv[data-theme='cartoon'] .bumper-list li.next .bumper-title b { font-size: 4.6vh; }
 .tv[data-theme='cartoon'] .bumper-episode { font-size: 2.2vh; opacity: 1; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .bumper-desc { font-size: 2.2vh; color: var(--ink-2); opacity: 1; margin-top: 0.6vh; }
-.tv[data-theme='cartoon'] .bumper-chip { display: inline-block; font-size: 2.2vh; font-weight: 600; color: var(--orange); }
+.tv[data-theme='cartoon'] .bumper-chip { display: inline-block; font-size: 2.2vh; font-weight: 700; color: var(--orange); }
 .tv[data-theme='cartoon'] .bumper-ticker { display: block; position: absolute; right: 7vw; bottom: var(--safe-y); font-size: 2.4vh; color: var(--ink-2); }
 .tv[data-theme='cartoon'] .bumper-ticker b { margin-right: 0.4em; }
 
@@ -1468,24 +1467,24 @@
 .tv[data-theme='cartoon'] .settings li { border: 0 solid transparent; border-radius: 0; margin-bottom: 0.4vh; padding: 1.4vh 1.6vw; }
 .tv[data-theme='cartoon'] .settings li.focused { border-image: var(--c-focus); background: none; }
 .tv[data-theme='cartoon'] .settings-row { font-size: 3.1vh; }
-.tv[data-theme='cartoon'] .settings-value { background: none; color: var(--orange); font-weight: 600; font-size: 2.8vh; }
+.tv[data-theme='cartoon'] .settings-value { background: none; color: var(--orange); font-weight: 700; font-size: 2.8vh; }
 .tv[data-theme='cartoon'] .settings li:not(.focused) .settings-value { color: var(--ink); background: none; }
 .tv[data-theme='cartoon'] .settings-note { font-size: 2.1vh; }
 .tv[data-theme='cartoon'] .settings-hint { font-size: 2.1vh; }
-.tv[data-theme='cartoon'] .card h1 { font-size: 5.2vh; font-weight: 600; }
+.tv[data-theme='cartoon'] .card h1 { font-size: 5.2vh; font-weight: 700; }
 .tv[data-theme='cartoon'] .card .dim { color: var(--orange); }
 .tv[data-theme='cartoon'] .reminder-head { color: var(--orange); }
 
 /* ── On Demand ── */
 .tv[data-theme='cartoon'] .od-page { background: var(--halftone); }
-.tv[data-theme='cartoon'] .od-head-number { display: flex; align-items: center; justify-content: center; width: 9vh; height: 9vh; padding: 0; background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 800 3.6vh var(--font-number); border-radius: 0; }
+.tv[data-theme='cartoon'] .od-head-number { display: flex; align-items: center; justify-content: center; width: 9vh; height: 9vh; padding: 0; background: url('./cartoon/lens.svg') center / contain no-repeat; color: #fff; font: 700 3.6vh var(--font-number); border-radius: 0; }
 .tv[data-theme='cartoon'] .od-head-title { font-size: 5.8vh; }
 .tv[data-theme='cartoon'] .od-head-sub { font-size: 2.3vh; }
 .tv[data-theme='cartoon'] .od-menu { gap: 1vh; }
-.tv[data-theme='cartoon'] .od-menu-item { padding: 1.4vh 1.4vw; border: 0 solid transparent; border-radius: 0; font-size: 2.5vh; font-weight: 500; color: var(--ink-2); }
-.tv[data-theme='cartoon'] .od-menu-item.focused { border-image: var(--c-focus); background: none; color: var(--ink); font-weight: 600; }
-.tv[data-theme='cartoon'] .od-menu-item.on { border-image: var(--c-card); color: var(--orange); font-weight: 600; }
-.tv[data-theme='cartoon'] .od-section { font-size: 2.2vh; font-weight: 600; color: var(--ink); }
+.tv[data-theme='cartoon'] .od-menu-item { padding: 1.4vh 1.4vw; border: 0 solid transparent; border-radius: 0; font-size: 2.5vh; font-weight: 400; color: var(--ink-2); }
+.tv[data-theme='cartoon'] .od-menu-item.focused { border-image: var(--c-focus); background: none; color: var(--ink); font-weight: 700; }
+.tv[data-theme='cartoon'] .od-menu-item.on { border-image: var(--c-card); color: var(--orange); font-weight: 700; }
+.tv[data-theme='cartoon'] .od-section { font-size: 2.2vh; font-weight: 700; color: var(--ink); }
 .tv[data-theme='cartoon'] .od-count { font-size: 2vh; }
 .tv[data-theme='cartoon'] .od-grid { gap: 4vh 2.4vw; }
 /* Pictures in drawn frames; the chosen one gets the orange lens ring and a scribble. */
@@ -1499,7 +1498,7 @@
 .tv[data-theme='cartoon'] .od-tile.focused .od-tile-title { color: var(--orange); }
 .tv[data-theme='cartoon'] .od-tile-sub { font-size: 1.9vh; }
 .tv[data-theme='cartoon'] .od-tile-chnum { color: var(--orange); }
-.tv[data-theme='cartoon'] .od-tile-num { color: var(--ink); font-weight: 800; }
+.tv[data-theme='cartoon'] .od-tile-num { color: var(--ink); font-weight: 700; }
 .tv[data-theme='cartoon'] .od-tile-progress { border-radius: 0.6vh; border: 0.2vh solid var(--ink); background: #f7f6f3; }
 .tv[data-theme='cartoon'] .od-progress i, .tv[data-theme='cartoon'] .od-tile-progress i, .tv[data-theme='cartoon'] .od-episode-bar i { background: var(--orange); }
 .tv[data-theme='cartoon'] .od-hint { background: var(--paper-color); font-size: 1.9vh; color: var(--ink-2); }
@@ -1512,11 +1511,11 @@
 .tv[data-theme='cartoon'] .od-query.on { border-image: var(--c-focus); }
 .tv[data-theme='cartoon'] .od-show-art { border: 0; border-radius: 2vh; position: relative; }
 .tv[data-theme='cartoon'] .od-show-art::after { content: ''; position: absolute; inset: -0.5vh; border: 0 solid transparent; border-image: var(--c-frame); }
-.tv[data-theme='cartoon'] .od-show-meta { color: var(--orange); font-weight: 600; font-size: 2.1vh; }
+.tv[data-theme='cartoon'] .od-show-meta { color: var(--orange); font-weight: 700; font-size: 2.1vh; }
 .tv[data-theme='cartoon'] .od-backdrop { opacity: 0.08; filter: grayscale(1); }
 .tv[data-theme='cartoon'] .od-badge, .tv[data-theme='cartoon'] .od-coming { background: none; color: var(--ink); border: 0 solid transparent; border-image: var(--c-card); border-radius: 0; }
 .tv[data-theme='cartoon'] .od-paused { color: #fff; text-shadow: 0 0.4vh 0 var(--ink), 0 0 2vh rgba(0, 0, 0, 0.5); }
-.tv[data-theme='cartoon'] .od-osd-time { color: var(--orange); font-weight: 600; }
+.tv[data-theme='cartoon'] .od-osd-time { color: var(--orange); font-weight: 700; }
 .tv[data-theme='cartoon'] .od-progress { border-radius: 0.6vh; border: 0.2vh solid var(--ink); background: #f7f6f3; height: 1.6vh; }
 .tv[data-theme='cartoon'] .od-hint { border-image: none; border-top: 0.3vh solid var(--ink); }
 .tv[data-theme='cartoon'] .guide-details-chlogo { display: none; }

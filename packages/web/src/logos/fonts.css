@@ -90,10 +90,16 @@
   font-display: swap;
   src: url('./fonts/architects-daughter.woff2') format('woff2');
 }
-/* The Cartoon theme's lettering: Shantell Sans (variable: weight 300–800, informality and bounce axes). */
+/* The Cartoon theme's lettering: Kalam, felt-tip handwriting. */
 @font-face {
-  font-family: 'Shantell Sans';
-  font-weight: 300 800;
+  font-family: 'Kalam';
+  font-weight: 400;
   font-display: swap;
-  src: url('./fonts/shantell-sans.woff2') format('woff2');
+  src: url('./fonts/kalam.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Kalam';
+  font-weight: 700;
+  font-display: swap;
+  src: url('./fonts/kalam-bold.woff2') format('woff2');
 }
